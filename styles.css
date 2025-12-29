@@ -873,3 +873,85 @@ body {
   border: 2px solid var(--color-gold);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
+/* === RESPONSIVE OVERRIDES (< 1024px) === */
+@media (max-width: 1024px) {
+  /* 1. Unlock Viewport Scroll */
+  html, body {
+    width: 100%;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+  }
+
+  .wrapper {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
+
+  .app-container {
+    height: auto !important;
+    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 2. Stack Main Layout */
+  .main-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+    gap: 20px;
+  }
+
+  .main-grid aside {
+    width: 100% !important;
+    height: auto !important;
+    flex-shrink: 0;
+  }
+
+  .main-grid main.city-dashboard {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* 3. Stack City Columns (Virtues, Vices, ToDos) */
+  .city-columns-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .city-col {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .city-col-content {
+    height: auto !important;
+    max-height: 400px; /* Optional cap, or let it grow */
+    overflow-y: visible !important; /* Let page handle scroll, or 'auto' if capped */
+  }
+
+  /* 4. Compact Hero Banner */
+  .hero-banner {
+    min-height: 100px;
+    padding: 15px;
+  }
+  
+  .header-content h1 {
+    font-size: 2.5rem;
+  }
+  
+  /* 5. Fix Tavern/Adventure Grids */
+  .adventure-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .combat-area {
+    height: auto;
+  }
+}
