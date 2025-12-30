@@ -374,11 +374,7 @@
                     <div className="app-container">
                         <button type="button" className="btn-icon settings-btn-fixed" onClick={(e) => { e.stopPropagation(); setShowSettings(true); }} title="Instellingen"><Icons.Settings /></button>
 
-                        <div className="tabs">
-                            <button className={`tab-btn ${activeTab === 'city' ? 'active' : ''}`} onClick={() => setActiveTab('city')}><Icons.Temple /> Stad & Plichten</button>
-                            <button className={`tab-btn ${activeTab === 'tavern' ? 'active' : ''}`} onClick={() => setActiveTab('tavern')}><Icons.Coin /> Taverne</button>
-                            <button className={`tab-btn ${activeTab === 'adventure' ? 'active' : ''}`} onClick={() => setActiveTab('adventure')}><Icons.Sword /> Avontuur</button>
-                        </div>
+
 
                         {activeTab === 'city' && (
                             <div className="city-dashboard">
@@ -548,6 +544,44 @@
                             {notifications.map(n => (
                                 <div key={n.id} className={`toast ${n.type}`}>{n.msg}</div>
                             ))}
+                        </div>
+                    </div>
+
+                    {/* Bottom Navigation */}
+                    <div className="bottom-nav">
+                        <div className="bottom-nav-content">
+                            {/* Left: Gold Stats */}
+                            <div className="nav-item stat-item edge-item">
+                                <div className="nav-icon clean"><Icons.Coin /></div>
+                                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                                    <span className="nav-label">Goud</span>
+                                    <span className="nav-value">{stats.gold}</span>
+                                </div>
+                            </div>
+
+                            {/* Center Group */}
+                            <div className="nav-group-center">
+                                <button className={`nav-item ${activeTab === 'city' ? 'active' : ''}`} onClick={() => setActiveTab('city')}>
+                                    <div className="nav-icon"><Icons.Temple /></div>
+                                    <span className="nav-label">Plichten</span>
+                                </button>
+                                <button className={`nav-item center-item ${activeTab === 'tavern' ? 'active' : ''}`} onClick={() => setActiveTab('tavern')}>
+                                    <div className="nav-icon large">
+                                        <img src="tavern.png" alt="Tavern" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </div>
+                                    <span className="nav-label">Taverne</span>
+                                </button>
+                                <button className={`nav-item ${activeTab === 'adventure' ? 'active' : ''}`} onClick={() => setActiveTab('adventure')}>
+                                    <div className="nav-icon"><Icons.Scroll /></div>
+                                    <span className="nav-label">Quests</span>
+                                </button>
+                            </div>
+
+                            {/* Right: Profile/Settings */}
+                            <button className="nav-item edge-item" onClick={(e) => { e.stopPropagation(); setShowSettings(true); }}>
+                                <div className="nav-icon"><Icons.Settings /></div>
+                                <span className="nav-label">Profiel</span>
+                            </button>
                         </div>
                     </div>
                 </div>
