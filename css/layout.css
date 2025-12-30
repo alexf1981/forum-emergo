@@ -435,21 +435,44 @@
 /* Scroll Modal Styles */
 .scroll-modal {
     position: relative;
-    width: 140vw;
-    height: 140vh;
+    width: 90vw;
+    /* Smaller as requested */
+    height: 90vh;
+    /* Smaller as requested */
+    max-width: 800px;
+    max-height: 1200px;
     background-image: url('../assets/scroll_texture.png');
     background-color: transparent;
     background-size: 100% 100%;
-    /* Using vmin ensures padding scales with the smallest viewport dimension, keeping ratio */
-    padding: 24vh 32vw;
+    /* No padding, using container for placement */
+    padding: 0;
     animation: scrollUnroll 0.5s ease-out;
     z-index: 3001;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 1.5vmin;
+    font-size: clamp(16px, 2vmin, 24px);
     /* Base font size for em units inside */
+}
+
+/* New Safe Area Container */
+.scroll-content-container {
+    background-color: transparent;
+    /* Changed to transparent as requested essentially */
+    width: 65%;
+    /* Wider to prevent text wrapping */
+    height: 75%;
+    /* Taller to fit content without scroll */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
 @keyframes scrollUnroll {
@@ -479,94 +502,96 @@
     flex-direction: column;
     color: #3d0a00;
     width: 100%;
-    max-width: 65vh;
-    /* Slightly wider to accommodate labels */
-    /* Scale max-width relative to height to match scroll aspect */
+    height: 100%;
     margin: 0 auto;
+    overflow: visible;
+    /* Prevent scrollbars */
+    /* Allow internal scrolling if content overflows container */
 }
 
 .scroll-title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: 3em;
-    /* Relative to container base size */
-    margin-top: 1em;
-    margin-bottom: 1em;
+    font-size: 2.5em;
+    /* Adjusted for container */
+    margin-top: 0;
+    margin-bottom: 0.5em;
     color: #3d0a00;
     font-weight: bold;
     line-height: 1.2;
 }
 
 .scroll-form {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    /* Give labels explicit space (40%) to prevent overlap */
+    grid-template-columns: 40% 1fr;
     gap: 15px;
-    padding: 0 40px;
-    /* Space from vertical lines in texture */
+    padding: 0 30px;
+    align-items: center;
+    /* Vertically center label with input */
+    width: 100%;
 }
 
 .scroll-field {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: contents;
+    /* Children participate in the grid */
 }
 
+/* Label in first column */
 .scroll-field label {
     font-family: var(--font-heading);
-    font-size: 1.1em;
-    /* Relative to container font size */
+    font-size: 1.3em;
     font-weight: bold;
-    width: 35%;
-    /* More room for long words */
-    min-width: 0;
-    flex-shrink: 0;
     text-align: right;
-    padding-right: 0.8em;
     white-space: nowrap;
-    /* Prevent wrapping */
+    grid-column: 1;
+    margin: 0;
+    line-height: 1;
+    /* Tighten line height to prevent vertical offset */
+    justify-self: end;
+    /* Ensure right alignment */
 }
 
+/* Input in second column */
 .scroll-field input[type="text"] {
-    flex: 1;
+    grid-column: 2;
     min-width: 0;
-    /* Critical for flex items to shrink properly */
-    padding: 12px;
-    /* Standardize padding */
+    padding: 10px;
     border: 2px solid #a0522d;
     background: white;
     font-family: var(--font-body);
     font-size: 1.1rem;
-    height: 48px;
-    /* Fixed height for alignment */
+    height: 44px;
     width: 100%;
-    /* Ensure it tries to fill the flex container */
+    margin: 0;
 }
 
 .date-display {
-    padding: 12px;
-    /* Same padding as text input */
+    grid-column: 2;
+    padding: 10px;
     background: #ccc;
     border: 2px solid #333;
     font-family: var(--font-body);
     font-size: 1.1rem;
     font-weight: bold;
-    flex: 1;
     min-width: 0;
-    /* Consistent scaling behavior */
     text-align: center;
-    height: 48px;
-    /* Same height as text input */
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    margin: 0;
 }
 
 .scroll-radio-group {
+    grid-column: 2;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding-left: 32%;
-    /* Align with field spacing */
+    gap: 8px;
+    padding-left: 0;
+    justify-self: start;
+    width: 100%;
 }
 
 .scroll-radio-item {
@@ -586,7 +611,6 @@
     width: 25px;
     height: 25px;
     flex-shrink: 0;
-    /* Prevent squashing */
     border-radius: 50%;
     border: 2px solid #333;
 }
@@ -608,18 +632,22 @@
 }
 
 .checkbox-field {
-    margin-top: 10px;
+    /* display: contents */
 }
 
-.scroll-checkbox-item {
+.scroll-field.checkbox-field label {
+    grid-column: 2;
+    text-align: left;
+    padding-right: 0;
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 15px;
-    font-family: var(--font-heading);
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
     cursor: pointer;
-    padding-left: 32%;
-    /* Match radio group */
+}
+
+.scroll-checkbox-item {
+    /* simplified */
 }
 
 .scroll-checkbox-item input {
@@ -630,7 +658,6 @@
     width: 25px;
     height: 25px;
     flex-shrink: 0;
-    /* Prevent squashing */
     border: 2px solid #333;
     border-radius: 4px;
     background: white;
@@ -642,7 +669,6 @@
 
 .scroll-checkbox-item input:checked+.checkbox-box {
     background: #333;
-    /* Black/Dark Grey as requested */
     position: relative;
     box-shadow: 0 0 0 3px #3d0a00, 0 0 8px rgba(0, 0, 0, 0.5);
 }
@@ -660,22 +686,20 @@
 }
 
 .scroll-actions {
+    grid-column: 1 / -1;
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin-top: 15px;
-    margin-bottom: 50px;
-    /* Stay above the bottom horizontal line */
+    margin-top: 20px;
+    margin-bottom: 0;
 }
 
 .btn-scroll {
-    padding: 0.5em 1.5em;
-    /* Smaller as requested */
+    padding: 0.4em 1.0em;
     border: 2px solid #333;
     background: white;
     font-family: var(--font-heading);
-    font-size: 1.5em;
-    /* Smaller font */
+    font-size: 1.3em;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
@@ -687,10 +711,7 @@
 }
 
 .btn-scroll.ok {
-    min-width: 120px;
-}
-.btn-scroll.ok {
-    min-width: 6em;
+    min-width: 100px;
 }
 
 /* Ensure Habit Controls are Clickable */
@@ -704,3 +725,92 @@
     pointer-events: auto;
 }
 
+@media (max-width: 768px) {
+    .scroll-modal {
+        width: 100vw;
+        height: 80vh;
+    }
+
+    .scroll-content-container {
+        width: 70%;
+        height: 80%;
+        padding: 5px;
+    }
+
+    .scroll-title {
+        font-size: 1.5em;
+        margin-bottom: 5px;
+        margin-top: 0;
+    }
+
+    .scroll-form {
+        display: flex;
+        /* Revert grid to flex column */
+        flex-direction: column;
+        gap: 10px;
+        padding: 0;
+        align-items: stretch;
+    }
+
+    .scroll-field {
+        display: flex;
+        /* Revert contents to flex */
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        width: 100%;
+    }
+
+    /* Specific margins for text inputs only */
+    .scroll-field:not(.checkbox-field) {
+        width: 85%;
+        /* More margin as requested */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .scroll-field label {
+        text-align: left;
+        width: 100%;
+        padding-right: 0;
+        margin-bottom: 2px;
+        grid-column: auto;
+    }
+
+    .scroll-field input[type="text"],
+    .date-display {
+        width: 100%;
+        grid-column: auto;
+    }
+
+    .scroll-radio-group {
+        align-items: flex-start;
+        /* Ensure items stack vertically straight */
+        padding-left: 0;
+        grid-column: auto;
+        margin-top: 5px;
+        width: auto;
+        /* Position the entire group at ~35% of the container width to appear visually centered */
+        margin-left: 30%;
+        margin-right: auto;
+    }
+
+    .scroll-field.checkbox-field label {
+        justify-content: flex-start;
+        grid-column: auto;
+        width: auto;
+        margin-left: 30%;
+        /* Match radio group margin */
+    }
+
+    .btn-scroll {
+        font-size: 1.1em;
+        padding: 0.4em 0.8em;
+    }
+
+    .scroll-actions {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+}
