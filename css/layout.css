@@ -440,14 +440,16 @@
     background-image: url('../assets/scroll_texture.png');
     background-color: transparent;
     background-size: 100% 100%;
+    /* Using vmin ensures padding scales with the smallest viewport dimension, keeping ratio */
     padding: 24vh 32vw;
-    /* Push content into the central parchment frame */
     animation: scrollUnroll 0.5s ease-out;
     z-index: 3001;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    font-size: 1.5vmin;
+    /* Base font size for em units inside */
 }
 
 @keyframes scrollUnroll {
@@ -477,20 +479,22 @@
     flex-direction: column;
     color: #3d0a00;
     width: 100%;
-    max-width: 550px;
-    /* Keep content compact in center */
+    max-width: 65vh;
+    /* Slightly wider to accommodate labels */
+    /* Scale max-width relative to height to match scroll aspect */
     margin: 0 auto;
 }
 
 .scroll-title {
     text-align: center;
     font-family: var(--font-heading);
-    font-size: 1.6rem;
-    margin-top: 40px;
-    /* Push below the horizontal line in texture */
-    margin-bottom: 25px;
+    font-size: 3em;
+    /* Relative to container base size */
+    margin-top: 1em;
+    margin-bottom: 1em;
     color: #3d0a00;
     font-weight: bold;
+    line-height: 1.2;
 }
 
 .scroll-form {
@@ -509,15 +513,17 @@
 
 .scroll-field label {
     font-family: var(--font-heading);
-    font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+    font-size: 1.1em;
+    /* Relative to container font size */
     font-weight: bold;
-    width: 32%;
-    /* Proportional width */
-    min-width: 120px;
+    width: 35%;
+    /* More room for long words */
+    min-width: 0;
     flex-shrink: 0;
     text-align: right;
-    padding-right: 15px;
-    /* Alignment gap */
+    padding-right: 0.8em;
+    white-space: nowrap;
+    /* Prevent wrapping */
 }
 
 .scroll-field input[type="text"] {
@@ -663,12 +669,12 @@
 }
 
 .btn-scroll {
-    padding: 8px 20px;
+    padding: 0.5em 1.5em;
     /* Smaller as requested */
     border: 2px solid #333;
     background: white;
     font-family: var(--font-heading);
-    font-size: 1rem;
+    font-size: 1.5em;
     /* Smaller font */
     font-weight: bold;
     cursor: pointer;
@@ -683,3 +689,18 @@
 .btn-scroll.ok {
     min-width: 120px;
 }
+.btn-scroll.ok {
+    min-width: 6em;
+}
+
+/* Ensure Habit Controls are Clickable */
+.habit-controls {
+    position: relative;
+    z-index: 10;
+}
+
+.habit-controls button {
+    cursor: pointer;
+    pointer-events: auto;
+}
+

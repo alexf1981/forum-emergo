@@ -20,7 +20,7 @@ function AddTaskModal({ onClose, onAdd }) {
                 <div className="scroll-inner">
                     <h2 className="scroll-title">Nieuwe taak toevoegen</h2>
 
-                    <form onSubmit={handleSubmit} className="scroll-form">
+                    <form onSubmit={handleSubmit} onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }} className="scroll-form">
                         <div className="scroll-field">
                             <label>Omschrijving:</label>
                             <input
