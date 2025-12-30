@@ -1098,17 +1098,18 @@ body {
   }
 
   .header-content h1 {
-    font-size: clamp(0.7rem, 6.5vw, 1.4rem);
+    font-size: clamp(0.6rem, 6vw, 1.3rem);
     letter-spacing: 1px;
     white-space: nowrap;
-    width: 100%;
     margin: 0;
+    text-align: center;
   }
 
   /* Force 1 line for title even in compact mode */
   .hero-banner.compact h1 {
-    font-size: clamp(0.6rem, 5.5vw, 1.1rem) !important;
+    font-size: clamp(0.5rem, 5vw, 1.0rem) !important;
     white-space: nowrap;
+    text-align: center;
   }
 
   .header-content .subtitle {
