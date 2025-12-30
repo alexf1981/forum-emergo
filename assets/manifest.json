@@ -8,8 +8,8 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon.svg",
-      "type": "image/svg+xml",
+      "src": "nav_tavern.jpg",
+      "type": "image/jpeg",
       "sizes": "any",
       "purpose": "any maskable"
     }
