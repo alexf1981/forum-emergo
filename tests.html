@@ -182,47 +182,90 @@
             assertEqual(r4.newStats.gold, 150, "Task ON: Gold +50");
 
 
-            // ==========================================
-            summary.innerHTML = `Tests Completed: ${passes} / ${testCount} Passed.`;
-            summary.style.color = fails === 0 ? '#4caf50' : '#ff4444';
+            // (Summary and Visual Tests continue below)
 
             // ==========================================
             logGroup("Visual Layout Tests (Desktop Simulation)");
             // ==========================================
-            // Note: Since this is running in the browser, we can actually check dimensions
-            // We'll create a temporary rendering of the columns to check their orientation
+            if (window.innerWidth >= 1024) {
+                const testDiv = document.createElement('div');
+                testDiv.style.position = 'absolute';
+                testDiv.style.left = '-9999px';
+                testDiv.style.width = '1000px';
+                testDiv.innerHTML = `
+                    <div class="city-columns-container">
+                        <div class="city-col" id="col1">C1</div>
+                        <div class="city-col" id="col2">C2</div>
+                        <div class="city-col" id="col3">C3</div>
+                    </div>
+                `;
+                document.body.appendChild(testDiv);
 
-            const testDiv = document.createElement('div');
-            testDiv.style.position = 'absolute';
-            testDiv.style.left = '-9999px';
-            testDiv.style.width = '1200px'; // Force desktop width
-            testDiv.innerHTML = `
-                <div class="city-columns-container">
-                    <div class="city-col" id="col1">C1</div>
-                    <div class="city-col" id="col2">C2</div>
-                    <div class="city-col" id="col3">C3</div>
-                </div>
-            `;
-            document.body.appendChild(testDiv);
+                const c1 = document.getElementById('col1');
+                const c2 = document.getElementById('col2');
+                const c3 = document.getElementById('col3');
 
-            const c1 = document.getElementById('col1');
-            const c2 = document.getElementById('col2');
-            const c3 = document.getElementById('col3');
+                const y1 = c1.getBoundingClientRect().top;
+                const y2 = c2.getBoundingClientRect().top;
+                const y3 = c3.getBoundingClientRect().top;
 
-            // On desktop, they should be horizontal (y-offsets should be near equal)
-            const y1 = c1.getBoundingClientRect().top;
-            const y2 = c2.getBoundingClientRect().top;
-            const y3 = c3.getBoundingClientRect().top;
+                assert(Math.abs(y1 - y2) < 5 && Math.abs(y2 - y3) < 5, "Desktop: Columns are side-by-side (Horizontal)");
 
-            assert(Math.abs(y1 - y2) < 5 && Math.abs(y2 - y3) < 5, "Desktop: Columns are side-by-side (Horizontal)");
+                const w1 = c1.offsetWidth;
+                const w2 = c2.offsetWidth;
+                assert(Math.abs(w1 - w2) < 50, `Desktop: Columns have similar width (${w1}px vs ${w2}px)`);
 
-            // Check if they have roughly equal width
-            const w1 = c1.offsetWidth;
-            const w2 = c2.offsetWidth;
-            assert(Math.abs(w1 - w2) < 50, `Desktop: Columns have similar width (${w1}px vs ${w2}px)`);
+                document.body.removeChild(testDiv);
+            } else {
+                log("(!) Desktop Layout Test skipped: Window too narrow", "info");
+            }
 
-            // Cleanup
-            document.body.removeChild(testDiv);
+            // ==========================================
+            logGroup("Visual Layout Tests (Mobile Simulation)");
+            // ==========================================
+            if (window.innerWidth <= 600) {
+                const mobileTestDiv = document.createElement('div');
+                mobileTestDiv.style.position = 'absolute';
+                mobileTestDiv.style.left = '-9999px';
+                mobileTestDiv.style.width = '100%';
+                mobileTestDiv.innerHTML = `
+                    <div class="bottom-nav">
+                        <div class="bottom-nav-content">
+                            <div class="nav-item edge-item" id="edge-left">E1</div>
+                            <div class="nav-group-center">
+                                <div class="nav-item role-left" id="m-left">L</div>
+                                <div class="nav-item role-center" id="m-center">C</div>
+                                <div class="nav-item role-right" id="m-right">R</div>
+                            </div>
+                            <div class="nav-item edge-item" id="edge-right">E2</div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(mobileTestDiv);
+
+                const mLeft = document.getElementById('m-left').getBoundingClientRect();
+                const mCenter = document.getElementById('m-center').getBoundingClientRect();
+                const mRight = document.getElementById('m-right').getBoundingClientRect();
+                const eLeft = document.getElementById('edge-left').getBoundingClientRect();
+                const eRight = document.getElementById('edge-right').getBoundingClientRect();
+
+                const isOverlapping = (r1, r2) => {
+                    return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom);
+                };
+
+                assert(!isOverlapping(eLeft, mLeft), "Mobile: Left Edge does not overlap Left Nav");
+                assert(!isOverlapping(mLeft, mCenter), "Mobile: Left Nav does not overlap Center");
+                assert(!isOverlapping(mCenter, mRight), "Mobile: Center does not overlap Right Nav");
+                assert(!isOverlapping(mRight, eRight), "Mobile: Right Nav does not overlap Right Edge");
+
+                document.body.removeChild(mobileTestDiv);
+            } else {
+                log("(!) Mobile Layout Test skipped: Window too wide", "info");
+            }
+
+            // Update summary with final tally
+            summary.innerHTML = `Tests Completed: ${passes} / ${testCount} Passed.`;
+            summary.style.color = fails === 0 ? '#4caf50' : '#ff4444';
         }
 
         setTimeout(runTests, 100);
