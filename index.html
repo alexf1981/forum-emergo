@@ -372,7 +372,7 @@
                     </div>
 
                     <div className="app-container">
-                        <button type="button" className="btn-icon settings-btn-fixed" onClick={(e) => { e.stopPropagation(); setShowSettings(true); }} title="Instellingen"><Icons.Settings /></button>
+
 
 
 
@@ -552,16 +552,16 @@
                         <div className="bottom-nav-content">
                             {/* Left: Gold Stats */}
                             <div className="nav-item stat-item edge-item">
-                                <div className="nav-icon clean"><Icons.Coin /></div>
+                                <div className="nav-icon"><img src="nav_gold.jpg" alt="Goud" /></div>
                                 <span className="nav-value">{stats.gold}</span>
                             </div>
 
                             {/* Center Group (Carousel) */}
                             <div className="nav-group-center">
                                 {[
-                                    { id: 'city', label: 'Plichten', icon: <Icons.Temple /> },
-                                    { id: 'tavern', label: 'Taverne', icon: <img src="tavern.png" alt="Tavern" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> },
-                                    { id: 'adventure', label: 'Quests', icon: <Icons.Scroll /> }
+                                    { id: 'city', label: 'Plichten', icon: <img src="nav_plichten.jpg" alt="Plichten" /> },
+                                    { id: 'tavern', label: 'Taverne', icon: <img src="nav_tavern.jpg" alt="Taverne" /> },
+                                    { id: 'adventure', label: 'Quests', icon: <img src="nav_quests.jpg" alt="Quests" /> }
                                 ].map(item => {
                                     const navOrder = ['city', 'tavern', 'adventure'];
                                     const activeIdx = navOrder.indexOf(activeTab);
@@ -589,7 +589,7 @@
 
                             {/* Right: Profile/Settings */}
                             <button className="nav-item edge-item" onClick={(e) => { e.stopPropagation(); setShowSettings(true); }} title="Profiel">
-                                <div className="nav-icon"><Icons.Settings /></div>
+                                <div className="nav-icon"><img src="nav_profile.jpg" alt="Profiel" /></div>
                             </button>
                         </div>
                     </div>
