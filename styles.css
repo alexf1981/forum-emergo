@@ -55,9 +55,9 @@ body {
 
 .hero-banner {
   /* Flexible height to force inclusion of content */
-  min-height: 140px;
+  min-height: 80px;
   height: auto;
-  padding: 30px 20px;
+  padding: 10px 20px;
 
   background-image: url('banner.png');
   background-size: cover;
@@ -282,7 +282,7 @@ body {
 /* Override default header styles for banner integration */
 .header-content h1 {
   font-family: 'Cinzel', serif;
-  font-size: 4rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #FFD700;
   /* Brighter Gold */
@@ -300,7 +300,7 @@ body {
 .header-content .subtitle {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: 0.85rem;
   color: #FFFFFF;
   /* Pure white for max contrast */
   text-transform: uppercase;
@@ -310,7 +310,7 @@ body {
     /* Heavy hard black shadow */
     0 0 10px rgba(0, 0, 0, 0.9);
   /* Strong outer glow */
-  margin-top: 10px;
+  margin-top: 4px;
 }
 
 /* City Visuals */
