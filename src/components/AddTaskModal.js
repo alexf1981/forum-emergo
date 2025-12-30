@@ -4,14 +4,27 @@ const { useState } = React;
 function AddTaskModal({ onClose, onAdd }) {
     const [text, setText] = useState('');
     const [type, setType] = useState('virtue');
-    const [isOneTime, setIsOneTime] = useState(false);
+    const [isRecurring, setIsRecurring] = useState(false);
     const today = new Date().toLocaleDateString('nl-NL');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleTypeChange = (newType) => {
+        setType(newType);
+        if (newType === 'todo') {
+            setIsRecurring(false);
+        }
+    };
+
+    const handleSubmit = (e, keepOpen = false) => {
+        if (e) e.preventDefault();
         if (!text) return;
-        onAdd(text, type, isOneTime);
-        onClose();
+        // bucket (one-time) is the inverse of isRecurring
+        onAdd(text, type, !isRecurring);
+
+        if (keepOpen) {
+            setText('');
+        } else {
+            onClose();
+        }
     };
 
     return (
@@ -20,13 +33,19 @@ function AddTaskModal({ onClose, onAdd }) {
                 <div className="scroll-inner">
                     <h2 className="scroll-title">Nieuwe taak toevoegen</h2>
 
-                    <form onSubmit={handleSubmit} onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }} className="scroll-form">
+                    <div className="scroll-form">
                         <div className="scroll-field">
                             <label>Omschrijving:</label>
                             <input
                                 type="text"
                                 value={text}
                                 onChange={e => setText(e.target.value)}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter' || e.keyCode === 13) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }
+                                }}
                                 autoFocus
                             />
                         </div>
@@ -43,7 +62,7 @@ function AddTaskModal({ onClose, onAdd }) {
                                     name="type"
                                     value="virtue"
                                     checked={type === 'virtue'}
-                                    onChange={e => setType(e.target.value)}
+                                    onChange={e => handleTypeChange(e.target.value)}
                                 />
                                 <span className="radio-dot dot-green"></span>
                                 Virtus
@@ -54,7 +73,7 @@ function AddTaskModal({ onClose, onAdd }) {
                                     name="type"
                                     value="vice"
                                     checked={type === 'vice'}
-                                    onChange={e => setType(e.target.value)}
+                                    onChange={e => handleTypeChange(e.target.value)}
                                 />
                                 <span className="radio-dot dot-red"></span>
                                 Barbarium
@@ -65,7 +84,7 @@ function AddTaskModal({ onClose, onAdd }) {
                                     name="type"
                                     value="todo"
                                     checked={type === 'todo'}
-                                    onChange={e => setType(e.target.value)}
+                                    onChange={e => handleTypeChange(e.target.value)}
                                 />
                                 <span className="radio-dot dot-blue"></span>
                                 Mandatum
@@ -73,22 +92,24 @@ function AddTaskModal({ onClose, onAdd }) {
                         </div>
 
                         <div className="scroll-field checkbox-field">
-                            <label className="scroll-checkbox-item">
+                            <label className={`scroll-checkbox-item ${type === 'todo' ? 'disabled' : ''}`} style={type === 'todo' ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>
                                 <input
                                     type="checkbox"
-                                    checked={isOneTime}
-                                    onChange={e => setIsOneTime(e.target.checked)}
+                                    checked={isRecurring}
+                                    onChange={e => setIsRecurring(e.target.checked)}
+                                    disabled={type === 'todo'}
                                 />
-                                <span className="checkbox-box"></span>
+                                <span className="checkbox-box recurring-circle"></span>
                                 Repeterend?
                             </label>
                         </div>
 
                         <div className="scroll-actions">
                             <button type="button" className="btn-scroll cancel" onClick={onClose}>ANNULEER</button>
-                            <button type="submit" className="btn-scroll ok">OK</button>
+                            <button type="button" className="btn-scroll" onClick={() => handleSubmit(null, true)}>OK & NIEUWE</button>
+                            <button type="button" className="btn-scroll ok" onClick={() => handleSubmit(null, false)}>OK</button>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -74,13 +74,19 @@
                         <div className="scroll-inner">
                             <h2 className="scroll-title">Nieuwe taak toevoegen</h2>
 
-                            <form onSubmit={handleSubmit} className="scroll-form">
+                            <div className="scroll-form">
                                 <div className="scroll-field">
                                     <label>Omschrijving:</label>
                                     <input
                                         type="text"
                                         value={text}
                                         onChange={e => setText(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter' || e.keyCode === 13) {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            }
+                                        }}
                                         autoFocus
                                     />
                                 </div>
@@ -144,7 +150,7 @@
                                     <button type="button" className="btn-scroll" onClick={() => handleSubmit(null, true)}>OK & NIEUWE</button>
                                     <button type="button" className="btn-scroll ok" onClick={() => handleSubmit(null, false)}>OK</button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
