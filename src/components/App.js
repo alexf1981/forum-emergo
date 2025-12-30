@@ -7,6 +7,7 @@ function App() {
     // === STATE ===
     const [activeTab, setActiveTab] = useState('city');
     const [showSettings, setShowSettings] = useState(false);
+    const [showAddTaskModal, setShowAddTaskModal] = useState(false);
     const [editingHabitId, setEditingHabitId] = useState(null);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
 
@@ -98,15 +99,8 @@ function App() {
         }));
     };
 
-    const addHabit = (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const text = form.elements.habitText.value;
-        const type = form.elements.habitType.value;
-        const bucket = form.elements.bucket ? form.elements.bucket.checked : false;
-        if (!text) return;
+    const addHabit = (text, type, bucket) => {
         setHabits(GameLogic.createHabit(habits, text, type, bucket));
-        form.reset();
     };
 
     const deleteHabit = (id) => {
@@ -214,6 +208,18 @@ function App() {
     return (
         <div className="wrapper">
             {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onExport={handleExport} onImport={handleImport} />}
+            {showAddTaskModal && (
+                <AddTaskModal
+                    onClose={() => setShowAddTaskModal(false)}
+                    onAdd={(text, type, bucket) => {
+                        addHabit(text, type, bucket);
+                        notify("Nieuwe taak toegevoegd!", "success");
+                    }}
+                />
+            )}
+
+            <button className="fab" onClick={() => setShowAddTaskModal(true)} title="Nieuwe taak">+</button>
+
             <div className={`hero-placeholder ${isHeaderCompact ? 'compact' : ''}`} />
             <div className={`hero-banner ${isHeaderCompact ? 'compact' : ''}`}>
                 <div className="hero-overlay header-content">
@@ -236,21 +242,6 @@ function App() {
                             </aside>
 
                             <main className="city-dashboard-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', flexGrow: 1 }}>
-                                <div className="city-top-bar">
-                                    <form onSubmit={addHabit} className="city-form-compact">
-                                        <label style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '10px', cursor: 'pointer' }}>
-                                            <input name="bucket" type="checkbox" /> Eenmalig?
-                                        </label>
-                                        <input name="habitText" type="text" placeholder="Nieuwe activiteit..." style={{ width: '250px', padding: '8px' }} />
-                                        <select name="habitType" style={{ padding: '8px', borderRadius: '4px', background: '#333', color: '#fff' }}>
-                                            <option value="virtue">Virtus</option>
-                                            <option value="vice">Barbaria</option>
-                                            <option value="todo">Mandatum</option>
-                                        </select>
-                                        <button className="btn" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>+</button>
-                                    </form>
-                                </div>
-
                                 <div className="city-columns-container">
                                     {['virtue', 'vice', 'todo'].map(colType => {
                                         const colTitle = colType === 'virtue' ? 'Virtutes' : colType === 'vice' ? 'Barbaria' : 'Mandata';

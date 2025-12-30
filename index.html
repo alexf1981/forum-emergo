@@ -39,6 +39,118 @@
         const { useState, useEffect, useMemo } = React;
         const GameLogic = window.GameLogic;
 
+        // --- ADD TASK MODAL ---
+        const AddTaskModal = ({ onClose, onAdd }) => {
+            const [text, setText] = useState('');
+            const [type, setType] = useState('virtue');
+            const [isRecurring, setIsRecurring] = useState(false);
+            const today = new Date().toLocaleDateString('nl-NL');
+
+            const handleTypeChange = (newType) => {
+                setType(newType);
+                if (newType === 'todo') {
+                    setIsRecurring(false);
+                }
+            };
+
+            const handleSubmit = (e, keepOpen = false) => {
+                if (e) e.preventDefault();
+                if (!text) return;
+                // bucket (one-time) is the inverse of isRecurring
+                onAdd(text, type, !isRecurring);
+
+                if (keepOpen) {
+                    setText('');
+                    // Reset type and recurring if needed, or keep for speed
+                    // Let's keep the type for speed of entry
+                } else {
+                    onClose();
+                }
+            };
+
+            return (
+                <div className="modal-overlay">
+                    <div className="scroll-modal">
+                        <div className="scroll-inner">
+                            <h2 className="scroll-title">Nieuwe taak toevoegen</h2>
+
+                            <form onSubmit={handleSubmit} className="scroll-form">
+                                <div className="scroll-field">
+                                    <label>Omschrijving:</label>
+                                    <input
+                                        type="text"
+                                        value={text}
+                                        onChange={e => setText(e.target.value)}
+                                        autoFocus
+                                    />
+                                </div>
+
+                                <div className="scroll-field">
+                                    <label>Aangemaakt:</label>
+                                    <div className="date-display">{today}</div>
+                                </div>
+
+                                <div className="scroll-radio-group">
+                                    <label className="scroll-radio-item">
+                                        <input
+                                            type="radio"
+                                            name="type"
+                                            value="virtue"
+                                            checked={type === 'virtue'}
+                                            onChange={e => handleTypeChange(e.target.value)}
+                                        />
+                                        <span className="radio-dot dot-green"></span>
+                                        Virtus
+                                    </label>
+                                    <label className="scroll-radio-item">
+                                        <input
+                                            type="radio"
+                                            name="type"
+                                            value="vice"
+                                            checked={type === 'vice'}
+                                            onChange={e => handleTypeChange(e.target.value)}
+                                        />
+                                        <span className="radio-dot dot-red"></span>
+                                        Barbarium
+                                    </label>
+                                    <label className="scroll-radio-item">
+                                        <input
+                                            type="radio"
+                                            name="type"
+                                            value="todo"
+                                            checked={type === 'todo'}
+                                            onChange={e => handleTypeChange(e.target.value)}
+                                        />
+                                        <span className="radio-dot dot-blue"></span>
+                                        Mandatum
+                                    </label>
+                                </div>
+
+                                <div className="scroll-field checkbox-field">
+                                    <label className={`scroll-checkbox-item ${type === 'todo' ? 'disabled' : ''}`} style={type === 'todo' ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isRecurring}
+                                            onChange={e => setIsRecurring(e.target.checked)}
+                                            disabled={type === 'todo'}
+                                        />
+                                        <span className="checkbox-box recurring-circle"></span>
+                                        Repeterend?
+                                    </label>
+                                </div>
+
+                                <div className="scroll-actions">
+                                    <button type="button" className="btn-scroll cancel" onClick={onClose}>ANNULEER</button>
+                                    <button type="button" className="btn-scroll" onClick={() => handleSubmit(null, true)}>OK & NIEUWE</button>
+                                    <button type="button" className="btn-scroll ok" onClick={() => handleSubmit(null, false)}>OK</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // --- ICONS ---
         const Icons = {
             Check: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
@@ -99,6 +211,7 @@
             // === STATE ===
             const [activeTab, setActiveTab] = useState('city');
             const [showSettings, setShowSettings] = useState(false);
+            const [showAddTaskModal, setShowAddTaskModal] = useState(false);
             const [editingHabitId, setEditingHabitId] = useState(null);
             const [isHeaderCompact, setIsHeaderCompact] = useState(false);
 
@@ -187,15 +300,8 @@
                 }));
             };
 
-            const addHabit = (e) => {
-                e.preventDefault();
-                const form = e.target;
-                const text = form.elements.habitText.value;
-                const type = form.elements.habitType.value;
-                const bucket = form.elements.bucket ? form.elements.bucket.checked : false;
-                if (!text) return;
+            const addHabit = (text, type, bucket) => {
                 setHabits(GameLogic.createHabit(habits, text, type, bucket));
-                form.reset();
             };
 
             const deleteHabit = (id) => {
@@ -303,6 +409,18 @@
             return (
                 <div className="wrapper">
                     {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onExport={handleExport} onImport={handleImport} />}
+                    {showAddTaskModal && (
+                        <AddTaskModal
+                            onClose={() => setShowAddTaskModal(false)}
+                            onAdd={(text, type, bucket) => {
+                                addHabit(text, type, bucket);
+                                notify("Nieuwe taak toegevoegd!", "success");
+                            }}
+                        />
+                    )}
+
+                    <button className="fab" onClick={() => setShowAddTaskModal(true)} title="Nieuwe taak">+</button>
+
                     <div className={`hero-placeholder ${isHeaderCompact ? 'compact' : ''}`} />
                     <div className={`hero-banner ${isHeaderCompact ? 'compact' : ''}`}>
                         <div className="hero-overlay header-content">
@@ -325,21 +443,6 @@
                                     </aside>
 
                                     <main className="city-dashboard-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', flexGrow: 1 }}>
-                                        <div className="city-top-bar">
-                                            <form onSubmit={addHabit} className="city-form-compact">
-                                                <label style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '10px', cursor: 'pointer' }}>
-                                                    <input name="bucket" type="checkbox" /> Eenmalig?
-                                                </label>
-                                                <input name="habitText" type="text" placeholder="Nieuwe activiteit..." style={{ width: '250px', padding: '8px' }} />
-                                                <select name="habitType" style={{ padding: '8px', borderRadius: '4px', background: '#333', color: '#fff' }}>
-                                                    <option value="virtue">Virtus</option>
-                                                    <option value="vice">Barbaria</option>
-                                                    <option value="todo">Mandatum</option>
-                                                </select>
-                                                <button className="btn" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>+</button>
-                                            </form>
-                                        </div>
-
                                         <div className="city-columns-container">
                                             {['virtue', 'vice', 'todo'].map(colType => {
                                                 const colTitle = colType === 'virtue' ? 'Virtutes' : colType === 'vice' ? 'Barbaria' : 'Mandata';
