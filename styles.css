@@ -90,6 +90,11 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2000;
   /* High z-index to stay above ALL content */
+  /* Robust Centering */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -110,10 +115,14 @@ body {
 .hero-overlay {
   background: rgba(0, 0, 0, 0.5);
   /* Semi-transparent backing */
-  padding: 10px 20px;
+  padding: 8px 15px;
   border-radius: 4px;
   /* Ensure it doesn't overflow horizontally */
+  width: 100%;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .app-container {
@@ -1085,18 +1094,20 @@ body {
   /* Compact Hero for small screens */
   .hero-banner {
     min-height: 50px;
-    padding: 5px 15px;
+    padding: 5px 10px;
   }
 
   .header-content h1 {
-    font-size: clamp(1rem, 7.5vw, 1.4rem);
+    font-size: clamp(0.7rem, 6.5vw, 1.4rem);
     letter-spacing: 1px;
     white-space: nowrap;
+    width: 100%;
+    margin: 0;
   }
 
   /* Force 1 line for title even in compact mode */
   .hero-banner.compact h1 {
-    font-size: clamp(0.9rem, 6vw, 1.1rem) !important;
+    font-size: clamp(0.6rem, 5.5vw, 1.1rem) !important;
     white-space: nowrap;
   }
 
