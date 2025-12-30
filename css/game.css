@@ -1,0 +1,154 @@
+/* Combat / Adventure Section */
+.adventure-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.combat-area {
+    background: #2C2C2C;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 4px double var(--color-red);
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+}
+
+.combat-log {
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    margin: 10px 0;
+    font-family: monospace;
+    font-size: 0.85rem;
+    border: 1px solid #444;
+}
+
+/* Animations */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translate(-2px, -2px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translate(2px, 2px);
+    }
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
+.combat-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 999;
+    text-shadow: 2px 2px 0 #000;
+    animation: floatUp 1.5s ease-out forwards;
+}
+
+.effect-damage {
+    color: #ff4444;
+}
+
+.effect-xp {
+    color: #88ff88;
+}
+
+.effect-gold {
+    color: #ffd700;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+    .adventure-grid {
+        flex-direction: column;
+        display: flex;
+    }
+
+    .city-columns-container {
+        flex-direction: column !important;
+    }
+}
+
+/* Toast System */
+.toast-container {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    padding: 12px 24px;
+    border-radius: 4px;
+    color: white;
+    font-family: var(--font-heading);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: popIn 0.3s ease-out;
+}
+
+.toast.success {
+    background: #4caf50;
+}
+
+.toast.error {
+    background: #f44336;
+}
+
+.toast.info {
+    background: #2196f3;
+}
+
+.toast.warning {
+    background: #ff9800;
+}

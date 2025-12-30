@@ -1,0 +1,39 @@
+:root {
+    /* Romeinse Kleuren */
+    --color-gold: #C5A059;
+    --color-gold-light: #E5C079;
+    --color-red: #8E1600;
+    --color-red-dark: #5E0E00;
+    --color-marble: #F5F5F0;
+    --color-marble-dark: #E0E0DA;
+    --color-stone: #2C2C2C;
+    --color-text: #1A1A1A;
+
+    /* Spacing & Layout */
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Fonts */
+    --font-heading: 'Cinzel', serif;
+    --font-body: 'Lato', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    overflow-y: auto;
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+    overflow: visible;
+    height: auto;
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--color-text);
+}

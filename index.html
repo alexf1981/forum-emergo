@@ -11,12 +11,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap"
         rel="stylesheet">
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/game.css">
     <!-- PWA & Mobile -->
     <meta name="theme-color" content="#8E1600">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="manifest" href="assets/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
     <!-- React -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -26,10 +29,17 @@
 
 <body>
     <div id="root"></div>
-    <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
 
-        // --- Mock Icons (SVG) ---
+    <!-- Core Logic (Loaded first, compatible with file://) -->
+    <script src="src/logic/gameLogic.js"></script>
+
+    <!-- UI Components (Inlined to bypass file:// CORS restrictions) -->
+    <script type="text/babel">
+        const { React, ReactDOM } = window;
+        const { useState, useEffect, useMemo } = React;
+        const GameLogic = window.GameLogic;
+
+        // --- ICONS ---
         const Icons = {
             Check: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
             Sword: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" y1="19" x2="19" y2="13"></line><line x1="16" y1="16" x2="20" y2="20"></line><line x1="19" y1="21" x2="21" y2="19"></line></svg>,
@@ -45,35 +55,11 @@
             Save: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
         };
 
-        // --- Logic & Config ---
-        const getTodayString = () => new Date().toISOString().split('T')[0];
-
-        // --- RPG CONSTANTS ---
-        const HERO_NAMES = ["Lucius", "Titus", "Marcus", "Aurelius", "Flavius", "Maximus", "Octavius", "Casius", "Valerius", "Felix"];
-        const ITEMS = [
-            { id: 'glad_bronze', name: 'Bronzen Gladius', type: 'weapon', bonus: 2, icon: 'ðŸ—¡ï¸', rarity: 'common' },
-            { id: 'arm_leather', name: 'Leren Borstplaat', type: 'armor', bonus: 2, icon: 'ðŸ›¡ï¸', rarity: 'common' },
-            { id: 'glad_iron', name: 'IJzeren Gladius', type: 'weapon', bonus: 4, icon: 'âš”ï¸', rarity: 'uncommon' },
-            { id: 'arm_chain', name: 'MaliÃ«nkolder', type: 'armor', bonus: 4, icon: 'ðŸ›¡ï¸', rarity: 'uncommon' },
-            { id: 'spear_legion', name: 'Legioenspeer', type: 'weapon', bonus: 6, icon: 'ðŸ”±', rarity: 'rare' },
-            { id: 'shield_scutum', name: 'Scutum Schild', type: 'armor', bonus: 6, icon: 'ðŸ›¡ï¸', rarity: 'rare' },
-            { id: 'sword_legend', name: 'Zwaard van Mars', type: 'weapon', bonus: 10, icon: 'ðŸ”¥', rarity: 'legendary' }
-        ];
-        const QUESTS = [
-            { id: 'patrol', name: 'Stadspatrouille', level: 1, risk: 4, reward: 25, xp: 20, desc: 'Verjaag dronkenlappen en dieven.' },
-            { id: 'bandits', name: 'Bandietenkamp', level: 3, risk: 12, reward: 60, xp: 50, desc: 'Val een kamp in het bos aan.' },
-            { id: 'ruins', name: 'Vervloekte RuÃ¯nes', level: 5, risk: 25, reward: 150, xp: 120, desc: 'Verken duistere kerkers voor schatten.' }
-        ];
-        const ENEMY_TYPES = [
-            { name: "Straatschoffie", str: 2 }, { name: "Wolvenroedel", str: 5 }, { name: "Gallische Krijger", str: 8 },
-            { name: "Deserteur", str: 10 }, { name: "Oude Minotaurus", str: 15 }
-        ];
-
-        // --- Components ---
+        // --- CITY VISUAL ---
         const CityVisual = ({ rank, score }) => {
-            let imageSrc = 'city_village.png';
-            if (score >= 500) imageSrc = 'city_town.png';
-            if (score >= 1000) imageSrc = 'city_capital.png';
+            let imageSrc = './assets/city_village.png';
+            if (score >= 500) imageSrc = './assets/city_town.png';
+            if (score >= 1000) imageSrc = './assets/city_capital.png';
             return (
                 <div className="city-visual-container">
                     <img src={imageSrc} alt={`Stad status: ${rank}`} className="city-image" />
@@ -82,6 +68,7 @@
             );
         };
 
+        // --- SETTINGS MODAL ---
         const SettingsModal = ({ onClose, onExport, onImport }) => {
             return (
                 <div className="modal-overlay" onClick={onClose}>
@@ -107,7 +94,7 @@
             );
         };
 
-        // --- Main App ---
+        // --- APP ---
         function App() {
             // === STATE ===
             const [activeTab, setActiveTab] = useState('city');
@@ -122,7 +109,10 @@
 
             const [habits, setHabits] = useState(() => {
                 const saved = localStorage.getItem('romehabits');
-                const initial = [{ id: 1, text: "Ochtendgymnastiek", completed: false, history: [] }, { id: 2, text: "Latijn studeren", completed: false, history: [] }];
+                const initial = [
+                    { id: 1, text: "Ochtendgymnastiek", completed: false, history: [] },
+                    { id: 2, text: "Latijn studeren", completed: false, history: [] }
+                ];
                 if (!saved) return initial;
                 const parsed = JSON.parse(saved);
                 return parsed.map(h => ({ ...h, history: Array.isArray(h.history) ? h.history : [] }));
@@ -137,7 +127,6 @@
             const [combatLog, setCombatLog] = useState([]);
             const [selectedQuest, setSelectedQuest] = useState(null);
             const [notifications, setNotifications] = useState([]);
-            const [combatEffects, setCombatEffects] = useState([]);
 
             // Persistence
             useEffect(() => {
@@ -150,7 +139,6 @@
             useEffect(() => {
                 const handleScroll = () => {
                     const scrollPos = window.scrollY || document.documentElement.scrollTop;
-                    // Robust Hysteresis (80px / 40px)
                     setIsHeaderCompact(prev => {
                         if (!prev && scrollPos > 80) return true;
                         if (prev && scrollPos < 40) return false;
@@ -171,50 +159,22 @@
 
             // === ACTIONS: CITY ===
             const toggleHabit = (id) => {
-                setHabits(prev => prev.map(h => {
-                    if (h.id === id) {
-                        const type = h.type || 'virtue';
-                        const today = getTodayString();
-                        const dailyCount = h.history.filter(d => d === today).length;
-                        const isActive = dailyCount > 0;
-                        let newHistory = [...h.history];
-
-                        if (isActive) {
-                            if (type === 'vice') {
-                                setStats(s => ({ ...s, gold: s.gold + (20 * dailyCount), army: (s.army || 0) + (5 * dailyCount) }));
-                            } else if (type === 'todo') {
-                                setStats(s => ({ ...s, gold: Math.max(0, s.gold - 50) }));
-                            } else {
-                                setStats(s => ({ ...s, gold: Math.max(0, s.gold - (10 * dailyCount)), army: Math.max(0, (s.army || 0) - dailyCount) }));
-                            }
-                            newHistory = newHistory.filter(d => d !== today);
-                        } else {
-                            // ACTIVATE
-                            if (type === 'vice') {
-                                setStats(s => ({ ...s, gold: Math.max(0, s.gold - 20), army: Math.max(0, (s.army || 0) - 5) }));
-                                notify("Betoont berouw! (-20 Goud)", "error");
-                            } else if (type === 'todo') {
-                                setStats(s => ({ ...s, gold: s.gold + 50 }));
-                                notify("Taak voltooid! (+50 Goud)", "success");
-                            } else {
-                                setStats(s => ({ ...s, gold: s.gold + 10, army: (s.army || 0) + 1 }));
-                            }
-                            newHistory.push(today);
-                        }
-                        return { ...h, completed: !isActive, history: newHistory };
-                    }
-                    return h;
-                }));
+                const { newHabits, newStats, notifications: newNotifs } = GameLogic.processHabitToggle(habits, stats, id, GameLogic.getTodayString());
+                setHabits(newHabits);
+                setStats(newStats);
+                newNotifs.forEach(n => notify(n.msg, n.type));
             };
 
             const incrementHabit = (id, e) => {
                 e.stopPropagation();
+                const habit = habits.find(h => h.id === id);
+                if (habit.type === 'todo') return;
+
+                const { newHabits, newStats, notifications: newNotifs } = GameLogic.processHabitToggle(habits, stats, id, GameLogic.getTodayString());
                 setHabits(prev => prev.map(h => {
                     if (h.id === id) {
                         const type = h.type || 'virtue';
-                        const today = getTodayString();
-                        if (type === 'todo') return h;
-
+                        const today = GameLogic.getTodayString();
                         if (type === 'vice') {
                             setStats(s => ({ ...s, gold: Math.max(0, s.gold - 20), army: Math.max(0, (s.army || 0) - 5) }));
                             notify("De verleiding won... (-20 Goud)", "error");
@@ -234,57 +194,25 @@
                 const type = form.elements.habitType.value;
                 const bucket = form.elements.bucket ? form.elements.bucket.checked : false;
                 if (!text) return;
-                setHabits([...habits, { id: Date.now(), text, type, bucket, completed: false, history: [] }]);
+                setHabits(GameLogic.createHabit(habits, text, type, bucket));
                 form.reset();
             };
 
             const deleteHabit = (id) => {
                 if (confirm('Zeker weten dat je deze activiteit wilt verwijderen?')) {
-                    setHabits(prev => prev.filter(h => h.id !== id));
+                    setHabits(GameLogic.deleteHabit(habits, id));
                 }
             };
 
             const saveHabitEdit = (id, newText, newBucket) => {
-                setHabits(prev => prev.map(h => h.id === id ? { ...h, text: newText, bucket: newBucket } : h));
+                setHabits(GameLogic.updateHabit(habits, id, { text: newText, bucket: newBucket }));
                 setEditingHabitId(null);
             };
 
             // === ACTIONS: RPG ===
-            const calculateBattleResult = (hero, quest) => {
-                const winChance = Math.min(0.9, (hero.str + hero.lvl) / (quest.risk * 1.5));
-                const success = Math.random() < winChance;
-                let earnedGold = 0, earnedXp = 0, lootMsg = "", dmgTaken = 0;
-                let newItems = hero.items || [];
-
-                if (success) {
-                    earnedGold = quest.reward + Math.floor(Math.random() * 20);
-                    earnedXp = quest.xp;
-                    if (Math.random() < 0.3) {
-                        const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-                        newItems = [...newItems, item];
-                        lootMsg = ` | Gevonden: ${item.name}`;
-                    }
-                } else {
-                    dmgTaken = Math.floor(Math.random() * 5) + 1;
-                }
-
-                let newXp = hero.xp + earnedXp;
-                let newLvl = hero.lvl;
-                let newStr = hero.str;
-                let leveledUp = false;
-                if (newXp >= newLvl * 100) {
-                    newLvl++;
-                    newXp = 0;
-                    newStr += 2;
-                    leveledUp = true;
-                }
-
-                return { success, earnedGold, earnedXp, lootMsg, newItems, newLvl, newStr, newXp, hp: Math.max(0, hero.hp - dmgTaken), dmgTaken, leveledUp };
-            };
-
             const recruitHero = () => {
                 if (stats.gold < 100) { notify("Niet genoeg goud! (Nodig: 100)", "error"); return; }
-                const name = HERO_NAMES[Math.floor(Math.random() * HERO_NAMES.length)];
+                const name = GameLogic.HERO_NAMES[Math.floor(Math.random() * GameLogic.HERO_NAMES.length)];
                 const newHero = { id: Date.now(), name, lvl: 1, xp: 0, hp: 20, maxHp: 20, str: Math.floor(Math.random() * 3) + 3, items: [] };
                 setStats(s => ({ ...s, gold: s.gold - 100 }));
                 setHeroes([...heroes, newHero]);
@@ -293,24 +221,27 @@
 
             const goAdventure = (heroId, questId) => {
                 const hero = heroes.find(h => h.id === heroId);
-                const quest = QUESTS.find(q => q.id === questId);
+                const quest = GameLogic.QUESTS.find(q => q.id === questId);
                 if (!quest) { notify("Selecteer eerst een missie type!", "warning"); return; }
                 if (hero.hp <= 5) { notify(`${hero.name} is te gewond!`, "error"); return; }
 
-                log(`âš”ï¸ ${hero.name} vertrekt: ${quest.name}...`);
+                log(`⚔️ ${hero.name} vertrekt: ${quest.name}...`);
                 setTimeout(() => {
-                    const result = calculateBattleResult(hero, quest);
+                    const result = GameLogic.calculateBattleResult(hero, quest);
                     if (result.success) {
-                        log(`âœ… WINST! +${result.earnedXp} XP, +${result.earnedGold} Goud${result.lootMsg}`);
+                        log(`✅ WINST! +${result.earnedXp} XP, +${result.earnedGold} Goud${result.lootMsg}`);
                         if (result.lootMsg) notify(result.lootMsg.replace(' | ', ''), "success");
                         setHeroes(prev => prev.map(h => {
                             if (h.id !== heroId) return h;
-                            if (result.leveledUp) { log(`ðŸ†™ ${h.name} is nu level ${result.newLvl}! (+2 Str)`); notify(`${h.name} Level Up!`, "success"); }
+                            if (result.leveledUp) {
+                                log(`🆙 ${h.name} is nu level ${result.newLvl}! (+2 Str)`);
+                                notify(`${h.name} Level Up!`, "success");
+                            }
                             return { ...h, xp: result.newXp, lvl: result.newLvl, str: result.newStr, hp: result.hp, items: result.newItems };
                         }));
                         setStats(s => ({ ...s, gold: s.gold + result.earnedGold }));
                     } else {
-                        log(`âŒ NEDERLAAG! ${hero.name} vlucht... (-${result.dmgTaken} HP)`);
+                        log(`❌ NEDERLAAG! ${hero.name} vlucht... (-${result.dmgTaken} HP)`);
                         setHeroes(prev => prev.map(h => h.id === heroId ? { ...h, hp: result.hp } : h));
                         notify("Nederlaag...", "error");
                     }
@@ -319,13 +250,13 @@
 
             const fightBoss = () => {
                 const totalStr = heroes.reduce((acc, h) => acc + h.str + h.items.reduce((s, i) => s + i.bonus, 0) + h.lvl, 0);
-                log(`ðŸ² HYDRA GEVECHT! Totale Kracht: ${totalStr} vs 250`);
+                log(`🐲 HYDRA GEVECHT! Totale Kracht: ${totalStr} vs 250`);
                 if (totalStr > 250) {
-                    log(`ðŸ† OVERWINNING! DE HYDRA IS VERSLAGEN!`);
+                    log(`🏆 OVERWINNING! DE HYDRA IS VERSLAGEN!`);
                     notify("FORUM EMERGO IS EEUWIG!", "success");
                     setStats(s => ({ ...s, gold: s.gold + 50000 }));
                 } else {
-                    log(`ðŸ’€ Je legioen is te zwak!`);
+                    log(`💀 Je legioen is te zwak!`);
                     notify("Legioen te zwak...", "error");
                 }
             };
@@ -343,7 +274,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `forum-emergo-backup-${getTodayString()}.json`;
+                a.download = `forum-emergo-backup-${GameLogic.getTodayString()}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
                 notify("Kronieken opgeslagen!", "success");
@@ -356,31 +287,22 @@
                     try {
                         const data = JSON.parse(e.target.result);
                         if (data.romestats) {
-                            localStorage.setItem('romestats', JSON.stringify(data.romestats));
-                            localStorage.setItem('romehabits', JSON.stringify(data.romehabits));
-                            localStorage.setItem('romeheroes', JSON.stringify(data.romeheroes));
-                            window.location.reload();
+                            setStats(data.romestats);
+                            setHabits(data.romehabits);
+                            setHeroes(data.romeheroes);
+                            notify("Kronieken hersteld!", "success");
                         }
                     } catch (err) { notify("Fout bij lezen!", "error"); }
                 };
                 reader.readAsText(file);
             };
 
-            // === RENDER ===
-            const getScore = () => stats.gold + stats.army * 2 + stats.knowledge * 3;
-            const getCityRank = () => {
-                const s = getScore();
-                if (s < 200) return "Dorp";
-                if (s < 500) return "Handelspost";
-                if (s < 1000) return "Stad";
-                if (s < 2500) return "Provincie Hoofdstad";
-                return "Keizerlijk Forum Emergo";
-            };
+            const score = GameLogic.getScore(stats);
+            const rank = GameLogic.getCityRank(stats);
 
             return (
                 <div className="wrapper">
                     {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onExport={handleExport} onImport={handleImport} />}
-                    {/* Fixed Banner & Stable Placeholder */}
                     <div className={`hero-placeholder ${isHeaderCompact ? 'compact' : ''}`} />
                     <div className={`hero-banner ${isHeaderCompact ? 'compact' : ''}`}>
                         <div className="hero-overlay header-content">
@@ -390,27 +312,21 @@
                     </div>
 
                     <div className="app-container">
-
-
-
-
                         {activeTab === 'city' && (
                             <div className="city-dashboard">
                                 <div className="main-grid">
-                                    {/* SIDEBAR */}
                                     <aside>
                                         <div className="card">
                                             <div className="card-title"><h3>Stad Status</h3></div>
-                                            <CityVisual rank={getCityRank()} score={getScore()} />
+                                            <CityVisual rank={rank} score={score} />
                                             <div className="stat-row"><span className="resource gold"><Icons.Coin /> Goud</span><span>{stats.gold}</span></div>
                                             <div className="stat-row"><span className="resource army"><Icons.Sword /> Leger</span><span>{stats.army}</span></div>
                                         </div>
                                     </aside>
 
-                                    {/* MAIN DASHBOARD */}
                                     <main className="city-dashboard-content" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', flexGrow: 1 }}>
-                                        <div className="city-top-bar" style={{ display: 'flex', justifyContent: 'flex-end', background: 'white', padding: '10px', borderRadius: '4px', border: '1px solid var(--color-marble-dark)' }}>
-                                            <form onSubmit={addHabit} className="city-form-compact" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <div className="city-top-bar">
+                                            <form onSubmit={addHabit} className="city-form-compact">
                                                 <label style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '10px', cursor: 'pointer' }}>
                                                     <input name="bucket" type="checkbox" /> Eenmalig?
                                                 </label>
@@ -434,14 +350,14 @@
                                                         <div className="city-col-header" style={{ color: colColor, borderColor: colColor }}>{colTitle}</div>
                                                         <div className="city-col-content">
                                                             {habits.filter(h => (h.type || 'virtue') === colType).sort((a, b) => {
-                                                                const today = getTodayString();
+                                                                const today = GameLogic.getTodayString();
                                                                 const aDone = a.history.includes(today);
                                                                 const bDone = b.history.includes(today);
                                                                 if (a.bucket && aDone && (!b.bucket || !bDone)) return 1;
                                                                 if (b.bucket && bDone && (!a.bucket || !aDone)) return -1;
                                                                 return 0;
                                                             }).map(h => {
-                                                                const today = getTodayString();
+                                                                const today = GameLogic.getTodayString();
                                                                 const dailyCount = h.history.filter(d => d === today).length;
                                                                 const isDone = dailyCount > 0;
                                                                 const isDoneOneTime = h.bucket && isDone;
@@ -510,7 +426,7 @@
                                                 <div>XP: {h.xp} / {h.lvl * 100}</div>
                                                 <div>HP: {h.hp} / {h.maxHp}</div>
                                                 <div>Kracht: {h.str}</div>
-                                                {h.hp < h.maxHp && <button className="btn-icon" onClick={() => healHero(h.id)}>â¤ï¸ Genees (10g)</button>}
+                                                {h.hp < h.maxHp && <button className="btn-icon" onClick={() => healHero(h.id)}>❤️ Genees (10g)</button>}
                                                 {h.items.length > 0 && (
                                                     <div className="inventory">
                                                         {h.items.map((i, idx) => <span key={idx} title={`${i.name} (+${i.bonus})`}>{i.icon}</span>)}
@@ -529,7 +445,7 @@
                                 <div className="adventure-grid">
                                     <div className="card">
                                         <h3>Missies</h3>
-                                        {QUESTS.map(q => (
+                                        {GameLogic.QUESTS.map(q => (
                                             <div key={q.id}
                                                 className={`quest-item ${selectedQuest === q.id ? 'selected' : ''}`}
                                                 onClick={() => setSelectedQuest(q.id)}>
@@ -557,7 +473,6 @@
                             </div>
                         )}
 
-                        {/* Toast Container */}
                         <div className="toast-container">
                             {notifications.map(n => (
                                 <div key={n.id} className={`toast ${n.type}`}>{n.msg}</div>
@@ -565,23 +480,20 @@
                         </div>
                     </div>
 
-                    {/* Bottom Navigation */}
                     <div className="bottom-nav">
                         <div className="bottom-nav-content">
-                            {/* Left: Gold Stats */}
                             <div className="nav-item stat-item edge-item">
                                 <div className="nav-icon">
-                                    <img src="nav_gold.jpg" alt="Goud" />
+                                    <img src="./assets/nav_gold.jpg" alt="Goud" />
                                     <span className="nav-value">{stats.gold}</span>
                                 </div>
                             </div>
 
-                            {/* Center Group (Carousel) */}
                             <div className="nav-group-center">
                                 {[
-                                    { id: 'city', label: 'Plichten', icon: <img src="nav_plichten.jpg" alt="Plichten" /> },
-                                    { id: 'tavern', label: 'Taverne', icon: <img src="nav_tavern.jpg" alt="Taverne" /> },
-                                    { id: 'adventure', label: 'Quests', icon: <img src="nav_quests.jpg" alt="Quests" /> }
+                                    { id: 'city', label: 'Plichten', icon: <img src="./assets/nav_plichten.jpg" alt="Plichten" /> },
+                                    { id: 'tavern', label: 'Taverne', icon: <img src="./assets/nav_tavern.jpg" alt="Taverne" /> },
+                                    { id: 'adventure', label: 'Quests', icon: <img src="./assets/nav_quests.jpg" alt="Quests" /> }
                                 ].map(item => {
                                     const navOrder = ['city', 'tavern', 'adventure'];
                                     const activeIdx = navOrder.indexOf(activeTab);
@@ -607,9 +519,8 @@
                                 })}
                             </div>
 
-                            {/* Right: Profile/Settings */}
                             <button className="nav-item edge-item" onClick={(e) => { e.stopPropagation(); setShowSettings(true); }} title="Profiel">
-                                <div className="nav-icon"><img src="nav_profile.jpg" alt="Profiel" /></div>
+                                <div className="nav-icon"><img src="./assets/nav_profile.jpg" alt="Profiel" /></div>
                             </button>
                         </div>
                     </div>

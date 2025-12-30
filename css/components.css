@@ -1,0 +1,228 @@
+/* Cards (Parchment Style) */
+.card {
+    background: #fdfbf7;
+    border: 1px solid #d4c5b0;
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(139, 69, 19, 0.05);
+    position: relative;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-gold);
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-red-dark);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+}
+
+/* Buttons */
+.btn {
+    background: var(--color-red);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-family: var(--font-heading);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid var(--color-red-dark);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn:hover {
+    background: var(--color-red-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 var(--color-stone);
+}
+
+.btn-icon {
+    padding: 8px;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    background: var(--color-marble);
+    border: 1px solid var(--color-marble-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon.small {
+    padding: 4px;
+    width: 24px;
+    height: 24px;
+}
+
+/* Habit List */
+.habit-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--color-marble);
+    border: 1px solid var(--color-marble-dark);
+    margin-bottom: var(--spacing-sm);
+    transition: all 0.3s;
+}
+
+.habit-item.completed {
+    background: rgba(197, 160, 89, 0.2);
+    border-color: var(--color-gold);
+}
+
+.habit-checkbox {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--color-gold);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: var(--spacing-md);
+}
+
+.habit-checkbox.checked {
+    background: var(--color-gold);
+    color: white;
+}
+
+.habit-item.compact {
+    padding: 6px 10px;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.habit-checkbox.compact {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+/* City Visuals */
+.city-visual-container {
+    margin-bottom: var(--spacing-lg);
+    border: 4px double var(--color-gold);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.city-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.city-rank-badge {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-red);
+    color: var(--color-gold);
+    padding: 5px 15px;
+    font-family: var(--font-heading);
+    border: 2px solid var(--color-gold);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+/* Tavern Section */
+.tavern-bg {
+    background-image: url('../assets/tavern.png');
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.7);
+    margin-bottom: 10px;
+    max-height: 200px;
+}
+
+.heroes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.hero-card {
+    background: white;
+    border: 2px solid var(--color-marble-dark);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    color: var(--color-text);
+}
+
+/* Stats */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.1rem;
+}
+
+.resource {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+}
+
+.resource.gold {
+    color: #B8860B;
+}
+
+.resource.army {
+    color: #8E1600;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: #fdfbf7;
+    border: 4px double var(--color-gold);
+    border-radius: 8px;
+    padding: var(--spacing-lg);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--color-gold);
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
