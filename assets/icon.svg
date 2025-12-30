@@ -1,6 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#8E1600"/>
-  <path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64zm0 340c-81 0-148-67-148-148S175 108 256 108s148 67 148 148-67 148-148 148z" fill="#C5A059" opacity="0.2"/>
-  <path d="M256 120c-75 0-136 61-136 136s61 136 136 136 136-61 136-136-61-136-136-136zm0 240c-57 0-104-47-104-104s47-104 104-104 104 47 104 104-47 104-104 104z" fill="none" stroke="#C5A059" stroke-width="20"/>
-  <path d="M256 160l20 60h60l-45 35 15 60-50-35-50 35 15-60-45-35h60z" fill="#C5A059"/>
+  <defs>
+    <clipPath id="circleView">
+      <circle cx="256" cy="256" r="240" />
+    </clipPath>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#B8860B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background Circle (Gold Border) -->
+  <circle cx="256" cy="256" r="250" fill="url(#goldGradient)" stroke="#3d0a00" stroke-width="4" />
+  <!-- Tavern Image -->
+  <image href="nav_tavern.jpg" x="16" y="16" width="480" height="480" clip-path="url(#circleView)" preserveAspectRatio="xMidYMid slice" />
+  <!-- Inner Rim -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="8" />
 </svg>
