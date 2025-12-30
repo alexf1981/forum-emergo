@@ -113,6 +113,7 @@
             const [activeTab, setActiveTab] = useState('city');
             const [showSettings, setShowSettings] = useState(false);
             const [editingHabitId, setEditingHabitId] = useState(null);
+            const [isHeaderCompact, setIsHeaderCompact] = useState(false);
 
             const [stats, setStats] = useState(() => {
                 const saved = localStorage.getItem('romestats');
@@ -144,6 +145,21 @@
                 localStorage.setItem('romeheroes', JSON.stringify(heroes));
                 localStorage.setItem('romehabits', JSON.stringify(habits));
             }, [stats, habits, heroes]);
+
+            // Scroll listener for shrinking header
+            useEffect(() => {
+                const handleScroll = () => {
+                    const scrollPos = window.scrollY || document.documentElement.scrollTop;
+                    // Robust Hysteresis (80px / 40px)
+                    setIsHeaderCompact(prev => {
+                        if (!prev && scrollPos > 80) return true;
+                        if (prev && scrollPos < 40) return false;
+                        return prev;
+                    });
+                };
+                window.addEventListener('scroll', handleScroll, { passive: true });
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
 
             // Helpers
             const log = (msg) => setCombatLog(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 20));
@@ -364,7 +380,9 @@
             return (
                 <div className="wrapper">
                     {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onExport={handleExport} onImport={handleImport} />}
-                    <div className="hero-banner">
+                    {/* Fixed Banner & Stable Placeholder */}
+                    <div className={`hero-placeholder ${isHeaderCompact ? 'compact' : ''}`} />
+                    <div className={`hero-banner ${isHeaderCompact ? 'compact' : ''}`}>
                         <div className="hero-overlay header-content">
                             <h1>Forum Emergo</h1>
                             <div className="subtitle">Bouw je imperium, verover de wereld</div>
