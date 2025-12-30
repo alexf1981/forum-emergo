@@ -55,9 +55,11 @@ body {
 
 .hero-banner {
   /* Flexible height to force inclusion of content */
-  min-height: 80px;
+  min-height: 60px;
+  max-height: 20vh;
   height: auto;
-  padding: 10px 20px;
+  padding: 8px 20px;
+  overflow: hidden;
 
   background-image: url('banner.png');
   background-size: cover;
@@ -1046,6 +1048,23 @@ body {
 
   .nav-label {
     font-size: 0.6rem;
+  }
+
+  /* Compact Hero for small screens */
+  .hero-banner {
+    min-height: 50px;
+    padding: 5px 15px;
+  }
+
+  .header-content h1 {
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+  }
+
+  .header-content .subtitle {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    margin-top: 2px;
   }
 
   .nav-value {
