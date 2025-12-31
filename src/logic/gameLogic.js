@@ -1,3 +1,4 @@
+
 // --- RPG CONSTANTS ---
 export const HERO_NAMES = ["Lucius", "Titus", "Marcus", "Aurelius", "Flavius", "Maximus", "Octavius", "Casius", "Valerius", "Felix"];
 
@@ -201,4 +202,3 @@ export function processHabitToggle(habits, stats, id, dateString) {
 
     return { newHabits, newStats, notifications };
 }
-

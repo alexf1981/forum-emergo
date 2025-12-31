@@ -10,6 +10,7 @@ import '../css/game.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
+        {console.log("App is mounting...")}
         <App />
     </React.StrictMode>,
 )
