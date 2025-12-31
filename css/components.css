@@ -210,6 +210,9 @@
 
 .modal-content {
     background: #fdfbf7;
+    background-image: url('/assets/papyrus.jpg');
+    background-size: cover;
+    background-position: center;
     border: 4px double var(--color-gold);
     border-radius: 8px;
     padding: var(--spacing-lg);
