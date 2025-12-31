@@ -1,4 +1,4 @@
-const { React } = window;
+import React from 'react';
 
 const CityVisual = ({ rank, score }) => {
     let imageSrc = './assets/city_village.png';
@@ -11,3 +11,5 @@ const CityVisual = ({ rank, score }) => {
         </div>
     );
 };
+
+export default CityVisual;

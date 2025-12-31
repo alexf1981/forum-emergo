@@ -1,5 +1,5 @@
-const { React } = window;
-// (Icons loaded via global scope)
+import React from 'react';
+import Icons from './Icons';
 
 const SettingsModal = ({ onClose, onExport, onImport }) => {
     return (
@@ -25,3 +25,5 @@ const SettingsModal = ({ onClose, onExport, onImport }) => {
         </div>
     );
 };
+
+export default SettingsModal;

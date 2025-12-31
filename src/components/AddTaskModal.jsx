@@ -1,5 +1,4 @@
-const { React } = window;
-const { useState } = React;
+import React, { useState } from 'react';
 
 function AddTaskModal({ onClose, onAdd }) {
     const [text, setText] = useState('');
@@ -116,4 +115,4 @@ function AddTaskModal({ onClose, onAdd }) {
     );
 }
 
-window.AddTaskModal = AddTaskModal;
+export default AddTaskModal;

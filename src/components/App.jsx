@@ -1,7 +1,9 @@
-const { React, ReactDOM } = window;
-const { useState, useEffect, useMemo } = React;
-
-// (Dependencies loaded via global scope)
+import React, { useState, useEffect } from 'react';
+import * as GameLogic from '../logic/gameLogic';
+import Icons from './Icons';
+import CityVisual from './CityVisual';
+import AddTaskModal from './AddTaskModal';
+import SettingsModal from './SettingsModal';
 
 function App() {
     // === STATE ===
@@ -429,3 +431,5 @@ function App() {
         </div>
     );
 }
+
+export default App;
