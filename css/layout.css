@@ -13,7 +13,7 @@
 }
 
 .hero-placeholder {
-    height: 84px;
+    height: 120px;
     flex-shrink: 0;
     transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -153,10 +153,13 @@
     font-family: var(--font-heading);
     font-weight: bold;
     text-transform: uppercase;
-    border-bottom: 2px solid;
-    margin-bottom: var(--spacing-sm);
-    padding-bottom: 4px;
-    font-size: 0.9rem;
+    border-bottom: 3px solid var(--color-gold);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: 8px;
+    font-size: 1.6rem;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+    letter-spacing: 1px;
+    color: #3d0a00;
 }
 
 .city-col-content {
