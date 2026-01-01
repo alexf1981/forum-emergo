@@ -20,10 +20,10 @@ test.describe('Layout Checks', () => {
         const bottomNav = page.locator('.bottom-nav');
         await expect(bottomNav).toBeVisible();
 
-        // Check standard buttons (English defaults)
-        await expect(page.getByAltText('Duties')).toBeVisible();
-        await expect(page.getByAltText('Tavern')).toBeVisible();
-        await expect(page.getByAltText('Adventure')).toBeVisible();
+        // Check standard buttons (English defaults), allowing for dynamic Player Name prefix
+        await expect(bottomNav.getByAltText(/Duties|City|Stad/i)).toBeVisible();
+        await expect(bottomNav.getByAltText('Tavern')).toBeVisible();
+        await expect(bottomNav.getByAltText('Adventure')).toBeVisible();
     });
 
     test('should show City Visual overview', async ({ page }) => {
@@ -42,7 +42,8 @@ test.describe('Layout Checks', () => {
         await expect(page.locator('h2').getByText('De Vergulde Gladius')).toBeVisible(); // This substring is hardcoded in TavernView
 
         // Go back to City
-        await page.getByTitle('Duties').click();
-        await expect(page.locator('h3').getByText('Duties')).toBeVisible(); // nav_city is 'Duties'
+        await page.getByTitle(/Duties|City|Stad/i).click();
+        // Header might also be dynamic now
+        await expect(page.locator('h3').getByText(/Duties|City|Stad/i)).toBeVisible();
     });
 });

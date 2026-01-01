@@ -60,6 +60,24 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
 
         if (currentUser) {
+            // SYNC: Keep "last_sign_in_at" in sync with public profile so Admin Dashboard can see it
+            if (currentUser.last_sign_in_at) {
+                supabase.from('profiles')
+                    .update({ last_sign_in_at: currentUser.last_sign_in_at })
+                    .eq('id', currentUser.id)
+                    .then(({ error }) => {
+                        if (error) {
+                            // If column missing, try falling back to updated_at just to touch the row
+                            if (error.code === '42703') { // Undefined column
+                                supabase.from('profiles')
+                                    .update({ updated_at: new Date() })
+                                    .eq('id', currentUser.id);
+                            } else {
+                                console.warn("Failed to sync last_sign_in_at:", error);
+                            }
+                        }
+                    });
+            }
             await loadProfileName(currentUser.id);
         } else {
             loadLocalName();

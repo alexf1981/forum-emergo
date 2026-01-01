@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AdminService } from '../services/adminService';
+import Icons from './Icons';
 import '../../css/components.css'; // Reuse basic styles or add specific admin CSS
 
 const AdminDashboard = ({ onClose }) => {
@@ -19,6 +20,16 @@ const AdminDashboard = ({ onClose }) => {
         setLoading(false);
     };
 
+    const renderLanguage = (lang) => {
+        switch (lang) {
+            case 'nl': return <div title="Nederlands" style={{ display: 'flex', alignItems: 'center' }}><Icons.FlagNL /></div>;
+            case 'en': return <div title="English" style={{ display: 'flex', alignItems: 'center' }}><Icons.FlagUK /></div>;
+            case 'es': return <div title="Español" style={{ display: 'flex', alignItems: 'center' }}><Icons.FlagES /></div>;
+            case 'de': return <div title="Deutsch" style={{ display: 'flex', alignItems: 'center' }}><Icons.FlagDE /></div>;
+            default: return lang ? lang.toUpperCase() : '-';
+        }
+    };
+
     return (
         <div className="modal-overlay" style={{ zIndex: 2000 }}>
             <div className="modal-content" style={{ maxWidth: '800px', width: '90%' }}>
@@ -34,6 +45,7 @@ const AdminDashboard = ({ onClose }) => {
                                     <tr style={{ borderBottom: '2px solid #ccc' }}>
                                         <th style={{ padding: '10px' }}>Gebruiker</th>
                                         <th style={{ padding: '10px' }}>Email</th>
+                                        <th style={{ padding: '10px' }}>Taal</th>
                                         <th style={{ padding: '10px' }}>Score</th>
                                         <th style={{ padding: '10px' }}>Goud</th>
                                         <th style={{ padding: '10px' }}>Leger</th>
@@ -45,6 +57,7 @@ const AdminDashboard = ({ onClose }) => {
                                         <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
                                             <td style={{ padding: '10px' }}>{u.username}</td>
                                             <td style={{ padding: '10px' }}>{u.email}</td>
+                                            <td style={{ padding: '10px' }}>{renderLanguage(u.language)}</td>
                                             <td style={{ padding: '10px' }}><strong>{u.score}</strong></td>
                                             <td style={{ padding: '10px' }}>{u.gold}</td>
                                             <td style={{ padding: '10px' }}>{u.army}</td>
@@ -55,7 +68,9 @@ const AdminDashboard = ({ onClose }) => {
                             </table>
                         </div>
                     )}
-                    <button className="pixel-btn secondary-btn mt-md" onClick={loadData}>Verversen</button>
+                    <div className="modal-actions">
+                        <button className="btn" onClick={loadData}>VERVERSEN</button>
+                    </div>
                 </div>
             </div>
         </div>
