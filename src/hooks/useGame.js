@@ -142,11 +142,13 @@ export function useGame() {
 
     // === SYNC WITH SUPABASE ===
     const { user } = useAuth();
+    const [saveStatus, setSaveStatus] = useState('idle'); // 'idle', 'saving', 'saved', 'error'
 
     // 1. Initial Load from Cloud when user logs in
     useEffect(() => {
         const syncFromCloud = async () => {
             if (user) {
+                setSaveStatus('loading');
                 const cloudData = await DataService.loadGameData(user.id);
                 if (cloudData && cloudData.romestats) {
                     console.log("Syncing from Cloud...", cloudData);
@@ -154,26 +156,28 @@ export function useGame() {
                     setHabits(cloudData.romehabits);
                     setHeroes(cloudData.romeheroes);
                 }
+                setSaveStatus('saved');
             }
         };
         syncFromCloud();
     }, [user]);
 
-    // 2. Auto-save to cloud when state changes (debounced?)
+    // 2. Auto-save to cloud when state changes (debounced)
     useEffect(() => {
         if (user) {
+            setSaveStatus('pending');
             const dataToSave = {
                 romestats: stats,
                 romehabits: habits,
                 romeheroes: heroes
             };
-            // Simple debounce by just saving not on every frame but logic updates trigger this
-            // For production, a real debounce function is better to prevent API spam.
-            // But React state updates batching helps. 
-            // Let's us a simple timeout to avoid too many writes.
-            const timeoutId = setTimeout(() => {
-                DataService.saveGameData(user.id, dataToSave);
-            }, 2000);
+
+            // Reduced timeout to 1000ms to persist faster
+            const timeoutId = setTimeout(async () => {
+                setSaveStatus('saving');
+                const success = await DataService.saveGameData(user.id, dataToSave);
+                setSaveStatus(success ? 'saved' : 'error');
+            }, 1000);
 
             return () => clearTimeout(timeoutId);
         }
@@ -187,6 +191,7 @@ export function useGame() {
         habits,
         notifications,
         combatLog,
+        saveStatus, // Export status
         // Actions
         actions: {
             toggleHabit,

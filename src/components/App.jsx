@@ -20,7 +20,7 @@ function App() {
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions } = useGame();
+    const { stats, heroes, habits, notifications, actions, saveStatus } = useGame();
 
     // Scroll listener
     useEffect(() => {
@@ -168,6 +168,7 @@ function App() {
                 onProfileClick={() => setShowSettings(true)}
                 stats={stats}
                 formatNumber={formatNumber}
+                saveStatus={saveStatus}
             />
         </div>
     );

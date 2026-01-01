@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber }) => {
+const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber, saveStatus }) => {
     const navItems = [
         { id: 'city', label: 'Plichten', icon: './assets/nav_plichten.jpg' },
         { id: 'tavern', label: 'Taverne', icon: './assets/nav_tavern.jpg' },
@@ -44,7 +44,12 @@ const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber
                 </div>
 
                 <button className="nav-item edge-item" onClick={(e) => { e.stopPropagation(); onProfileClick(); }} title="Profiel">
-                    <div className="nav-icon"><img src="./assets/nav_profile.jpg" alt="Profiel" /></div>
+                    <div className="nav-icon">
+                        <img src="./assets/nav_profile.jpg" alt="Profiel" />
+                    </div>
+                    {saveStatus === 'saving' && <span style={{ position: 'absolute', top: '2px', right: '10px', fontSize: '18px', zIndex: 20, pointerEvents: 'none', textShadow: '0 0 5px black' }}>⏳</span>}
+                    {saveStatus === 'saved' && <span style={{ position: 'absolute', top: '2px', right: '10px', fontSize: '18px', zIndex: 20, pointerEvents: 'none', textShadow: '0 0 5px black' }}>☁️</span>}
+                    {saveStatus === 'error' && <span style={{ position: 'absolute', top: '2px', right: '10px', fontSize: '18px', zIndex: 20, pointerEvents: 'none', textShadow: '0 0 5px black' }}>⚠️</span>}
                 </button>
             </div>
         </div>

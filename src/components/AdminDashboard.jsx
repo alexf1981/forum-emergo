@@ -33,6 +33,7 @@ const AdminDashboard = ({ onClose }) => {
                                 <thead>
                                     <tr style={{ borderBottom: '2px solid #ccc' }}>
                                         <th style={{ padding: '10px' }}>Gebruiker</th>
+                                        <th style={{ padding: '10px' }}>Email</th>
                                         <th style={{ padding: '10px' }}>Score</th>
                                         <th style={{ padding: '10px' }}>Goud</th>
                                         <th style={{ padding: '10px' }}>Leger</th>
@@ -43,6 +44,7 @@ const AdminDashboard = ({ onClose }) => {
                                     {users.map(u => (
                                         <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
                                             <td style={{ padding: '10px' }}>{u.username}</td>
+                                            <td style={{ padding: '10px' }}>{u.email}</td>
                                             <td style={{ padding: '10px' }}><strong>{u.score}</strong></td>
                                             <td style={{ padding: '10px' }}>{u.gold}</td>
                                             <td style={{ padding: '10px' }}>{u.army}</td>

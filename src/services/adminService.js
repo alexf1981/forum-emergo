@@ -10,7 +10,7 @@ export const AdminService = {
         try {
             const { data: profiles, error: profileError } = await supabase
                 .from('profiles')
-                .select('id, username, updated_at');
+                .select('id, username, email, updated_at');
 
             if (profileError) throw profileError;
 
@@ -28,6 +28,7 @@ export const AdminService = {
                 return {
                     id: p.id,
                     username: p.username || 'Anonymous',
+                    email: p.email || '-',
                     lastActive: new Date(p.updated_at).toLocaleString(),
                     gold: gData.romestats?.gold || 0,
                     population: gData.romestats?.pop || 0,
