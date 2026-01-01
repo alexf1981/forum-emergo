@@ -20,15 +20,17 @@ test.describe('Layout Checks', () => {
         const bottomNav = page.locator('.bottom-nav');
         await expect(bottomNav).toBeVisible();
 
-        // Check standard buttons
-        await expect(page.getByAltText('Plichten')).toBeVisible();
-        await expect(page.getByAltText('Taverne')).toBeVisible();
-        await expect(page.getByAltText('Quests')).toBeVisible();
+        // Check standard buttons (English defaults)
+        await expect(page.getByAltText('Duties')).toBeVisible();
+        await expect(page.getByAltText('Tavern')).toBeVisible();
+        await expect(page.getByAltText('Adventure')).toBeVisible();
     });
 
     test('should show City Visual overview', async ({ page }) => {
         await expect(page.locator('.city-columns-container')).toBeVisible();
-        // Check for the three columns
+        // Check for the three columns (Column headers are hardcoded or translated? 
+        // In CityView they are: Virtue -> 'Virtutes', Vice -> 'Barbaria', Todo -> 'Mandata'
+        // These are hardcoded in CityView.jsx lines 46. So they work!
         await expect(page.getByText('Virtutes')).toBeVisible();
         await expect(page.getByText('Barbaria')).toBeVisible();
         await expect(page.getByText('Mandata')).toBeVisible();
@@ -36,11 +38,11 @@ test.describe('Layout Checks', () => {
 
     test('should navigate to Tavern and back', async ({ page }) => {
         // Go to Tavern
-        await page.getByTitle('Taverne').click();
-        await expect(page.locator('h2').getByText('De Vergulde Gladius')).toBeVisible();
+        await page.getByTitle('Tavern').click();
+        await expect(page.locator('h2').getByText('De Vergulde Gladius')).toBeVisible(); // This substring is hardcoded in TavernView
 
         // Go back to City
-        await page.getByTitle('Plichten').click();
-        await expect(page.locator('h3').getByText('Stad Status')).toBeVisible();
+        await page.getByTitle('Duties').click();
+        await expect(page.locator('h3').getByText('Duties')).toBeVisible(); // nav_city is 'Duties'
     });
 });
