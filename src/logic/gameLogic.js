@@ -46,32 +46,32 @@ export function getCityRank(stats) {
     return "Keizerlijk Forum Emergo";
 }
 
-export function calculateBattleResult(hero, quest) {
+export function calculateBattleResult(hero, quest, randomFn = Math.random) {
     // Calculate Powers
     const itemBonus = hero.items.reduce((sum, item) => sum + item.bonus, 0);
     const totalHeroStr = hero.str + itemBonus + hero.lvl;
 
-    const performance = totalHeroStr * (0.8 + Math.random() * 0.4);
-    const difficulty = quest.risk * (0.8 + Math.random() * 0.4);
+    const performance = totalHeroStr * (0.8 + randomFn() * 0.4);
+    const difficulty = quest.risk * (0.8 + randomFn() * 0.4);
 
     if (performance >= difficulty) {
         // WIN
         const earnedXp = quest.xp;
         let earnedGold = quest.reward;
-        const dmgTaken = Math.floor(Math.random() * 3);
+        const dmgTaken = Math.floor(randomFn() * 3);
 
         let lootMsg = "";
         let newItems = [...hero.items];
 
         // Loot Logic: 35% chance
-        if (Math.random() < 0.35) {
+        if (randomFn() < 0.35) {
             const possibleItems = ITEMS.filter(i =>
                 (quest.level <= 1 && i.rarity === 'common') ||
                 (quest.level >= 3 && i.rarity === 'uncommon') ||
                 (quest.level >= 5)
             );
             if (possibleItems.length > 0) {
-                const foundItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+                const foundItem = possibleItems[Math.floor(randomFn() * possibleItems.length)];
 
                 // Smart Inventory Management
                 const existingItemIndex = newItems.findIndex(i => i.type === foundItem.type);

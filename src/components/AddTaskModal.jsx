@@ -62,11 +62,14 @@ function AddTaskModal({ onClose, onAdd }) {
                     <div className="modal-form-group">
                         <div className="modal-radio-group">
                             {[
-                                { value: 'virtue', label: 'Virtus', color: '#4CAF50' },
-                                { value: 'vice', label: 'Barbarium', color: '#F44336' },
-                                { value: 'todo', label: 'Mandatum', color: '#2196F3' }
+                                { value: 'virtue', label: 'Virtus' },
+                                { value: 'vice', label: 'Barbarium' },
+                                { value: 'todo', label: 'Mandatum' }
                             ].map((option) => (
-                                <label key={option.value} className="modal-radio-label" style={{ background: type === option.value ? 'rgba(0,0,0,0.05)' : 'transparent' }}>
+                                <label
+                                    key={option.value}
+                                    className={`modal-radio-label type-${option.value} ${type === option.value ? 'selected' : ''}`}
+                                >
                                     <input
                                         type="radio"
                                         name="type"
@@ -75,11 +78,8 @@ function AddTaskModal({ onClose, onAdd }) {
                                         onChange={e => handleTypeChange(e.target.value)}
                                         style={{ display: 'none' }}
                                     />
-                                    <span className="modal-radio-indicator" style={{
-                                        border: `2px solid ${option.color}`,
-                                        background: type === option.value ? option.color : 'transparent',
-                                    }}></span>
-                                    <span className="modal-radio-text" style={{ fontWeight: type === option.value ? 'bold' : 'normal', color: type === option.value ? option.color : 'inherit' }}>
+                                    <span className="modal-radio-indicator"></span>
+                                    <span className="modal-radio-text">
                                         {option.label}
                                     </span>
                                 </label>
@@ -88,7 +88,7 @@ function AddTaskModal({ onClose, onAdd }) {
                     </div>
 
                     <div className="modal-form-group">
-                        <label className="modal-checkbox-label" style={{ cursor: type === 'todo' ? 'not-allowed' : 'pointer', opacity: type === 'todo' ? 0.5 : 1 }}>
+                        <label className={`modal-checkbox-label ${type === 'todo' ? 'disabled' : ''}`}>
                             <input
                                 type="checkbox"
                                 checked={isRecurring}

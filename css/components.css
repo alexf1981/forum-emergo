@@ -345,4 +345,126 @@
         text-align: center;
         margin-bottom: 5px;
     }
+}/* Modal State Styles */
+.modal-radio-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.modal-radio-label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s;
+    background: transparent;
+}
+
+.modal-radio-label.selected {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.modal-radio-indicator {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    border: 2px solid #ccc;
+    /* Default fallback */
+    background: transparent;
+}
+
+.modal-radio-text {
+    font-weight: normal;
+    transition: color 0.2s;
+}
+
+.modal-radio-label.selected .modal-radio-text {
+    font-weight: bold;
+}
+
+/* Type Specific Styles */
+.modal-radio-label.type-virtue .modal-radio-indicator {
+    border-color: var(--color-virtue);
+}
+
+.modal-radio-label.type-vice .modal-radio-indicator {
+    border-color: var(--color-vice);
+}
+
+.modal-radio-label.type-todo .modal-radio-indicator {
+    border-color: var(--color-mandatum);
+}
+
+.modal-radio-label.selected.type-virtue .modal-radio-indicator {
+    background: var(--color-virtue);
+}
+
+.modal-radio-label.selected.type-vice .modal-radio-indicator {
+    background: var(--color-vice);
+}
+
+.modal-radio-label.selected.type-todo .modal-radio-indicator {
+    background: var(--color-mandatum);
+}
+
+.modal-radio-label.selected.type-virtue .modal-radio-text {
+    color: var(--color-virtue);
+}
+
+.modal-radio-label.selected.type-vice .modal-radio-text {
+    color: var(--color-vice);
+}
+
+.modal-radio-label.selected.type-todo .modal-radio-text {
+    color: var(--color-mandatum);
+}
+
+/* Checkbox States */
+.modal-checkbox-label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    transition: opacity 0.2s;
+}
+
+.modal-checkbox-label.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+/* Utility Classes */
+.mb-md {
+    margin-bottom: var(--spacing-md);
+}
+
+.mt-sm {
+    margin-top: var(--spacing-sm);
+}
+
+.mt-md {
+    margin-top: var(--spacing-md);
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* Settings Modal Specific */
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.settings-checkbox {
+    width: 20px;
+    height: 20px;
 }

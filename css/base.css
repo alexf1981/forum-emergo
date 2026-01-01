@@ -9,6 +9,12 @@
     --color-stone: #2C2C2C;
     --color-text: #1A1A1A;
 
+    /* Semantic Colors */
+    --color-virtue: #4CAF50;
+    --color-vice: #F44336;
+    --color-mandatum: #2196F3;
+
+
     /* Spacing & Layout */
     --spacing-sm: 8px;
     --spacing-md: 16px;
