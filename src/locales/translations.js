@@ -52,6 +52,7 @@ export const translations = {
         rank: "Rank",
         habit_new: "New Task",
         habit_delete_confirm: "Are you sure you want to delete this activity?",
+        completed_tasks: "Completed",
         // Quests
         quest_patrol: "City Patrol",
         quest_patrol_desc: "Chase away drunks and thieves.",
@@ -158,6 +159,7 @@ export const translations = {
         rank: "Rang",
         habit_new: "Nieuwe taak",
         habit_delete_confirm: "Zeker weten dat je deze activiteit wilt verwijderen?",
+        completed_tasks: "Afgerond",
         // Quests
         quest_patrol: "Stadspatrouille",
         quest_patrol_desc: "Verjaag dronkenlappen en dieven.",
@@ -264,6 +266,7 @@ export const translations = {
         rank: "Rango",
         habit_new: "Nueva Tarea",
         habit_delete_confirm: "¿Estás seguro de eliminar esta actividad?",
+        completed_tasks: "Completado",
         // Quests
         quest_patrol: "Patrulla Urbana",
         quest_patrol_desc: "Ahuyenta a borrachos y ladrones.",
@@ -370,6 +373,7 @@ export const translations = {
         rank: "Rang",
         habit_new: "Neue Aufgabe",
         habit_delete_confirm: "Möchtest du diese Aktivität wirklich löschen?",
+        completed_tasks: "Abgeschlossen",
         // Quests
         quest_patrol: "Stadtpatrouille",
         quest_patrol_desc: "Vertreibe Betrunkene und Diebe.",

@@ -35,25 +35,38 @@ export function useGame() {
     };
 
     const incrementHabit = (id) => {
-        // Logic copied from App.jsx
-        setHabits(prev => prev.map(h => {
-            if (h.id === id) {
-                const type = h.type || 'virtue';
-                const today = GameLogic.getTodayString();
-                if (type === 'vice') {
-                    setStats(s => ({ ...s, gold: Math.max(0, s.gold - 20) }));
-                    notify({ key: 'msg_habit_vice_penalty' }, "error");
-                } else if (type === 'todo') {
-                    setStats(s => ({ ...s, gold: s.gold + 50 }));
-                    notify({ key: 'msg_habit_todo_reward' }, "mandatum");
-                } else {
-                    setStats(s => ({ ...s, gold: s.gold + 10 }));
-                    notify({ key: 'msg_habit_virtue_reward' }, "success");
-                }
-                return { ...h, completed: true, history: [...h.history, today] };
+        const habit = habits.find(h => h.id === id);
+        if (!habit) return;
+
+        const type = habit.type || 'virtue';
+        const today = GameLogic.getTodayString();
+
+        // Update Stats
+        setStats(s => {
+            let newGold = s.gold;
+            if (type === 'vice') {
+                newGold = Math.max(0, s.gold - 20);
+            } else if (type === 'todo') {
+                newGold = s.gold + 50;
+            } else {
+                newGold = s.gold + 10;
             }
-            return h;
-        }));
+            return { ...s, gold: newGold };
+        });
+
+        // Notify
+        if (type === 'vice') {
+            notify({ key: 'msg_habit_vice_penalty' }, "error");
+        } else if (type === 'todo') {
+            notify({ key: 'msg_habit_todo_reward' }, "mandatum");
+        } else {
+            notify({ key: 'msg_habit_virtue_reward' }, "success");
+        }
+
+        // Update Habits
+        setHabits(prev => prev.map(h =>
+            h.id === id ? { ...h, completed: true, history: [...h.history, today] } : h
+        ));
     };
 
     const decrementHabit = (id) => {

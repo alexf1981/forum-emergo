@@ -73,52 +73,81 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                 <div className="city-col" key={colType}>
                                     <div className="city-col-header" style={{ color: colColor, borderColor: colColor }}>{colTitle}</div>
                                     <div className="city-col-content">
-                                        {habits.filter(h => (h.type || 'virtue') === colType).sort((a, b) => {
+                                        {(() => {
+                                            const filteredHabits = habits.filter(h => (h.type || 'virtue') === colType);
                                             const today = GameLogic.getTodayString();
-                                            const aDone = a.history.includes(today);
-                                            const bDone = b.history.includes(today);
-                                            if (a.bucket && aDone && (!b.bucket || !bDone)) return 1;
-                                            if (b.bucket && bDone && (!a.bucket || !aDone)) return -1;
-                                            return 0;
-                                        }).map(h => {
-                                            const today = GameLogic.getTodayString();
-                                            const dailyCount = h.history.filter(d => d === today).length;
-                                            const isDone = dailyCount > 0;
-                                            const isDoneOneTime = h.bucket && isDone;
 
-                                            if (editingHabitId === h.id) {
-                                                return (
-                                                    <div key={h.id} className="habit-item compact editing" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-                                                        <input type="text" defaultValue={h.text} id={`edit-text-${h.id}`} style={{ width: '100%', padding: '4px', marginBottom: '4px' }} />
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                            <label style={{ fontSize: '0.8rem' }}><input type="checkbox" defaultChecked={h.bucket} id={`edit-bucket-${h.id}`} /> {t('habit_new')}</label>
-                                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                                <button className="btn-icon" onClick={() => handleSaveEdit(h.id, document.getElementById(`edit-text-${h.id}`).value, document.getElementById(`edit-bucket-${h.id}`).checked)}><Icons.Save /></button>
-                                                                <button className="btn-icon" onClick={() => setEditingHabitId(null)}><Icons.X /></button>
+                                            // Split into active and completed (one-time only, for grouping)
+                                            // Mandata (todo) are excluded from grouping as they delete automatically
+                                            const activeHabits = [];
+                                            const completedBucketHabits = [];
+
+                                            filteredHabits.forEach(h => {
+                                                const dailyCount = h.history.filter(d => d === today).length;
+                                                const isDone = dailyCount > 0;
+
+                                                if (colType !== 'todo' && h.bucket && isDone) {
+                                                    completedBucketHabits.push(h);
+                                                } else {
+                                                    activeHabits.push(h);
+                                                }
+                                            });
+
+                                            // Helper to render a list of habits
+                                            const renderList = (list) => list.map(h => {
+                                                const dailyCount = h.history.filter(d => d === today).length;
+                                                const isDone = dailyCount > 0;
+
+                                                if (editingHabitId === h.id) {
+                                                    return (
+                                                        <div key={h.id} className="habit-item compact editing" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                                                            <input type="text" defaultValue={h.text} id={`edit-text-${h.id}`} style={{ width: '100%', padding: '4px', marginBottom: '4px' }} />
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <label style={{ fontSize: '0.8rem' }}><input type="checkbox" defaultChecked={h.bucket} id={`edit-bucket-${h.id}`} /> {t('habit_new')}</label>
+                                                                <div style={{ display: 'flex', gap: '4px' }}>
+                                                                    <button className="btn-icon" onClick={() => handleSaveEdit(h.id, document.getElementById(`edit-text-${h.id}`).value, document.getElementById(`edit-bucket-${h.id}`).checked)}><Icons.Save /></button>
+                                                                    <button className="btn-icon" onClick={() => setEditingHabitId(null)}><Icons.X /></button>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <HabitItem
+                                                        key={h.id}
+                                                        habit={h}
+                                                        colType={colType}
+                                                        colColor={colColor}
+                                                        isDone={isDone}
+                                                        dailyCount={dailyCount}
+                                                        onToggle={onToggleHabit}
+                                                        onDelete={onDeleteHabit}
+                                                        onEdit={setEditingHabitId}
+                                                        onIncrement={onIncrementHabit}
+                                                        onDecrement={onDecrementHabit}
+                                                        formatNumber={formatNumber}
+                                                        t={t}
+                                                    />
                                                 );
-                                            }
+                                            });
 
                                             return (
-                                                <HabitItem
-                                                    key={h.id}
-                                                    habit={h}
-                                                    colType={colType}
-                                                    colColor={colColor}
-                                                    isDone={isDone}
-                                                    dailyCount={dailyCount}
-                                                    onToggle={onToggleHabit}
-                                                    onDelete={onDeleteHabit}
-                                                    onEdit={setEditingHabitId}
-                                                    onIncrement={onIncrementHabit}
-                                                    onDecrement={onDecrementHabit}
-                                                    formatNumber={formatNumber}
-                                                    t={t}
-                                                />
+                                                <>
+                                                    {renderList(activeHabits)}
+                                                    {completedBucketHabits.length > 0 && (
+                                                        <details style={{ marginTop: '10px', borderTop: '1px dashed #ccc', paddingTop: '5px' }}>
+                                                            <summary style={{ cursor: 'pointer', color: '#777', fontStyle: 'italic', marginBottom: '5px', userSelect: 'none' }}>
+                                                                {t('completed_tasks')} ({completedBucketHabits.length})
+                                                            </summary>
+                                                            <div style={{ opacity: 0.7 }}>
+                                                                {renderList(completedBucketHabits)}
+                                                            </div>
+                                                        </details>
+                                                    )}
+                                                </>
                                             );
-                                        })}
+                                        })()}
                                     </div>
                                 </div>
                             );
