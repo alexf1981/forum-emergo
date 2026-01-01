@@ -12,6 +12,12 @@
     height: auto;
 }
 
+@media (max-width: 480px) {
+    .card {
+        padding: 10px 8px;
+    }
+}
+
 .card-title {
     display: flex;
     align-items: center;
@@ -118,6 +124,10 @@
     border-radius: 4px;
     overflow: hidden;
     position: relative;
+    max-width: 100%;
+    box-sizing: border-box;
+    container-type: inline-size;
+    /* Enable container queries */
 }
 
 .city-image {
@@ -126,19 +136,52 @@
     display: block;
 }
 
-.city-rank-badge {
+.city-name-badge {
     position: absolute;
-    top: 10px;
+    top: 5%;
+    /* Relative positioning */
     left: 50%;
     transform: translateX(-50%);
     background: var(--color-red);
-    color: var(--color-gold);
-    padding: 5px 15px;
+    color: white;
+    padding: 2% 4%;
+    /* Relative padding */
     font-family: var(--font-heading);
-    border: 2px solid var(--color-gold);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 2px solid #3d0a00;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     text-transform: uppercase;
-    font-size: 0.9rem;
+    font-size: clamp(0.7rem, 6cqi, 1.4rem);
+    /* Scale with container width */
+    white-space: nowrap;
+    text-align: center;
+    font-weight: bold;
+    width: auto;
+    max-width: 90%;
+    z-index: 5;
+}
+
+.city-rank-badge {
+    position: absolute;
+    bottom: 5%;
+    /* Relative positioning */
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-red);
+    color: white;
+    padding: 2% 4%;
+    /* Relative padding */
+    font-family: var(--font-heading);
+    border: 2px solid #3d0a00;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    font-size: clamp(0.7rem, 6cqi, 1.4rem);
+    /* Scale with container width */
+    white-space: nowrap;
+    text-align: center;
+    font-weight: bold;
+    width: auto;
+    max-width: 90%;
+    z-index: 5;
 }
 
 /* Tavern Section */

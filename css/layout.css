@@ -24,7 +24,8 @@
 
 @media (max-width: 600px) {
     .hero-placeholder {
-        height: 160px;
+        height: 200px;
+        /* Increased to prevent overlap */
     }
 
     .hero-placeholder.compact {
@@ -117,29 +118,44 @@
     min-height: 200px;
 }
 
+@media (max-width: 480px) {
+    .app-container {
+        padding: 8px 4px;
+        /* Minimize side padding on very small screens */
+    }
+}
+
 /* Grid Layout */
 .main-grid {
     display: grid;
     grid-template-columns: 1fr;
+    grid-template-areas:
+        "tasks"
+        "title"
+        "visual";
     gap: var(--spacing-md);
     height: auto;
+}
+
+
+.city-visual-section {
+    grid-area: visual;
+}
+
+.city-dashboard-content {
+    grid-area: tasks;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    flex-grow: 1;
 }
 
 @media (min-width: 900px) {
     .main-grid {
         grid-template-columns: 350px 1fr;
-        grid-template-rows: 100%;
-    }
-}
-
-.main-grid aside {
-    flex-shrink: 0;
-    width: 300px;
-}
-
-@media (max-width: 900px) {
-    .main-grid aside {
-        width: 100%;
+        grid-template-areas:
+            "visual tasks";
+        grid-template-rows: auto 1fr;
     }
 }
 
@@ -152,9 +168,19 @@
     align-items: flex-start;
 }
 
+@media (max-width: 768px) {
+    .city-columns-container {
+        flex-direction: column;
+        width: 100%;
+        gap: var(--spacing-lg);
+    }
+}
+
 .city-col {
     flex: 1;
     min-width: 0;
+    width: 100%;
+    /* Ensure full width when stacked */
     display: flex;
     flex-direction: column;
 }
@@ -170,6 +196,13 @@
     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
     letter-spacing: 1px;
     color: #3d0a00;
+}
+
+@media (max-width: 480px) {
+    .city-col-header {
+        font-size: 1.25rem;
+        margin-bottom: var(--spacing-sm);
+    }
 }
 
 .city-col-content {
