@@ -14,7 +14,8 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
     const [showLocal, setShowLocal] = useState(false); // Collapsed by default to save space
 
     // Simple admin check
-    const isAdmin = user?.email === 'alexfitie1981@gmail.com';
+    const ADMINS = ['alexfitie1981@gmail.com', 'olivierfitie2015@gmail.com'];
+    const isAdmin = user?.email && ADMINS.includes(user.email);
 
     if (showAdmin) {
         return <AdminDashboard onClose={() => setShowAdmin(false)} />;
