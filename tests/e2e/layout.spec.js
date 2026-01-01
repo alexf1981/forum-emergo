@@ -4,6 +4,12 @@ test.describe('Layout Checks', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/');
         await page.waitForLoadState('domcontentloaded');
+
+        // Dismiss Daily Welcome if present
+        const welcome = page.getByText('Ave Keizer');
+        if (await welcome.isVisible()) {
+            await welcome.click();
+        }
     });
 
     test('should display correct title', async ({ page }) => {
@@ -13,7 +19,7 @@ test.describe('Layout Checks', () => {
     test('should show Hero Banner', async ({ page }) => {
         const banner = page.locator('.hero-banner');
         await expect(banner).toBeVisible();
-        await expect(page.locator('h1')).toHaveText('Forum Emergo');
+        await expect(page.locator('.hero-banner h1')).toHaveText('Forum Emergo');
     });
 
     test('should display Bottom Navigation on all devices', async ({ page }) => {
