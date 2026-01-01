@@ -20,7 +20,7 @@ function App() {
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, saveStatus } = useGame();
+    const { stats, heroes, habits, notifications, actions, saveStatus, isLoggedIn } = useGame();
 
     // Scroll listener
     useEffect(() => {
@@ -32,7 +32,17 @@ function App() {
                 return prev;
             });
         };
+
         window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // Check for logout message (persisted across reload)
+        const logoutMsg = localStorage.getItem('logout_message');
+        if (logoutMsg) {
+            // Need a slight delay to ensure notification system is ready/rendered or just call it immediately
+            setTimeout(() => actions.notify(logoutMsg, "info"), 500);
+            localStorage.removeItem('logout_message');
+        }
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -85,6 +95,12 @@ function App() {
     const score = GameLogic.getScore(stats);
     const rank = GameLogic.getCityRank(stats);
 
+    const handleLoginSuccess = (email) => {
+        setShowAuthModal(false);
+        setShowSettings(false);
+        actions.notify(`Ingelogd als ${email}`, "success");
+    };
+
     return (
         <div className="wrapper">
             {showSettings && <SettingsModal
@@ -93,12 +109,16 @@ function App() {
                 onImport={handleImport}
                 useRomanNumerals={useRomanNumerals}
                 toggleRomanNumerals={() => setUseRomanNumerals(prev => !prev)}
-                onLogin={() => setShowAuthModal(true)}
+                onLogin={() => {
+                    // Start login flow: show auth modal, keep settings open in background (it will be closed on success)
+                    setShowAuthModal(true);
+                }}
             />}
 
             <AuthModal
                 isOpen={showAuthModal}
                 onClose={() => setShowAuthModal(false)}
+                onLoginSuccess={handleLoginSuccess}
             />
 
             {showAddTaskModal && (
@@ -169,6 +189,7 @@ function App() {
                 stats={stats}
                 formatNumber={formatNumber}
                 saveStatus={saveStatus}
+                isLoggedIn={isLoggedIn}
             />
         </div>
     );

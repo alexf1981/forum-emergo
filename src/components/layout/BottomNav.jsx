@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber, saveStatus }) => {
+const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber, saveStatus, isLoggedIn }) => {
     const navItems = [
         { id: 'city', label: 'Plichten', icon: './assets/nav_plichten.jpg' },
         { id: 'tavern', label: 'Taverne', icon: './assets/nav_tavern.jpg' },
@@ -44,12 +44,26 @@ const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber
                 </div>
 
                 <button className="nav-item edge-item" onClick={(e) => { e.stopPropagation(); onProfileClick(); }} title="Profiel">
-                    <div className="nav-icon">
+                    <div className="nav-icon" style={{ position: 'relative' }}>
                         <img src="./assets/nav_profile.jpg" alt="Profiel" />
+
+                        {/* Sync Status Dot */}
+                        <div style={{
+                            position: 'absolute',
+                            top: '2px',
+                            right: '2px',
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            border: '2px solid #000000', // Black border for high contrast
+                            zIndex: 20,
+                            boxShadow: '0 0 4px rgba(0,0,0,0.8)',
+                            backgroundColor: !isLoggedIn ? '#ecf0f1' : // White/Light Grey (Local)
+                                (saveStatus === 'error') ? '#ff1744' : // Bright Red (Error)
+                                    (saveStatus === 'saved') ? '#00e676' : // Bright Green (Saved)
+                                        '#ffd700' // Gold/Yellow (Syncing)
+                        }} title={!isLoggedIn ? "Lokaal Opslaan" : (saveStatus === 'saved' ? "Gesynchroniseerd" : "Aan het synchroniseren...")} />
                     </div>
-                    {saveStatus === 'saving' && <span style={{ position: 'absolute', top: '2px', right: '10px', fontSize: '18px', zIndex: 20, pointerEvents: 'none', textShadow: '0 0 5px black' }}>⏳</span>}
-                    {saveStatus === 'saved' && <span style={{ position: 'absolute', top: '2px', right: '10px', fontSize: '18px', zIndex: 20, pointerEvents: 'none', textShadow: '0 0 5px black' }}>☁️</span>}
-                    {saveStatus === 'error' && <span style={{ position: 'absolute', top: '2px', right: '10px', fontSize: '18px', zIndex: 20, pointerEvents: 'none', textShadow: '0 0 5px black' }}>⚠️</span>}
                 </button>
             </div>
         </div>

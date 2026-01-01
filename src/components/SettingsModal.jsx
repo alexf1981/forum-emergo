@@ -17,12 +17,25 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
     }
 
     const handleLogout = async () => {
-        await signOut();
-        // Clear local game state to ensure a fresh start
-        localStorage.removeItem('romestats');
-        localStorage.removeItem('romeheroes');
-        localStorage.removeItem('romehabits');
-        window.location.reload(); // Force reload to clear all states/cache
+        const email = user?.email; // Capture email before it's gone
+
+        // 1. Attempt to sign out (server/client)
+        try {
+            await signOut();
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+
+        // 2. Nuke everything from storage to be sure (Auth tokens + Game Data)
+        window.localStorage.clear();
+
+        // 3. Set a flag for the "just logged out" message (must be done AFTER clear)
+        if (email) {
+            window.localStorage.setItem('logout_message', `Uitgelogd als ${email}`);
+        }
+
+        // 4. Force reload
+        window.location.reload();
     };
 
     return (
@@ -41,11 +54,11 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                             <div className="mt-sm">
                                 <p style={{ fontSize: '0.9em' }}>Ingelogd als: <br /><strong>{user.email}</strong></p>
                                 {isAdmin && (
-                                    <button className="btn full-width mt-sm" onClick={() => setShowAdmin(true)} style={{ backgroundColor: '#8e44ad', padding: '8px' }}>
+                                    <button className="btn full-width mt-sm" onClick={() => setShowAdmin(true)} style={{ backgroundColor: '#8e44ad', borderColor: '#6c3483' }}>
                                         <Icons.Crown /> Admin
                                     </button>
                                 )}
-                                <button className="btn full-width mt-sm" onClick={handleLogout} style={{ backgroundColor: '#e74c3c', padding: '8px' }}>Uitloggen</button>
+                                <button className="btn full-width mt-sm" onClick={handleLogout} style={{ backgroundColor: '#c0392b', borderColor: '#962d22' }}>Uitloggen</button>
                             </div>
                         ) : (
                             <div className="mt-sm">

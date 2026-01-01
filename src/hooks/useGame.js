@@ -204,7 +204,9 @@ export function useGame() {
             goAdventure,
             fightBoss,
             importData,
-            getExportData
-        }
+            getExportData,
+            notify // Expose notify for App usage
+        },
+        isLoggedIn: !!user
     };
 }

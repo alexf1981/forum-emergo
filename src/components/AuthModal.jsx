@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { signUp, signIn } from '../services/auth'
 import '../../css/components.css' // Reusing component styles for modal
 
-const AuthModal = ({ isOpen, onClose }) => {
+const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     const [isLogin, setIsLogin] = useState(true)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -28,12 +28,15 @@ const AuthModal = ({ isOpen, onClose }) => {
         if (result.error) {
             setMessage(result.error.message)
         } else {
-            setMessage(isLogin ? 'Ingelogd!' : 'Check je email voor de bevestigingslink!')
             if (isLogin) {
-                setTimeout(() => {
-                    onClose()
-                    // Optionally reload or refresh data
-                }, 1000)
+                // Immediate success action, no message in modal needed
+                if (onLoginSuccess) {
+                    onLoginSuccess(email);
+                } else {
+                    onClose();
+                }
+            } else {
+                setMessage('Check je email voor de bevestigingslink!')
             }
         }
     }
@@ -62,7 +65,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                             required
                             style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
                         />
-                        <button type="submit" disabled={loading} className="pixel-btn primary-btn" style={{ marginTop: '10px' }}>
+                        <button type="submit" disabled={loading} className="btn full-width" style={{ marginTop: '10px' }}>
                             {loading ? 'Laden...' : (isLogin ? 'Log in' : 'Registreer')}
                         </button>
                     </form>
@@ -72,14 +75,14 @@ const AuthModal = ({ isOpen, onClose }) => {
                         <button
                             type="button"
                             onClick={() => { setIsLogin(!isLogin); setMessage(''); }}
-                            style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+                            style={{ background: 'none', border: 'none', color: '#8E1600', textDecoration: 'underline', cursor: 'pointer', fontWeight: 'bold' }}
                         >
                             {isLogin ? "Registreer hier" : "Log hier in"}
                         </button>
                     </p>
                 </div>
-                <div className="modal-footer">
-                    <button className="pixel-btn secondary-btn" onClick={onClose}>Sluiten</button>
+                <div className="modal-actions">
+                    <button className="btn" onClick={onClose}>Sluiten</button>
                 </div>
             </div>
         </div>
