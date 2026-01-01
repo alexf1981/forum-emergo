@@ -57,8 +57,8 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                     <div className="card">
                         <div className="card-title"><h3>{playerName ? t('city_of_player').replace('{name}', playerName) : t('nav_city')}</h3></div>
                         <CityVisual rank={rank} score={score} formatNumber={formatNumber} />
-                        <div className="stat-row"><span className="resource gold"><Icons.Coin /> {t('gold')}</span><span>{formatNumber(stats.gold)}</span></div>
-                        <div className="stat-row"><span className="resource army"><Icons.Sword /> {t('score')}</span><span>{formatNumber(stats.army)}</span></div>
+
+
                     </div>
                 </aside>
 

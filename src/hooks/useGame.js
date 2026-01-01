@@ -6,7 +6,7 @@ import { DataService } from '../services/dataService';
 
 export function useGame() {
     // === STATE ===
-    const [stats, setStats] = useLocalStorage('romestats', { gold: 200, army: 10, know: 0, pop: 100 });
+    const [stats, setStats] = useLocalStorage('romestats', { gold: 200, know: 0, pop: 100 });
     const [heroes, setHeroes] = useLocalStorage('romeheroes', []); // We handle init logic in default val context if needed, but [] is safe fallback
     const [habits, setHabits] = useLocalStorage('romehabits', [
         { id: 1, text: "Ochtendgymnastiek", completed: false, history: [] },
@@ -41,10 +41,14 @@ export function useGame() {
                 const type = h.type || 'virtue';
                 const today = GameLogic.getTodayString();
                 if (type === 'vice') {
-                    setStats(s => ({ ...s, gold: Math.max(0, s.gold - 20), army: Math.max(0, (s.army || 0) - 5) }));
+                    setStats(s => ({ ...s, gold: Math.max(0, s.gold - 20) }));
                     notify({ key: 'msg_habit_vice_penalty' }, "error");
+                } else if (type === 'todo') {
+                    setStats(s => ({ ...s, gold: s.gold + 50 }));
+                    notify({ key: 'msg_habit_todo_reward' }, "mandatum");
                 } else {
-                    setStats(s => ({ ...s, gold: s.gold + 10, army: (s.army || 0) + 1 }));
+                    setStats(s => ({ ...s, gold: s.gold + 10 }));
+                    notify({ key: 'msg_habit_virtue_reward' }, "success");
                 }
                 return { ...h, completed: true, history: [...h.history, today] };
             }

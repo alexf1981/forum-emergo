@@ -91,6 +91,7 @@ export const translations = {
         msg_loot_sell: " | 💰 Sold weak loot (+10g)",
         msg_habit_vice_penalty: "Repent! (-20 Gold)",
         msg_habit_todo_reward: "Task completed! (+50 Gold)",
+        msg_habit_virtue_reward: "Task completed! (+10 Gold)",
         msg_added_task: "New task added!",
         msg_restored: "Chronicles restored!",
         // Items (Generic)
@@ -196,6 +197,7 @@ export const translations = {
         msg_loot_sell: " | 💰 Verkocht zwakke buit (+10g)",
         msg_habit_vice_penalty: "Betoont berouw! (-20 Goud)",
         msg_habit_todo_reward: "Taak voltooid! (+50 Goud)",
+        msg_habit_virtue_reward: "Taak voltooid! (+10 Goud)",
         msg_added_task: "Nieuwe taak toegevoegd!",
         msg_restored: "Kronieken hersteld!",
         // Items
@@ -301,6 +303,7 @@ export const translations = {
         msg_loot_sell: " | 💰 Botín débil vendido (+10g)",
         msg_habit_vice_penalty: "¡Arrepiéntete! (-20 Oro)",
         msg_habit_todo_reward: "¡Tarea completada! (+50 Oro)",
+        msg_habit_virtue_reward: "¡Tarea completada! (+10 Oro)",
         msg_added_task: "¡Nueva tarea añadida!",
         msg_restored: "¡Crónicas restauradas!",
         // Items
@@ -406,6 +409,7 @@ export const translations = {
         msg_loot_sell: " | 💰 Schwache Beute verkauft (+10g)",
         msg_habit_vice_penalty: "Bereue! (-20 Gold)",
         msg_habit_todo_reward: "Aufgabe erledigt! (+50 Gold)",
+        msg_habit_virtue_reward: "Aufgabe erledigt! (+10 Gold)",
         msg_added_task: "Neue Aufgabe hinzugefügt!",
         msg_restored: "Chroniken wiederhergestellt!",
         // Items

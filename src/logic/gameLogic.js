@@ -34,7 +34,7 @@ export const getTodayString = () => new Date().toISOString().split('T')[0];
 // --- PURE LOGIC ---
 
 export function getScore(stats) {
-    return stats.gold + (stats.army || 0) * 2 + (stats.knowledge || 0) * 3;
+    return stats.gold + (stats.knowledge || 0) * 3;
 }
 
 export function getCityRank(stats) {
@@ -183,14 +183,12 @@ export function processHabitToggle(habits, stats, id, dateString) {
                 if (type === 'vice') {
                     // Undo Penalty (Refund)
                     newStats.gold += (20 * dailyCount);
-                    newStats.army = (newStats.army || 0) + (5 * dailyCount);
                 } else if (type === 'todo') {
                     // Undo Reward
                     newStats.gold = Math.max(0, newStats.gold - 50);
                 } else {
                     // Virtue: Undo Reward
                     newStats.gold = Math.max(0, newStats.gold - (10 * dailyCount));
-                    newStats.army = Math.max(0, (newStats.army || 0) - dailyCount);
                 }
                 newHistory = newHistory.filter(d => d !== dateString);
             } else {
@@ -198,16 +196,15 @@ export function processHabitToggle(habits, stats, id, dateString) {
                 if (type === 'vice') {
                     // Penalty
                     newStats.gold = Math.max(0, newStats.gold - 20);
-                    newStats.army = Math.max(0, (newStats.army || 0) - 5);
                     notifications.push({ msg: { key: 'msg_habit_vice_penalty' }, type: "error" });
                 } else if (type === 'todo') {
                     // High Reward
                     newStats.gold += 50;
-                    notifications.push({ msg: { key: 'msg_habit_todo_reward' }, type: "success" });
+                    notifications.push({ msg: { key: 'msg_habit_todo_reward' }, type: "mandatum" });
                 } else {
                     // Virtue
                     newStats.gold += 10;
-                    newStats.army = (newStats.army || 0) + 1;
+                    notifications.push({ msg: { key: 'msg_habit_virtue_reward' }, type: "success" });
                 }
                 newHistory.push(dateString);
             }
