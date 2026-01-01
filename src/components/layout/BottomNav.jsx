@@ -1,10 +1,13 @@
-import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber, saveStatus, isLoggedIn }) => {
+    const { t } = useLanguage();
+
+    // We construct navItems inside render or memo so 't' is fresh
     const navItems = [
-        { id: 'city', label: 'Plichten', icon: './assets/nav_plichten.jpg' },
-        { id: 'tavern', label: 'Taverne', icon: './assets/nav_tavern.jpg' },
-        { id: 'adventure', label: 'Quests', icon: './assets/nav_quests.jpg' }
+        { id: 'city', label: t('nav_city'), icon: './assets/nav_plichten.jpg' },
+        { id: 'tavern', label: t('nav_tavern'), icon: './assets/nav_tavern.jpg' },
+        { id: 'adventure', label: t('nav_adventure'), icon: './assets/nav_quests.jpg' }
     ];
 
     return (

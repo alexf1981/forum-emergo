@@ -14,7 +14,8 @@ const Icons = {
     X: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
     Save: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>,
     Crown: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-3-4 3-6-7z"></path></svg>,
-    Wreath: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21.88a3 3 0 0 0-2.12-5.12C3 16.76 1 14 1 11a7 7 0 0 1 13.9 0c0 3-2 5.76-4.88 5.76A3 3 0 0 0 8 21.88Z"></path><path d="M16 21.88a3 3 0 0 1 2.12-5.12C21 16.76 23 14 23 11a7 7 0 0 0-13.9 0c0 3 2 5.76 4.88 5.76A3 3 0 0 1 16 21.88Z"></path></svg>
+    Wreath: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21.88a3 3 0 0 0-2.12-5.12C3 16.76 1 14 1 11a7 7 0 0 1 13.9 0c0 3-2 5.76-4.88 5.76A3 3 0 0 0 8 21.88Z"></path><path d="M16 21.88a3 3 0 0 1 2.12-5.12C21 16.76 23 14 23 11a7 7 0 0 0-13.9 0c0 3 2 5.76 4.88 5.76A3 3 0 0 1 16 21.88Z"></path></svg>,
+    Plus: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
 };
 
 export default Icons;

@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './components/App'
 import { AuthProvider } from './context/AuthContext'
+import { LanguageProvider } from './context/LanguageContext'
 
 // Import CSS
 import '../css/base.css'
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         {console.log("App is mounting...")}
         <AuthProvider>
-            <App />
+            <LanguageProvider>
+                <App />
+            </LanguageProvider>
         </AuthProvider>
     </React.StrictMode>,
 )

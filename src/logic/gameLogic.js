@@ -39,11 +39,11 @@ export function getScore(stats) {
 
 export function getCityRank(stats) {
     const s = getScore(stats);
-    if (s < 200) return "Dorp";
-    if (s < 500) return "Handelspost";
-    if (s < 1000) return "Stad";
-    if (s < 2500) return "Provincie Hoofdstad";
-    return "Keizerlijk Forum Emergo";
+    if (s < 200) return "rank_0";
+    if (s < 500) return "rank_1";
+    if (s < 1000) return "rank_2";
+    if (s < 2500) return "rank_3";
+    return "rank_4";
 }
 
 export function calculateBattleResult(hero, quest, randomFn = Math.random) {
@@ -74,19 +74,18 @@ export function calculateBattleResult(hero, quest, randomFn = Math.random) {
                 const foundItem = possibleItems[Math.floor(randomFn() * possibleItems.length)];
 
                 // Smart Inventory Management
-                const existingItemIndex = newItems.findIndex(i => i.type === foundItem.type);
                 if (existingItemIndex !== -1) {
                     const existingItem = newItems[existingItemIndex];
                     if (foundItem.bonus > existingItem.bonus) {
                         newItems[existingItemIndex] = foundItem; // Upgrade
-                        lootMsg = ` | 🆙 UPGRADE: ${foundItem.name} replaces ${existingItem.name}!`;
+                        lootMsg = { key: 'msg_loot_upgrade', args: { item: foundItem.name, oldItem: existingItem.name } };
                     } else {
                         earnedGold += 10;
-                        lootMsg = ` | 💰 Verkocht zwakke buit (+10g)`;
+                        lootMsg = { key: 'msg_loot_sell', args: {} };
                     }
                 } else {
                     newItems.push(foundItem); // New slot
-                    lootMsg = ` | 🎁 GEVONDEN: ${foundItem.name}!`;
+                    lootMsg = { key: 'msg_loot_found', args: { item: foundItem.name } };
                 }
             }
         }
@@ -109,7 +108,7 @@ export function calculateBattleResult(hero, quest, randomFn = Math.random) {
             earnedXp,
             earnedGold,
             dmgTaken,
-            lootMsg,
+            lootMsg, // Now an object or null
             newItems,
             newXp,
             newLvl,
@@ -199,11 +198,11 @@ export function processHabitToggle(habits, stats, id, dateString) {
                     // Penalty
                     newStats.gold = Math.max(0, newStats.gold - 20);
                     newStats.army = Math.max(0, (newStats.army || 0) - 5);
-                    notifications.push({ msg: "Betoont berouw! (-20 Goud)", type: "error" });
+                    notifications.push({ msg: { key: 'msg_habit_vice_penalty' }, type: "error" });
                 } else if (type === 'todo') {
                     // High Reward
                     newStats.gold += 50;
-                    notifications.push({ msg: "Taak voltooid! (+50 Goud)", type: "success" });
+                    notifications.push({ msg: { key: 'msg_habit_todo_reward' }, type: "success" });
                 } else {
                     // Virtue
                     newStats.gold += 10;

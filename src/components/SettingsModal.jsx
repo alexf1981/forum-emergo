@@ -4,8 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/auth';
 import AdminDashboard from './AdminDashboard';
 
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../locales/translations';
+
 const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRomanNumerals, onLogin }) => {
     const { user } = useAuth();
+    const { language, changeLanguage, t } = useLanguage();
     const [showAdmin, setShowAdmin] = useState(false);
     const [showLocal, setShowLocal] = useState(false); // Collapsed by default to save space
 
@@ -42,36 +46,60 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>Instellingen</h2>
+                    <h2>{t('settings_title')}</h2>
                     <button className="btn-icon" onClick={onClose}><Icons.X /></button>
                 </div>
                 <div className="modal-body" style={{ gap: '10px' }}>
 
                     {/* CLOUD SECTION (Preferred) */}
                     <div className="card">
-                        <h3><Icons.Wreath /> Cloud Opslag</h3>
+                        <h3><Icons.Wreath /> {t('cloud_storage')}</h3>
                         {user ? (
                             <div className="mt-sm">
-                                <p style={{ fontSize: '0.9em' }}>Ingelogd als: <br /><strong>{user.email}</strong></p>
+                                <p style={{ fontSize: '0.9em' }}>{t('cloud_desc_user')} <br /><strong>{user.email}</strong></p>
                                 {isAdmin && (
                                     <button className="btn full-width mt-sm" onClick={() => setShowAdmin(true)} style={{ backgroundColor: '#8e44ad', borderColor: '#6c3483' }}>
                                         <Icons.Crown /> Admin
                                     </button>
                                 )}
-                                <button className="btn full-width mt-sm" onClick={handleLogout} style={{ backgroundColor: '#c0392b', borderColor: '#962d22' }}>Uitloggen</button>
+                                <button className="btn full-width mt-sm" onClick={handleLogout} style={{ backgroundColor: '#c0392b', borderColor: '#962d22' }}>{t('logout')}</button>
                             </div>
                         ) : (
                             <div className="mt-sm">
-                                <p style={{ fontSize: '0.9em' }}>Maak een account aan om je voortgang veilig in de cloud te bewaren en overal te spelen.</p>
-                                <button className="btn full-width mt-sm" onClick={onLogin}>Inloggen / Registreren</button>
+                                <p style={{ fontSize: '0.9em' }}>{t('cloud_desc_guest')}</p>
+                                <button className="btn full-width mt-sm" onClick={onLogin}>{t('login_btn')} / {t('register_btn')}</button>
                             </div>
                         )}
                     </div>
 
                     {/* DISPLAY SETTINGS */}
                     <div className="card" style={{ padding: '10px' }}>
+                        <div className="settings-row" style={{ marginBottom: '10px', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <span style={{ marginBottom: '5px' }}>Taal / Language</span>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                {['en', 'nl', 'es', 'de'].map(langKey => (
+                                    <button
+                                        key={langKey}
+                                        onClick={() => changeLanguage(langKey)}
+                                        style={{
+                                            fontSize: '1.5rem',
+                                            padding: '5px',
+                                            border: language === langKey ? '2px solid #8E1600' : '1px solid #ccc',
+                                            borderRadius: '5px',
+                                            backgroundColor: language === langKey ? '#fff0e0' : 'white',
+                                            cursor: 'pointer',
+                                            opacity: language === langKey ? 1 : 0.7
+                                        }}
+                                        title={translations[langKey].name}
+                                    >
+                                        {translations[langKey].flag}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="settings-row">
-                            <span>Romeinse Cijfers</span>
+                            <span>{t('roman_nums')}</span>
                             <input
                                 type="checkbox"
                                 checked={useRomanNumerals}
@@ -87,20 +115,20 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
                             onClick={() => setShowLocal(!showLocal)}
                         >
-                            <h3 style={{ margin: 0, fontSize: '1rem' }}><Icons.Scroll /> Lokaal Beheer</h3>
+                            <h3 style={{ margin: 0, fontSize: '1rem' }}><Icons.Scroll /> {t('local_manage')}</h3>
                             <span>{showLocal ? '▲' : '▼'}</span>
                         </div>
 
                         {showLocal && (
                             <div className="mt-md">
                                 <p style={{ fontSize: '0.85em', color: '#666', marginBottom: '10px' }}>
-                                    Geen account nodig. Gegevens worden op dit apparaat opgeslagen. je kunt ook handmatig back-ups maken.
+                                    {t('local_desc')}
                                 </p>
                                 <button className="btn full-width" onClick={onExport} style={{ fontSize: '0.9em', padding: '8px' }}>
-                                    <Icons.Save /> Download Backup
+                                    <Icons.Save /> {t('download_backup')}
                                 </button>
                                 <div className="mt-sm">
-                                    <label style={{ fontSize: '0.9em', display: 'block', marginBottom: '4px' }}>Backup Terugzetten:</label>
+                                    <label style={{ fontSize: '0.9em', display: 'block', marginBottom: '4px' }}>{t('restore_backup')}:</label>
                                     <input
                                         className="file-input full-width"
                                         type="file"

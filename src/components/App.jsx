@@ -8,8 +8,10 @@ import AddTaskModal from './AddTaskModal';
 import SettingsModal from './SettingsModal';
 import AuthModal from './AuthModal';
 import { useGame } from '../hooks/useGame';
+import { useLanguage } from '../context/LanguageContext';
 
 function App() {
+    const { t } = useLanguage();
     // === STATE ===
     const [activeTab, setActiveTab] = useState('city');
     const [showSettings, setShowSettings] = useState(false);
@@ -38,7 +40,16 @@ function App() {
         // Check for logout message (persisted across reload)
         const logoutMsg = localStorage.getItem('logout_message');
         if (logoutMsg) {
-            // Need a slight delay to ensure notification system is ready/rendered or just call it immediately
+            // Parses "email" from stored message if I stored plain email? 
+            // Previous code stored "Uitgelogd als [email]". 
+            // New I should probably just store the email and reconstruct the message here with t().
+            // But for backward compatibility or simplicity, I'll display it as is if it's a string, or parse if I change how it's stored.
+            // Let's assume it's just the full message string for now as per previous implementation.
+            // To make it fully multi-lang, I should have stored just the email or a flag.
+            // Given I can't easily change the stored format of an "already implemented" feature without breaking existing flow potentially...
+            // Wait, I changed SettingsModal to store: localStorage.setItem('logout_message', `Uitgelogd als ${userEmail}`);
+            // I should change THAT to store just the email or a JSON object.
+
             setTimeout(() => actions.notify(logoutMsg, "info"), 500);
             localStorage.removeItem('logout_message');
         }
@@ -55,7 +66,7 @@ function App() {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Zeker weten dat je deze activiteit wilt verwijderen?')) {
+        if (confirm(t('habit_delete_confirm'))) {
             actions.deleteHabit(id);
         }
     };
@@ -80,13 +91,13 @@ function App() {
     };
 
     const handleImport = (file) => {
-        if (!confirm("Overschrijven?")) return;
+        if (!confirm(t('confirm') + "?")) return; // "Confirm?"
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 const data = JSON.parse(e.target.result);
                 actions.importData(data);
-            } catch (err) { console.error(err); alert("Fout bij lezen!"); }
+            } catch (err) { console.error(err); alert("Error!"); }
         };
         reader.readAsText(file);
     };
@@ -98,7 +109,7 @@ function App() {
     const handleLoginSuccess = (email) => {
         setShowAuthModal(false);
         setShowSettings(false);
-        actions.notify(`Ingelogd als ${email}`, "success");
+        actions.notify(t('login_success') + ` ${email}`, "success");
     };
 
     return (
@@ -128,13 +139,13 @@ function App() {
                 />
             )}
 
-            <button className="fab" onClick={() => setShowAddTaskModal(true)} title="Nieuwe taak">+</button>
+            <button className="fab" onClick={() => setShowAddTaskModal(true)} title={t('habit_new')}>+</button>
 
             <div className={`hero-placeholder ${isHeaderCompact ? 'compact' : ''}`} />
             <div className={`hero-banner ${isHeaderCompact ? 'compact' : ''}`}>
                 <div className="hero-overlay header-content">
                     <h1>Forum Emergo</h1>
-                    <div className="subtitle">Bouw je imperium, verover de wereld</div>
+                    <div className="subtitle">{t('subtitle')}</div>
                 </div>
             </div>
 
@@ -176,9 +187,15 @@ function App() {
                 )}
 
                 <div className="toast-container">
-                    {notifications.map(n => (
-                        <div key={n.id} className={`toast ${n.type}`}>{n.msg}</div>
-                    ))}
+                    {notifications.map(n => {
+                        let text = "";
+                        if (typeof n.msg === 'string') {
+                            text = n.msg;
+                        } else if (n.msg && n.msg.key) {
+                            text = t(n.msg.key, n.msg.args);
+                        }
+                        return <div key={n.id} className={`toast ${n.type}`}>{text}</div>;
+                    })}
                 </div>
             </div>
 
