@@ -43,13 +43,7 @@ function AddTaskModal({ onClose, onAdd }) {
                             type="text"
                             value={text}
                             onChange={e => setText(e.target.value)}
-                            onKeyDown={e => {
-                                if (e.key === 'Enter' || e.keyCode === 13) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleSubmit(e);
-                                }
-                            }}
+
                             autoFocus
                         />
                     </div>
