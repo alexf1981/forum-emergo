@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as GameLogic from '../../logic/gameLogic';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import Icons from '../Icons';
 
 const CityVisual = ({ rank }) => {
@@ -41,6 +42,7 @@ const CityVisual = ({ rank }) => {
 
 const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, formatNumber }) => {
     const { t } = useLanguage();
+    const { playerName } = useAuth();
     const [editingHabitId, setEditingHabitId] = useState(null);
 
     const handleSaveEdit = (id, newText, newBucket) => {
@@ -53,7 +55,7 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
             <div className="main-grid">
                 <aside>
                     <div className="card">
-                        <div className="card-title"><h3>{t('nav_city')}</h3></div>
+                        <div className="card-title"><h3>{playerName ? t('city_of_player').replace('{name}', playerName) : t('nav_city')}</h3></div>
                         <CityVisual rank={rank} score={score} formatNumber={formatNumber} />
                         <div className="stat-row"><span className="resource gold"><Icons.Coin /> {t('gold')}</span><span>{formatNumber(stats.gold)}</span></div>
                         <div className="stat-row"><span className="resource army"><Icons.Sword /> {t('score')}</span><span>{formatNumber(stats.army)}</span></div>

@@ -1,11 +1,17 @@
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 
 const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber, saveStatus, isLoggedIn }) => {
     const { t } = useLanguage();
+    const { playerName } = useAuth();
 
     // We construct navItems inside render or memo so 't' is fresh
     const navItems = [
-        { id: 'city', label: t('nav_city'), icon: './assets/nav_plichten.jpg' },
+        {
+            id: 'city',
+            label: playerName ? t('city_of_player').replace('{name}', playerName) : t('nav_city'),
+            icon: './assets/nav_plichten.jpg'
+        },
         { id: 'tavern', label: t('nav_tavern'), icon: './assets/nav_tavern.jpg' },
         { id: 'adventure', label: t('nav_adventure'), icon: './assets/nav_quests.jpg' }
     ];

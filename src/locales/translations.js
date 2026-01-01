@@ -40,8 +40,10 @@ export const translations = {
         restore_backup: "Restore Backup",
         roman_nums: "Roman Numerals",
         admin_panel: "Imperial Admin",
+        player_name: "Player Name",
         // Navigation
         nav_city: "Duties",
+        city_of_player: "{name}'s City",
         nav_tavern: "Tavern",
         nav_adventure: "Adventure",
         // Game
@@ -143,8 +145,10 @@ export const translations = {
         restore_backup: "Backup Terugzetten",
         roman_nums: "Romeinse Cijfers",
         admin_panel: "Keizerlijk Overzicht",
+        player_name: "Spelersnaam",
         // Navigation
         nav_city: "Plichten",
+        city_of_player: "{name}'s Stad",
         nav_tavern: "Taverne",
         nav_adventure: "Avontuur",
         // Game
@@ -246,8 +250,10 @@ export const translations = {
         restore_backup: "Restaurar Copia",
         roman_nums: "Números Romanos",
         admin_panel: "Admin Imperial",
+        player_name: "Nombre del Jugador",
         // Navigation
         nav_city: "Deberes",
+        city_of_player: "Ciudad de {name}",
         nav_tavern: "Taberna",
         nav_adventure: "Aventura",
         // Game
@@ -349,8 +355,10 @@ export const translations = {
         restore_backup: "Backup wiederherstellen",
         roman_nums: "Römische Zahlen",
         admin_panel: "Kaiserliche Admin",
+        player_name: "Spielername",
         // Navigation
         nav_city: "Pflichten",
+        city_of_player: "Stadt von {name}",
         nav_tavern: "Taverne",
         nav_adventure: "Abenteuer",
         // Game

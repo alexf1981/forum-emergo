@@ -9,9 +9,11 @@ import SettingsModal from './SettingsModal';
 import AuthModal from './AuthModal';
 import { useGame } from '../hooks/useGame';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 function App() {
     const { t } = useLanguage();
+    const { playerName, updatePlayerName } = useAuth();
     // === STATE ===
     const [activeTab, setActiveTab] = useState('city');
     const [showSettings, setShowSettings] = useState(false);
@@ -71,7 +73,8 @@ function App() {
 
     // Import/Export Handlers
     const handleExport = () => {
-        const data = actions.getExportData();
+        const gameData = actions.getExportData();
+        const data = { ...gameData, player_name: playerName };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -87,6 +90,9 @@ function App() {
         reader.onload = (e) => {
             try {
                 const data = JSON.parse(e.target.result);
+                if (data.player_name) {
+                    updatePlayerName(data.player_name);
+                }
                 actions.importData(data);
             } catch (err) { console.error(err); alert("Error!"); }
         };
@@ -102,6 +108,8 @@ function App() {
         setShowSettings(false);
         actions.notify(t('login_success') + ` ${email}`, "success");
     };
+
+
 
     return (
         <div className="wrapper">

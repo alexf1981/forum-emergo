@@ -8,7 +8,14 @@ import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../locales/translations';
 
 const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRomanNumerals, onLogin }) => {
-    const { user } = useAuth();
+    const { user, playerName, updatePlayerName } = useAuth();
+    const [localPlayerName, setLocalPlayerName] = useState(playerName || '');
+
+    // Keep local input in sync if context updates (e.g. after async fetch)
+    React.useEffect(() => {
+        setLocalPlayerName(playerName || '');
+    }, [playerName]);
+
     const { language, changeLanguage, t } = useLanguage();
     const [showAdmin, setShowAdmin] = useState(false);
     const [showLocal, setShowLocal] = useState(false); // Collapsed by default to save space
@@ -24,11 +31,13 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
     const handleLogout = async () => {
         const email = user?.email; // Capture email before it's gone
 
-        // 1. Attempt to sign out (server/client)
+        // 1. Attempt to sign out (server/client) with timeout safety
         try {
-            await signOut();
+            const logoutPromise = signOut();
+            const timeoutPromise = new Promise(resolve => setTimeout(resolve, 2000));
+            await Promise.race([logoutPromise, timeoutPromise]);
         } catch (error) {
-            console.error("Logout error:", error);
+            console.error("Logout error (or timeout):", error);
         }
 
         // 2. Nuke everything from storage to be sure (Auth tokens + Game Data)
@@ -51,6 +60,21 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                     <button className="btn-icon" onClick={onClose}><Icons.X /></button>
                 </div>
                 <div className="modal-body" style={{ gap: '10px' }}>
+
+
+                    {/* PROFILE SECTION */}
+                    <div className="card">
+                        <div className="modal-form-group">
+                            <label>{t('player_name')}</label>
+                            <input
+                                type="text"
+                                value={localPlayerName}
+                                onChange={(e) => setLocalPlayerName(e.target.value)}
+                                onBlur={() => updatePlayerName(localPlayerName)}
+                                placeholder={t('player_name')}
+                            />
+                        </div>
+                    </div>
 
                     {/* CLOUD SECTION (Preferred) */}
                     <div className="card">
@@ -120,6 +144,9 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                                 className="settings-checkbox"
                             />
                         </div>
+
+
+
                     </div>
 
                     {/* LOCAL SECTION (Collapsible) */}

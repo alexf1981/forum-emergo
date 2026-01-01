@@ -157,19 +157,39 @@ export function useGame() {
     // === SYNC WITH SUPABASE ===
     const { user } = useAuth();
     const [saveStatus, setSaveStatus] = useState('idle'); // 'idle', 'saving', 'saved', 'error'
+    const [isCloudSynchronized, setIsCloudSynchronized] = useState(false);
 
     // 1. Initial Load from Cloud when user logs in
     useEffect(() => {
         const syncFromCloud = async () => {
             if (user) {
+                // Reset sync status because we are loading new user data
+                // We do NOT want to auto-save local stale data over this new user's cloud data
+                setIsCloudSynchronized(false);
                 setSaveStatus('loading');
-                const cloudData = await DataService.loadGameData(user.id);
-                if (cloudData && cloudData.romestats) {
-                    setStats(cloudData.romestats);
-                    setHabits(cloudData.romehabits);
-                    setHeroes(cloudData.romeheroes);
+
+                try {
+                    const cloudData = await DataService.loadGameData(user.id);
+                    if (cloudData && cloudData.romestats) {
+                        setStats(cloudData.romestats);
+                        setHabits(cloudData.romehabits);
+                        setHeroes(cloudData.romeheroes);
+                    }
+                    setSaveStatus('saved');
+                } catch (error) {
+                    console.error("Sync error:", error);
+                    setSaveStatus('error');
+                    notify("Kon niet synchroniseren met de cloud", "error"); // "Could not sync with cloud"
+                } finally {
+                    // Whether success or fail, we attempted sync.
+                    // If fail, we arguably might not want to overwrite cloud with local, but 
+                    // usually we let user continue. For safety, let's say we are synchronized 
+                    // so valid local changes can eventually be saved.
+                    setIsCloudSynchronized(true);
                 }
-                setSaveStatus('saved');
+            } else {
+                // No user? No sync needed, but we are "synchronized" with local (noop)
+                setIsCloudSynchronized(false);
             }
         };
         syncFromCloud();
@@ -177,7 +197,9 @@ export function useGame() {
 
     // 2. Auto-save to cloud when state changes (debounced)
     useEffect(() => {
-        if (user) {
+        // CRITICAL FIX: Do NOT save if we haven't finished loading cloud data yet.
+        // This prevents local stale data from overwriting fresh cloud data on startup.
+        if (user && isCloudSynchronized) {
             setSaveStatus('pending');
             const dataToSave = {
                 romestats: stats,
@@ -185,16 +207,16 @@ export function useGame() {
                 romeheroes: heroes
             };
 
-            // Reduced timeout to 1000ms to persist faster
+            // Reduced timeout to 200ms to persist faster and feel snappier
             const timeoutId = setTimeout(async () => {
                 setSaveStatus('saving');
                 const success = await DataService.saveGameData(user.id, dataToSave);
                 setSaveStatus(success ? 'saved' : 'error');
-            }, 1000);
+            }, 200);
 
             return () => clearTimeout(timeoutId);
         }
-    }, [stats, habits, heroes, user]);
+    }, [stats, habits, heroes, user, isCloudSynchronized]);
 
 
     return {
