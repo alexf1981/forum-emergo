@@ -408,10 +408,42 @@
     z-index: 2;
 }
 
+.nav-value.gold-value {
+    z-index: 10;
+    text-shadow:
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000,
+        0 0 8px rgba(0, 0, 0, 1);
+    width: 140%;
+    /* Allow text to be wider than icon */
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+
+@media (max-width: 600px) {
+    .nav-value.gold-value {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .nav-value.gold-value {
+        font-size: 0.8rem;
+    }
+}
+
 .stat-item {
     cursor: default;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
 }
 
 /* Floating Action Button (FAB) */
@@ -646,7 +678,9 @@
 }
 
 .checkbox-field {
-    /* display: contents */
+    /* Styles for checkbox field container */
+    display: flex;
+    flex-direction: column;
 }
 
 .scroll-field.checkbox-field label {
@@ -661,7 +695,9 @@
 }
 
 .scroll-checkbox-item {
-    /* simplified */
+    /* Styles for scroll checkbox item */
+    display: flex;
+    align-items: center;
 }
 
 .scroll-checkbox-item input {

@@ -20,10 +20,10 @@ const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber
         <div className="bottom-nav">
             <div className="bottom-nav-content">
                 <div className="nav-item stat-item edge-item">
-                    <div className="nav-icon">
+                    <div className="nav-icon gold-icon">
                         <img src="./assets/nav_gold.jpg" alt="Goud" />
-                        <span className="nav-value">{stats.gold}</span>
                     </div>
+                    <span className="nav-value gold-value">{stats.gold}</span>
                 </div>
 
                 <div className="nav-group-center">
