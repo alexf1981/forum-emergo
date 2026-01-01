@@ -22,7 +22,8 @@ function App() {
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, saveStatus, isLoggedIn } = useGame();
+    // === HOOK ===
+    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn } = useGame();
 
     // Scroll listener
     useEffect(() => {
@@ -40,16 +41,6 @@ function App() {
         // Check for logout message (persisted across reload)
         const logoutMsg = localStorage.getItem('logout_message');
         if (logoutMsg) {
-            // Parses "email" from stored message if I stored plain email? 
-            // Previous code stored "Uitgelogd als [email]". 
-            // New I should probably just store the email and reconstruct the message here with t().
-            // But for backward compatibility or simplicity, I'll display it as is if it's a string, or parse if I change how it's stored.
-            // Let's assume it's just the full message string for now as per previous implementation.
-            // To make it fully multi-lang, I should have stored just the email or a flag.
-            // Given I can't easily change the stored format of an "already implemented" feature without breaking existing flow potentially...
-            // Wait, I changed SettingsModal to store: localStorage.setItem('logout_message', `Uitgelogd als ${userEmail}`);
-            // I should change THAT to store just the email or a JSON object.
-
             setTimeout(() => actions.notify(logoutMsg, "info"), 500);
             localStorage.removeItem('logout_message');
         }
@@ -183,6 +174,7 @@ function App() {
                         onGoAdventure={actions.goAdventure}
                         onFightBoss={actions.fightBoss}
                         formatNumber={formatNumber}
+                        combatLog={combatLog}
                     />
                 )}
 

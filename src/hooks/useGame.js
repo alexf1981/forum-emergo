@@ -24,7 +24,7 @@ export function useGame() {
         setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 3000);
     };
 
-    const log = (msg) => setCombatLog(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 20));
+    const log = (msg) => setCombatLog(prev => [{ id: Date.now() + Math.random(), time: new Date(), msg }, ...prev].slice(0, 20));
 
     // === ACTIONS: HABITS ===
     const toggleHabit = (id) => {
@@ -42,7 +42,7 @@ export function useGame() {
                 const today = GameLogic.getTodayString();
                 if (type === 'vice') {
                     setStats(s => ({ ...s, gold: Math.max(0, s.gold - 20), army: Math.max(0, (s.army || 0) - 5) }));
-                    notify("De verleiding won... (-20 Goud)", "error");
+                    notify({ key: 'msg_habit_vice_penalty' }, "error");
                 } else {
                     setStats(s => ({ ...s, gold: s.gold + 10, army: (s.army || 0) + 1 }));
                 }
@@ -54,7 +54,7 @@ export function useGame() {
 
     const addHabit = (text, type, bucket) => {
         setHabits(GameLogic.createHabit(habits, text, type, bucket));
-        notify("Nieuwe taak toegevoegd!", "success");
+        notify({ key: 'msg_added_task' }, "success");
     };
 
     const deleteHabit = (id) => {
@@ -67,62 +67,76 @@ export function useGame() {
 
     // === ACTIONS: HEROES ===
     const recruitHero = () => {
-        if (stats.gold < 100) { notify("Niet genoeg goud! (Nodig: 100)", "error"); return; }
+        if (stats.gold < 100) { notify({ key: 'msg_recruit_fail_gold' }, "error"); return; }
         const name = GameLogic.HERO_NAMES[Math.floor(Math.random() * GameLogic.HERO_NAMES.length)];
         const newHero = { id: Date.now(), name, lvl: 1, xp: 0, hp: 20, maxHp: 20, str: Math.floor(Math.random() * 3) + 3, items: [] };
         setStats(s => ({ ...s, gold: s.gold - 100 }));
         setHeroes([...heroes, newHero]);
-        notify(`${name} is gerekruteerd!`, "success");
+        notify({ key: 'msg_recruit_success', args: { name } }, "success");
     };
 
     const healHero = (id) => {
         if (stats.gold < 10) return;
         setStats(s => ({ ...s, gold: s.gold - 10 }));
         setHeroes(prev => prev.map(h => h.id === id ? { ...h, hp: h.maxHp } : h));
-        log("Held is verzorgd.");
+        notify({ key: 'msg_heal_success' }, "success");
+        log({ key: 'msg_heal_success' });
     };
 
     const goAdventure = (heroId, questId) => {
         const hero = heroes.find(h => h.id === heroId);
         const quest = GameLogic.QUESTS.find(q => q.id === questId);
-        if (!quest) { notify("Selecteer eerst een missie type!", "warning"); return; }
-        if (hero.hp <= 5) { notify(`${hero.name} is te gewond!`, "error"); return; }
+        if (!quest) { notify({ key: 'msg_select_mission' }, "warning"); return; }
+        if (hero.hp <= 5) { notify({ key: 'msg_hero_wounded', args: { name: hero.name } }, "error"); return; }
 
-        log(`⚔️ ${hero.name} vertrekt: ${quest.name}...`);
+        if (hero.hp <= 5) { notify({ key: 'msg_hero_wounded', args: { name: hero.name } }, "error"); return; }
+
+        // Use translated quest name in args? Or pass quest object? 
+        // We can pass simple quest name, but if quest name is translated dynamically in view it's better.
+        // But QUEST names are in translations.js? No, they are in gameLogic.js as "name" property (Dutch).
+        // I should probably translate quest name too. `quest_${quest.id}` is the key.
+        log({ key: 'msg_hero_depart', args: { name: hero.name, quest: quest.id } }); // Pass quest ID to resolve translation
 
         // Async result handling in hook? Ideally UI shouldn't wait, but we use setTimeout for effect
         setTimeout(() => {
             const result = GameLogic.calculateBattleResult(hero, quest);
             if (result.success) {
-                log(`✅ WINST! +${result.earnedXp} XP, +${result.earnedGold} Goud${result.lootMsg}`);
-                if (result.lootMsg) notify(result.lootMsg.replace(' | ', ''), "success");
+                log({
+                    key: 'msg_win',
+                    args: {
+                        xp: result.earnedXp,
+                        gold: result.earnedGold,
+                        loot: result.lootMsg // This is a nested message object {key, args}
+                    }
+                });
+                if (result.lootMsg) notify(result.lootMsg, "success"); // lootMsg is already { key, args } from gameLogic
                 setHeroes(prev => prev.map(h => {
                     if (h.id !== heroId) return h;
                     if (result.leveledUp) {
-                        log(`🆙 ${h.name} is nu level ${result.newLvl}! (+2 Str)`);
-                        notify(`${h.name} Level Up!`, "success");
+                        log({ key: 'msg_levelup', args: { name: h.name, lvl: result.newLvl } });
+                        notify({ key: 'msg_levelup_toast', args: { name: h.name } }, "success");
                     }
                     return { ...h, xp: result.newXp, lvl: result.newLvl, str: result.newStr, hp: result.hp, items: result.newItems };
                 }));
                 setStats(s => ({ ...s, gold: s.gold + result.earnedGold }));
             } else {
-                log(`❌ NEDERLAAG! ${hero.name} vlucht... (-${result.dmgTaken} HP)`);
+                log({ key: 'msg_loss', args: { name: hero.name, dmg: result.dmgTaken } });
                 setHeroes(prev => prev.map(h => h.id === heroId ? { ...h, hp: result.hp } : h));
-                notify("Nederlaag...", "error");
+                notify({ key: 'msg_defeat_title' }, "error");
             }
         }, 500);
     };
 
     const fightBoss = () => {
         const totalStr = heroes.reduce((acc, h) => acc + h.str + h.items.reduce((s, i) => s + i.bonus, 0) + h.lvl, 0);
-        log(`🐲 HYDRA GEVECHT! Totale Kracht: ${totalStr} vs 250`);
+        log({ key: 'msg_hydra_fight', args: { str: totalStr } });
         if (totalStr > 250) {
-            log(`🏆 OVERWINNING! DE HYDRA IS VERSLAGEN!`);
-            notify("FORUM EMERGO IS EEUWIG!", "success");
+            log({ key: 'msg_hydra_win' });
+            notify({ key: 'msg_hydra_win_toast' }, "success");
             setStats(s => ({ ...s, gold: s.gold + 50000 }));
         } else {
-            log(`💀 Je legioen is te zwak!`);
-            notify("Legioen te zwak...", "error");
+            log({ key: 'msg_hydra_fail' });
+            notify({ key: 'msg_hydra_fail_toast' }, "error");
         }
     };
 
@@ -133,7 +147,7 @@ export function useGame() {
             setStats(data.romestats);
             setHabits(data.romehabits);
             setHeroes(data.romeheroes);
-            notify("Kronieken hersteld!", "success");
+            notify({ key: 'msg_restored' }, "success");
         }
     };
 
@@ -151,7 +165,6 @@ export function useGame() {
                 setSaveStatus('loading');
                 const cloudData = await DataService.loadGameData(user.id);
                 if (cloudData && cloudData.romestats) {
-                    console.log("Syncing from Cloud...", cloudData);
                     setStats(cloudData.romestats);
                     setHabits(cloudData.romehabits);
                     setHeroes(cloudData.romeheroes);

@@ -3,8 +3,25 @@ import * as GameLogic from '../../logic/gameLogic';
 
 import { useLanguage } from '../../context/LanguageContext';
 
-const AdventureView = ({ heroes, selectedQuest, onSelectQuest, onGoAdventure, onFightBoss, formatNumber }) => {
+const AdventureView = ({ heroes, selectedQuest, onSelectQuest, onGoAdventure, onFightBoss, formatNumber, combatLog }) => {
     const { t } = useLanguage();
+
+    const renderMessage = (msgObj) => {
+        if (!msgObj) return "";
+        if (typeof msgObj === 'string') return msgObj;
+        const { key, args } = msgObj;
+        if (!key) return "";
+
+        const tArgs = { ...args };
+        if (tArgs.quest && typeof tArgs.quest === 'string') {
+            tArgs.quest = t(`quest_${tArgs.quest}`);
+        }
+        if (tArgs.loot && typeof tArgs.loot === 'object') {
+            tArgs.loot = renderMessage(tArgs.loot);
+        }
+
+        return t(key, tArgs);
+    };
 
     return (
         <div>
@@ -38,6 +55,20 @@ const AdventureView = ({ heroes, selectedQuest, onSelectQuest, onGoAdventure, on
                 <h3 style={{ color: '#d32f2f' }}>{t('boss_hydra')}</h3>
                 <p>{t('boss_desc')}</p>
                 <button className="btn" style={{ background: '#d32f2f', color: 'white' }} onClick={onFightBoss}>{t('boss_fight')}</button>
+            </div>
+
+            {/* Combat Log */}
+            <div className="card" style={{ marginTop: '20px', background: '#333', color: '#fff', maxHeight: '200px', overflowY: 'auto' }}>
+                <h3 style={{ color: '#fff', borderBottom: '1px solid #555' }}>Combat Log</h3>
+                <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                    {combatLog && combatLog.map((entry, i) => (
+                        <div key={i} style={{ borderBottom: '1px solid #444', padding: '2px 0' }}>
+                            <span style={{ color: '#888', marginRight: '8px' }}>[{new Date(entry.time).toLocaleTimeString()}]</span>
+                            {renderMessage(entry.msg)}
+                        </div>
+                    ))}
+                    {(!combatLog || combatLog.length === 0) && <div style={{ color: '#666', fontStyle: 'italic' }}>...</div>}
+                </div>
             </div>
         </div>
     );
