@@ -3,11 +3,11 @@ import * as GameLogic from './gameLogic';
 
 describe('City Rank Logic', () => {
     it('should determine correct rank based on score', () => {
-        expect(GameLogic.getCityRank({ gold: 199 })).toBe("Dorp");
-        expect(GameLogic.getCityRank({ gold: 200 })).toBe("Handelspost");
-        expect(GameLogic.getCityRank({ gold: 499 })).toBe("Handelspost");
-        expect(GameLogic.getCityRank({ gold: 500 })).toBe("Stad");
-        expect(GameLogic.getCityRank({ gold: 2500 })).toBe("Keizerlijk Forum Emergo");
+        expect(GameLogic.getCityRank({ gold: 199 })).toBe("rank_0");
+        expect(GameLogic.getCityRank({ gold: 200 })).toBe("rank_1");
+        expect(GameLogic.getCityRank({ gold: 499 })).toBe("rank_1");
+        expect(GameLogic.getCityRank({ gold: 500 })).toBe("rank_2");
+        expect(GameLogic.getCityRank({ gold: 2500 })).toBe("rank_4");
     });
 });
 

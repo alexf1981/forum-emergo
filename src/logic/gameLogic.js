@@ -74,6 +74,7 @@ export function calculateBattleResult(hero, quest, randomFn = Math.random) {
                 const foundItem = possibleItems[Math.floor(randomFn() * possibleItems.length)];
 
                 // Smart Inventory Management
+                const existingItemIndex = newItems.findIndex(i => i.type === foundItem.type);
                 if (existingItemIndex !== -1) {
                     const existingItem = newItems[existingItemIndex];
                     if (foundItem.bonus > existingItem.bonus) {
