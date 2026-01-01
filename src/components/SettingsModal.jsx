@@ -18,6 +18,11 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
 
     const handleLogout = async () => {
         await signOut();
+        // Clear local game state to ensure a fresh start
+        localStorage.removeItem('romestats');
+        localStorage.removeItem('romeheroes');
+        localStorage.removeItem('romehabits');
+        window.location.reload(); // Force reload to clear all states/cache
     };
 
     return (
