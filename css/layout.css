@@ -131,7 +131,6 @@
     grid-template-columns: 1fr;
     grid-template-areas:
         "tasks"
-        "title"
         "visual";
     gap: var(--spacing-md);
     height: auto;

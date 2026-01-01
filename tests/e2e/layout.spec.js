@@ -45,5 +45,8 @@ test.describe('Layout Checks', () => {
         await page.getByTitle(/Duties|City|Stad/i).click();
         // Header might also be dynamic now (Player Name badge)
         await expect(page.locator('.city-name-badge')).toBeVisible();
+        await expect(page.locator('.city-rank-badge')).toBeVisible();
+        // Check for common rank names (English or Dutch)
+        await expect(page.locator('.city-rank-badge')).toHaveText(/Village|Dorp|Trading Post|Handelspost|City|Stad/i);
     });
 });
