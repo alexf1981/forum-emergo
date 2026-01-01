@@ -264,6 +264,23 @@ export function useGame() {
         }
     }, [stats, habits, heroes, user, isCloudSynchronized]);
 
+    // === DAILY WELCOME ===
+    const [showWelcome, setShowWelcome] = useState(false);
+
+    useEffect(() => {
+        const lastDate = localStorage.getItem('rome_last_welcome');
+        const today = GameLogic.getTodayString();
+        if (lastDate !== today) {
+            setShowWelcome(true);
+        }
+    }, []);
+
+    const dismissWelcome = () => {
+        const today = GameLogic.getTodayString();
+        localStorage.setItem('rome_last_welcome', today);
+        setShowWelcome(false);
+        setHabits(prev => GameLogic.resetDailyHabits(prev));
+    };
 
     return {
         // State
@@ -273,6 +290,7 @@ export function useGame() {
         notifications,
         combatLog,
         saveStatus, // Export status
+        showWelcome, // NEW
         // Actions
         actions: {
             toggleHabit,
@@ -287,7 +305,8 @@ export function useGame() {
             fightBoss,
             importData,
             getExportData,
-            notify // Expose notify for App usage
+            notify,
+            dismissWelcome // NEW
         },
         isLoggedIn: !!user
     };

@@ -215,3 +215,13 @@ export function processHabitToggle(habits, stats, id, dateString) {
 
     return { newHabits, newStats, notifications };
 }
+
+export function resetDailyHabits(habits) {
+    return habits.map(h => {
+        if (h.type === 'virtue' || h.type === 'vice' || !h.type) {
+            // Keep history, but ensure completed is false for visual state if used elsewhere
+            return { ...h, completed: false };
+        }
+        return h;
+    });
+}

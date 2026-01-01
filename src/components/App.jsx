@@ -7,6 +7,7 @@ import AdventureView from './views/AdventureView';
 import AddTaskModal from './AddTaskModal';
 import SettingsModal from './SettingsModal';
 import AuthModal from './AuthModal';
+import DailyWelcome from './DailyWelcome';
 import { useGame } from '../hooks/useGame';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -24,8 +25,7 @@ function App() {
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
-    // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn } = useGame();
+    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome } = useGame();
 
     // Scroll listener
     useEffect(() => {
@@ -113,6 +113,7 @@ function App() {
 
     return (
         <div className="wrapper">
+            {showWelcome && <DailyWelcome onDismiss={actions.dismissWelcome} />}
             {showSettings && <SettingsModal
                 onClose={() => setShowSettings(false)}
                 onExport={handleExport}
