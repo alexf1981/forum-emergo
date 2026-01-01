@@ -1,0 +1,140 @@
+import React, { useState, useEffect, useRef } from 'react';
+import Icons from './Icons';
+
+const HabitItem = ({
+    habit,
+    colType,
+    colColor,
+    isDone,
+    dailyCount,
+    onToggle,
+    onDelete,
+    onEdit,
+    onIncrement,
+    formatNumber,
+    t
+}) => {
+    const isTodo = colType === 'todo';
+    const isDoneOneTime = habit.bucket && isDone;
+
+    // Timer Logic for Mandata
+    const [progress, setProgress] = useState(0);
+    const [isPendingDelete, setIsPendingDelete] = useState(false);
+    const timerRef = useRef(null);
+    const startTimeRef = useRef(null);
+    const DURATION = 15000; // 15 seconds
+
+    useEffect(() => {
+        const shouldRun = isTodo && isDoneOneTime;
+
+        if (shouldRun) {
+            // Initialize if new start
+            if (!startTimeRef.current) {
+                startTimeRef.current = Date.now();
+                setIsPendingDelete(true);
+                setProgress(0);
+            }
+
+            // Ensure interval is running (re-bind if deps changed)
+            if (timerRef.current) clearInterval(timerRef.current);
+
+            timerRef.current = setInterval(() => {
+                const elapsed = Date.now() - startTimeRef.current;
+                const p = Math.min(100, (elapsed / DURATION) * 100);
+                setProgress(p);
+
+                if (elapsed >= DURATION) {
+                    clearInterval(timerRef.current);
+                    timerRef.current = null;
+                    onDelete(habit.id, true);
+                }
+            }, 100);
+        } else {
+            // Reset
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+            startTimeRef.current = null;
+            setIsPendingDelete(false);
+            setProgress(0);
+        }
+
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+        };
+    }, [isTodo, isDoneOneTime, habit.id, onDelete]);
+
+    // Derived Visuals
+    const isGreyedOut = isDoneOneTime;
+    const opacity = isPendingDelete ? 0.7 : (isDoneOneTime ? 0.5 : 1);
+
+    // If pending delete, overriding styles
+    const containerStyle = {
+        borderLeft: `3px solid ${isPendingDelete ? '#ccc' : colColor}`,
+        opacity: opacity,
+        backgroundColor: isPendingDelete ? '#f9f9f9' : 'transparent',
+        transition: 'all 0.5s'
+    };
+
+    return (
+        <div className={`habit-item compact ${isDoneOneTime ? 'completed' : ''}`} style={containerStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                {/* Checkbox / Undo Circle */}
+                <div
+                    className={`habit-checkbox compact ${isDone ? 'checked' : ''}`}
+                    style={{
+                        borderColor: isPendingDelete ? '#999' : colColor,
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}
+                    onClick={() => onToggle(habit.id)}
+                >
+                    {isPendingDelete ? (
+                        // Timer Overlay
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width="100%" height="100%" viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
+                                <path
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    fill="none"
+                                    stroke="#ddd"
+                                    strokeWidth="4"
+                                />
+                                <path
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    fill="none"
+                                    stroke={colColor} // Blue
+                                    strokeWidth="4"
+                                    strokeDasharray={`${progress}, 100`}
+                                />
+                            </svg>
+                            <span style={{ position: 'absolute', color: '#555', fontSize: '8px', fontWeight: 'bold' }}>↩</span>
+                        </div>
+                    ) : (
+                        isDone && (colType === 'vice' ? <span style={{ color: colColor, fontWeight: 'bold' }}>X</span> : <Icons.Check style={{ width: 14, height: 14 }} />)
+                    )}
+                </div>
+
+                <span className="habit-text" style={isDone && colType === 'todo' ? { textDecoration: 'line-through', color: '#888' } : {}}>
+                    {habit.text}
+                    {!habit.bucket && dailyCount > 1 && <span style={{ marginLeft: '4px', color: 'var(--color-gold)', fontWeight: 'bold' }}>x{formatNumber(dailyCount)}</span>}
+                    {colType === 'vice' && dailyCount > 0 && <span style={{ marginLeft: '4px', color: '#ff4444', fontWeight: 'bold' }}>(-20g)</span>}
+                    {isPendingDelete && <span style={{ marginLeft: '8px', fontSize: '0.8em', color: '#999', fontStyle: 'italic' }}>({Math.ceil((DURATION - (progress / 100) * DURATION) / 1000)}s)</span>}
+                </span>
+            </div>
+
+            <div className="habit-controls" style={{ display: 'flex', gap: '2px' }}>
+                <button className="btn-icon small" onClick={() => onEdit(habit.id)} title={t('save')}><Icons.Edit /></button>
+                <button className="btn-icon small" onClick={() => onDelete(habit.id)} title={t('habit_delete_confirm')}><Icons.Trash /></button>
+                {!habit.bucket && (
+                    <button className="btn-icon" style={{ borderColor: colColor, color: colColor, marginLeft: '4px' }} onClick={(e) => onIncrement(habit.id, e)}>+</button>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default HabitItem;

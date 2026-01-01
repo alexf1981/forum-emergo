@@ -3,6 +3,7 @@ import * as GameLogic from '../../logic/gameLogic';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import Icons from '../Icons';
+import HabitItem from '../HabitItem';
 
 const CityVisual = ({ rank }) => {
     const { t } = useLanguage();
@@ -101,27 +102,20 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                             }
 
                                             return (
-                                                <div key={h.id} className={`habit-item compact ${isDoneOneTime ? 'completed' : ''}`}
-                                                    style={{ borderLeft: `3px solid ${colColor}`, opacity: isDoneOneTime ? 0.5 : 1 }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                                                        <div className={`habit-checkbox compact ${isDone ? 'checked' : ''}`} style={{ borderColor: colColor }} onClick={() => onToggleHabit(h.id)}>
-                                                            {isDone && (colType === 'vice' ? <span style={{ color: colColor, fontWeight: 'bold' }}>X</span> : <Icons.Check style={{ width: 14, height: 14 }} />)}
-                                                        </div>
-                                                        <span className="habit-text" style={isDone && colType === 'todo' ? { textDecoration: 'line-through', color: '#888' } : {}}>
-                                                            {h.text}
-                                                            {!h.bucket && dailyCount > 1 && <span style={{ marginLeft: '4px', color: 'var(--color-gold)', fontWeight: 'bold' }}>x{formatNumber(dailyCount)}</span>}
-                                                            {colType === 'vice' && dailyCount > 0 && <span style={{ marginLeft: '4px', color: '#ff4444', fontWeight: 'bold' }}>(-20g)</span>}
-                                                        </span>
-                                                    </div>
-
-                                                    <div className="habit-controls" style={{ display: 'flex', gap: '2px' }}>
-                                                        <button className="btn-icon small" onClick={() => setEditingHabitId(h.id)} title={t('save')}><Icons.Edit /></button>
-                                                        <button className="btn-icon small" onClick={() => onDeleteHabit(h.id)} title={t('habit_delete_confirm')}><Icons.Trash /></button>
-                                                        {!h.bucket && (
-                                                            <button className="btn-icon" style={{ borderColor: colColor, color: colColor, marginLeft: '4px' }} onClick={(e) => onIncrementHabit(h.id, e)}>+</button>
-                                                        )}
-                                                    </div>
-                                                </div>
+                                                <HabitItem
+                                                    key={h.id}
+                                                    habit={h}
+                                                    colType={colType}
+                                                    colColor={colColor}
+                                                    isDone={isDone}
+                                                    dailyCount={dailyCount}
+                                                    onToggle={onToggleHabit}
+                                                    onDelete={onDeleteHabit}
+                                                    onEdit={setEditingHabitId}
+                                                    onIncrement={onIncrementHabit}
+                                                    formatNumber={formatNumber}
+                                                    t={t}
+                                                />
                                             );
                                         })}
                                     </div>

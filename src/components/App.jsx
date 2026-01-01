@@ -58,8 +58,8 @@ function App() {
         actions.incrementHabit(id);
     };
 
-    const handleDelete = (id) => {
-        if (confirm(t('habit_delete_confirm'))) {
+    const handleDelete = (id, force = false) => {
+        if (force === true || confirm(t('habit_delete_confirm'))) {
             actions.deleteHabit(id);
         }
     };
