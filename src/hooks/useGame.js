@@ -56,6 +56,35 @@ export function useGame() {
         }));
     };
 
+    const decrementHabit = (id) => {
+        const h = habits.find(h => h.id === id);
+        if (!h) return;
+
+        const today = GameLogic.getTodayString();
+        const idx = h.history.lastIndexOf(today);
+
+        // Can't decrement if not done today (floor at 0)
+        if (idx === -1) return;
+
+        // Valid decrement
+        const newHistory = [...h.history];
+        newHistory.splice(idx, 1);
+
+        setHabits(prev => prev.map(hab => hab.id === id ? { ...hab, history: newHistory } : hab));
+
+        const type = h.type || 'virtue';
+        setStats(s => {
+            let newGold = s.gold;
+            if (type === 'vice') {
+                newGold += 20; // Refund penalty
+            } else if (type === 'todo') {
+                newGold = Math.max(0, newGold - 50); // Refund reward
+            } else {
+                newGold = Math.max(0, newGold - 10); // Refund reward
+            }
+            return { ...s, gold: newGold };
+        });
+    };
     const addHabit = (text, type, bucket) => {
         setHabits(GameLogic.createHabit(habits, text, type, bucket));
         notify({ key: 'msg_added_task' }, "success");
@@ -235,6 +264,7 @@ export function useGame() {
         actions: {
             toggleHabit,
             incrementHabit,
+            decrementHabit,
             addHabit,
             deleteHabit,
             updateHabit,

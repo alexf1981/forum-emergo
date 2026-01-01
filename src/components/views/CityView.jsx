@@ -41,7 +41,7 @@ const CityVisual = ({ rank }) => {
     );
 };
 
-const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, formatNumber }) => {
+const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onDecrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, formatNumber }) => {
     const { t } = useLanguage();
     const { playerName } = useAuth();
     const [editingHabitId, setEditingHabitId] = useState(null);
@@ -113,6 +113,7 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                                     onDelete={onDeleteHabit}
                                                     onEdit={setEditingHabitId}
                                                     onIncrement={onIncrementHabit}
+                                                    onDecrement={onDecrementHabit}
                                                     formatNumber={formatNumber}
                                                     t={t}
                                                 />

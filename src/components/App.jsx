@@ -157,6 +157,7 @@ function App() {
                         score={score}
                         onToggleHabit={actions.toggleHabit}
                         onIncrementHabit={handleIncrement}
+                        onDecrementHabit={actions.decrementHabit}
                         onAddHabit={actions.addHabit}
                         onDeleteHabit={handleDelete}
                         onUpdateHabit={actions.updateHabit}
