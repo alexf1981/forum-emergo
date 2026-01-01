@@ -793,6 +793,33 @@
         grid-column: auto;
     }
 
+    @media (max-width: 380px) {
+        .bottom-nav {
+            padding: 0 4px;
+        }
+
+        .nav-group-center {
+            min-width: 130px;
+        }
+
+        .nav-item.role-left {
+            transform: translate(calc(-50% - 55px), -50%) scale(0.8);
+        }
+
+        .nav-item.role-right {
+            transform: translate(calc(-50% + 55px), -50%) scale(0.8);
+        }
+
+        .nav-item.edge-item {
+            flex: 0 0 45px;
+        }
+
+        .nav-item.edge-item .nav-icon {
+            width: 38px;
+            height: 38px;
+        }
+    }
+
     .scroll-field input[type="text"],
     .date-display {
         width: 100%;
