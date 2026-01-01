@@ -6,6 +6,7 @@ import TavernView from './views/TavernView';
 import AdventureView from './views/AdventureView';
 import AddTaskModal from './AddTaskModal';
 import SettingsModal from './SettingsModal';
+import AuthModal from './AuthModal';
 import { useGame } from '../hooks/useGame';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
     const [activeTab, setActiveTab] = useState('city');
     const [showSettings, setShowSettings] = useState(false);
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [selectedQuest, setSelectedQuest] = useState(null);
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
@@ -91,7 +93,13 @@ function App() {
                 onImport={handleImport}
                 useRomanNumerals={useRomanNumerals}
                 toggleRomanNumerals={() => setUseRomanNumerals(prev => !prev)}
+                onLogin={() => setShowAuthModal(true)}
             />}
+
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+            />
 
             {showAddTaskModal && (
                 <AddTaskModal

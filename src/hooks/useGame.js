@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import * as GameLogic from '../logic/gameLogic';
+import { useAuth } from '../context/AuthContext';
+import { DataService } from '../services/dataService';
 
 export function useGame() {
     // === STATE ===
@@ -136,6 +138,46 @@ export function useGame() {
     };
 
     const getExportData = () => ({ romestats: stats, romehabits: habits, romeheroes: heroes });
+
+
+    // === SYNC WITH SUPABASE ===
+    const { user } = useAuth();
+
+    // 1. Initial Load from Cloud when user logs in
+    useEffect(() => {
+        const syncFromCloud = async () => {
+            if (user) {
+                const cloudData = await DataService.loadGameData(user.id);
+                if (cloudData && cloudData.romestats) {
+                    console.log("Syncing from Cloud...", cloudData);
+                    setStats(cloudData.romestats);
+                    setHabits(cloudData.romehabits);
+                    setHeroes(cloudData.romeheroes);
+                }
+            }
+        };
+        syncFromCloud();
+    }, [user]);
+
+    // 2. Auto-save to cloud when state changes (debounced?)
+    useEffect(() => {
+        if (user) {
+            const dataToSave = {
+                romestats: stats,
+                romehabits: habits,
+                romeheroes: heroes
+            };
+            // Simple debounce by just saving not on every frame but logic updates trigger this
+            // For production, a real debounce function is better to prevent API spam.
+            // But React state updates batching helps. 
+            // Let's us a simple timeout to avoid too many writes.
+            const timeoutId = setTimeout(() => {
+                DataService.saveGameData(user.id, dataToSave);
+            }, 2000);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [stats, habits, heroes, user]);
 
 
     return {

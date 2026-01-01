@@ -1,29 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Icons from './Icons';
+import { useAuth } from '../context/AuthContext';
+import { signOut } from '../services/auth';
+import AdminDashboard from './AdminDashboard';
 
-const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRomanNumerals }) => {
+const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRomanNumerals, onLogin }) => {
+    const { user } = useAuth();
+    const [showAdmin, setShowAdmin] = useState(false);
+    const [showLocal, setShowLocal] = useState(false); // Collapsed by default to save space
+
+    // Simple admin check
+    const isAdmin = user?.email === 'alexfitie1981@gmail.com';
+
+    if (showAdmin) {
+        return <AdminDashboard onClose={() => setShowAdmin(false)} />;
+    }
+
+    const handleLogout = async () => {
+        await signOut();
+    };
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>Systeembeheer</h2>
+                    <h2>Instellingen</h2>
                     <button className="btn-icon" onClick={onClose}><Icons.X /></button>
                 </div>
-                <div className="modal-body">
-                    <div className="card mb-md">
-                        <h3><Icons.Scroll /> Kronieken Schrijven</h3>
-                        <p>Exporteer je voortgang naar een bestand om het veilig te bewaren.</p>
-                        <button className="btn full-width mt-sm" onClick={onExport}>Schrijf Kronieken (Export)</button>
-                    </div>
+                <div className="modal-body" style={{ gap: '10px' }}>
+
+                    {/* CLOUD SECTION (Preferred) */}
                     <div className="card">
-                        <h3><Icons.Scroll /> Kronieken Lezen</h3>
-                        <p>Herstel je voortgang vanuit een eerder bestand.</p>
-                        <input className="file-input mt-sm full-width" type="file" accept=".json" onChange={(e) => { if (e.target.files[0]) onImport(e.target.files[0]); }} />
+                        <h3><Icons.Wreath /> Cloud Opslag</h3>
+                        {user ? (
+                            <div className="mt-sm">
+                                <p style={{ fontSize: '0.9em' }}>Ingelogd als: <br /><strong>{user.email}</strong></p>
+                                {isAdmin && (
+                                    <button className="btn full-width mt-sm" onClick={() => setShowAdmin(true)} style={{ backgroundColor: '#8e44ad', padding: '8px' }}>
+                                        <Icons.Crown /> Admin
+                                    </button>
+                                )}
+                                <button className="btn full-width mt-sm" onClick={handleLogout} style={{ backgroundColor: '#e74c3c', padding: '8px' }}>Uitloggen</button>
+                            </div>
+                        ) : (
+                            <div className="mt-sm">
+                                <p style={{ fontSize: '0.9em' }}>Maak een account aan om je voortgang veilig in de cloud te bewaren en overal te spelen.</p>
+                                <button className="btn full-width mt-sm" onClick={onLogin}>Inloggen / Registreren</button>
+                            </div>
+                        )}
                     </div>
-                    <div className="card mt-md">
-                        <h3><Icons.Scroll /> Weergave</h3>
-                        <div className="settings-row mt-sm">
-                            <span>Gebruik Romeinse Cijfers</span>
+
+                    {/* DISPLAY SETTINGS */}
+                    <div className="card" style={{ padding: '10px' }}>
+                        <div className="settings-row">
+                            <span>Romeinse Cijfers</span>
                             <input
                                 type="checkbox"
                                 checked={useRomanNumerals}
@@ -32,6 +62,39 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                             />
                         </div>
                     </div>
+
+                    {/* LOCAL SECTION (Collapsible) */}
+                    <div className="card" style={{ padding: '10px' }}>
+                        <div
+                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                            onClick={() => setShowLocal(!showLocal)}
+                        >
+                            <h3 style={{ margin: 0, fontSize: '1rem' }}><Icons.Scroll /> Lokaal Beheer</h3>
+                            <span>{showLocal ? '▲' : '▼'}</span>
+                        </div>
+
+                        {showLocal && (
+                            <div className="mt-md">
+                                <p style={{ fontSize: '0.85em', color: '#666', marginBottom: '10px' }}>
+                                    Geen account nodig. Gegevens worden op dit apparaat opgeslagen. je kunt ook handmatig back-ups maken.
+                                </p>
+                                <button className="btn full-width" onClick={onExport} style={{ fontSize: '0.9em', padding: '8px' }}>
+                                    <Icons.Save /> Download Backup
+                                </button>
+                                <div className="mt-sm">
+                                    <label style={{ fontSize: '0.9em', display: 'block', marginBottom: '4px' }}>Backup Terugzetten:</label>
+                                    <input
+                                        className="file-input full-width"
+                                        type="file"
+                                        accept=".json"
+                                        onChange={(e) => { if (e.target.files[0]) onImport(e.target.files[0]); }}
+                                        style={{ fontSize: '0.8em' }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                 </div>
             </div>
         </div>
