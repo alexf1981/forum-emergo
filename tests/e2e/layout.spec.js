@@ -43,7 +43,7 @@ test.describe('Layout Checks', () => {
 
         // Go back to City
         await page.getByTitle(/Duties|City|Stad/i).click();
-        // Header might also be dynamic now
-        await expect(page.locator('h3').getByText(/Duties|City|Stad/i)).toBeVisible();
+        // Header might also be dynamic now (Player Name badge)
+        await expect(page.locator('.city-name-badge')).toBeVisible();
     });
 });
