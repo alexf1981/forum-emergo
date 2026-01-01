@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats }) => {
+const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber }) => {
     const navItems = [
         { id: 'city', label: 'Plichten', icon: './assets/nav_plichten.jpg' },
         { id: 'tavern', label: 'Taverne', icon: './assets/nav_tavern.jpg' },

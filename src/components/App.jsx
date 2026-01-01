@@ -15,6 +15,7 @@ function App() {
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [selectedQuest, setSelectedQuest] = useState(null);
+    const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
     const { stats, heroes, habits, notifications, actions } = useGame();
@@ -47,6 +48,13 @@ function App() {
         }
     };
 
+    const formatNumber = (num) => {
+        if (useRomanNumerals) {
+            return GameLogic.toRoman(num);
+        }
+        return num;
+    };
+
     // Import/Export Handlers
     const handleExport = () => {
         const data = actions.getExportData();
@@ -77,7 +85,13 @@ function App() {
 
     return (
         <div className="wrapper">
-            {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onExport={handleExport} onImport={handleImport} />}
+            {showSettings && <SettingsModal
+                onClose={() => setShowSettings(false)}
+                onExport={handleExport}
+                onImport={handleImport}
+                useRomanNumerals={useRomanNumerals}
+                toggleRomanNumerals={() => setUseRomanNumerals(prev => !prev)}
+            />}
 
             {showAddTaskModal && (
                 <AddTaskModal
@@ -108,6 +122,7 @@ function App() {
                         onAddHabit={actions.addHabit}
                         onDeleteHabit={handleDelete}
                         onUpdateHabit={actions.updateHabit}
+                        formatNumber={formatNumber}
                     />
                 )}
 
@@ -117,6 +132,7 @@ function App() {
                         gold={stats.gold}
                         onRecruit={actions.recruitHero}
                         onHeal={actions.healHero}
+                        formatNumber={formatNumber}
                     />
                 )}
 
@@ -127,6 +143,7 @@ function App() {
                         onSelectQuest={setSelectedQuest}
                         onGoAdventure={actions.goAdventure}
                         onFightBoss={actions.fightBoss}
+                        formatNumber={formatNumber}
                     />
                 )}
 
@@ -142,6 +159,7 @@ function App() {
                 onTabChange={setActiveTab}
                 onProfileClick={() => setShowSettings(true)}
                 stats={stats}
+                formatNumber={formatNumber}
             />
         </div>
     );

@@ -3,7 +3,7 @@ import * as GameLogic from '../../logic/gameLogic';
 import Icons from '../Icons';
 import CityVisual from '../CityVisual';
 
-const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit }) => {
+const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, formatNumber }) => {
     const [editingHabitId, setEditingHabitId] = useState(null);
 
     const handleSaveEdit = (id, newText, newBucket) => {
@@ -17,9 +17,9 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                 <aside>
                     <div className="card">
                         <div className="card-title"><h3>Stad Status</h3></div>
-                        <CityVisual rank={rank} score={score} />
-                        <div className="stat-row"><span className="resource gold"><Icons.Coin /> Goud</span><span>{stats.gold}</span></div>
-                        <div className="stat-row"><span className="resource army"><Icons.Sword /> Leger</span><span>{stats.army}</span></div>
+                        <CityVisual rank={rank} score={score} formatNumber={formatNumber} />
+                        <div className="stat-row"><span className="resource gold"><Icons.Coin /> Goud</span><span>{formatNumber(stats.gold)}</span></div>
+                        <div className="stat-row"><span className="resource army"><Icons.Sword /> Leger</span><span>{formatNumber(stats.army)}</span></div>
                     </div>
                 </aside>
 
@@ -70,7 +70,7 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                                         </div>
                                                         <span className="habit-text" style={isDone && colType === 'todo' ? { textDecoration: 'line-through', color: '#888' } : {}}>
                                                             {h.text}
-                                                            {!h.bucket && dailyCount > 1 && <span style={{ marginLeft: '4px', color: 'var(--color-gold)', fontWeight: 'bold' }}>x{dailyCount}</span>}
+                                                            {!h.bucket && dailyCount > 1 && <span style={{ marginLeft: '4px', color: 'var(--color-gold)', fontWeight: 'bold' }}>x{formatNumber(dailyCount)}</span>}
                                                             {colType === 'vice' && dailyCount > 0 && <span style={{ marginLeft: '4px', color: '#ff4444', fontWeight: 'bold' }}>(-20g)</span>}
                                                         </span>
                                                     </div>

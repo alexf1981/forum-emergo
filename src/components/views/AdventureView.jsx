@@ -1,7 +1,7 @@
 import React from 'react';
 import * as GameLogic from '../../logic/gameLogic';
 
-const AdventureView = ({ heroes, selectedQuest, onSelectQuest, onGoAdventure, onFightBoss }) => {
+const AdventureView = ({ heroes, selectedQuest, onSelectQuest, onGoAdventure, onFightBoss, formatNumber }) => {
     return (
         <div>
             <h2>Campagne Kaart</h2>
@@ -12,9 +12,9 @@ const AdventureView = ({ heroes, selectedQuest, onSelectQuest, onGoAdventure, on
                         <div key={q.id}
                             className={`quest-item ${selectedQuest === q.id ? 'selected' : ''}`}
                             onClick={() => onSelectQuest(q.id)}>
-                            <h4>{q.name} (Lvl {q.level})</h4>
+                            <h4>{q.name} (Lvl {formatNumber(q.level)})</h4>
                             <p>{q.desc}</p>
-                            <small>Risico: {q.risk} | Beloning: {q.reward}g</small>
+                            <small>Risico: {formatNumber(q.risk)} | Beloning: {formatNumber(q.reward)}g</small>
                         </div>
                     ))}
                 </div>
