@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }) => {
                 .single();
 
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Profile fetch timed out')), 5000)
+                setTimeout(() => reject(new Error('Profile fetch timed out')), 1000)
             );
 
             const { data, error } = await Promise.race([fetchProfile, timeoutPromise]);

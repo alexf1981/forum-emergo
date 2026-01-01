@@ -14,8 +14,8 @@ const AdminDashboard = ({ onClose }) => {
     const loadData = async () => {
         setLoading(true);
         const data = await AdminService.getAllUsersStats();
-        // Sort by score descending
-        data.sort((a, b) => b.score - a.score);
+        // Sort by Gold descending since Score is hidden
+        data.sort((a, b) => b.gold - a.gold);
         setUsers(data);
         setLoading(false);
     };
@@ -46,9 +46,7 @@ const AdminDashboard = ({ onClose }) => {
                                         <th style={{ padding: '10px' }}>Gebruiker</th>
                                         <th style={{ padding: '10px' }}>Email</th>
                                         <th style={{ padding: '10px' }}>Taal</th>
-                                        <th style={{ padding: '10px' }}>Score</th>
                                         <th style={{ padding: '10px' }}>Goud</th>
-                                        <th style={{ padding: '10px' }}>Leger</th>
                                         <th style={{ padding: '10px' }}>Laatst Gezien</th>
                                     </tr>
                                 </thead>
@@ -58,9 +56,7 @@ const AdminDashboard = ({ onClose }) => {
                                             <td style={{ padding: '10px' }}>{u.username}</td>
                                             <td style={{ padding: '10px' }}>{u.email}</td>
                                             <td style={{ padding: '10px' }}>{renderLanguage(u.language)}</td>
-                                            <td style={{ padding: '10px' }}><strong>{u.score}</strong></td>
                                             <td style={{ padding: '10px' }}>{u.gold}</td>
-                                            <td style={{ padding: '10px' }}>{u.army}</td>
                                             <td style={{ padding: '10px', fontSize: '0.8em' }}>{u.lastActive}</td>
                                         </tr>
                                     ))}
