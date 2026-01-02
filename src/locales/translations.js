@@ -5,6 +5,8 @@ export const translations = {
         // General
         loading: "Loading empire...",
         save: "Save",
+        edit: "Edit",
+        delete: "Delete",
         cancel: "Cancel",
         close: "Close",
         confirm: "Confirm",
@@ -51,6 +53,8 @@ export const translations = {
         score: "Score",
         rank: "Rank",
         habit_new: "New Task",
+        recurring: "Recurring?",
+        habit_delete_confirm: "Are you sure you want to delete this activity?",
         habit_delete_confirm: "Are you sure you want to delete this activity?",
         completed_tasks: "Completed",
         // Quests
@@ -112,6 +116,8 @@ export const translations = {
         // General
         loading: "Rijk laden...",
         save: "Opslaan",
+        edit: "Bewerken",
+        delete: "Verwijder",
         cancel: "Annuleren",
         close: "Sluiten",
         confirm: "Bevestigen",
@@ -158,6 +164,8 @@ export const translations = {
         score: "Score",
         rank: "Rang",
         habit_new: "Nieuwe taak",
+        recurring: "Repeterend?",
+        habit_delete_confirm: "Zeker weten dat je deze activiteit wilt verwijderen?",
         habit_delete_confirm: "Zeker weten dat je deze activiteit wilt verwijderen?",
         completed_tasks: "Afgerond",
         // Quests
@@ -219,6 +227,8 @@ export const translations = {
         // General
         loading: "Cargando imperio...",
         save: "Guardar",
+        edit: "Editar",
+        delete: "Eliminar",
         cancel: "Cancelar",
         close: "Cerrar",
         confirm: "Confirmar",
@@ -265,6 +275,8 @@ export const translations = {
         score: "Puntos",
         rank: "Rango",
         habit_new: "Nueva Tarea",
+        recurring: "¿Recurrente?",
+        habit_delete_confirm: "¿Estás seguro de eliminar esta actividad?",
         habit_delete_confirm: "¿Estás seguro de eliminar esta actividad?",
         completed_tasks: "Completado",
         // Quests
@@ -326,6 +338,8 @@ export const translations = {
         // General
         loading: "Reich wird geladen...",
         save: "Speichern",
+        edit: "Bearbeiten",
+        delete: "Löschen",
         cancel: "Abbrechen",
         close: "Schließen",
         confirm: "Bestätigen",
@@ -372,6 +386,8 @@ export const translations = {
         score: "Punktzahl",
         rank: "Rang",
         habit_new: "Neue Aufgabe",
+        recurring: "Wiederkehrend?",
+        habit_delete_confirm: "Möchtest du diese Aktivität wirklich löschen?",
         habit_delete_confirm: "Möchtest du diese Aktivität wirklich löschen?",
         completed_tasks: "Abgeschlossen",
         // Quests

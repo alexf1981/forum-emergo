@@ -64,9 +64,9 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                                         <div key={h.id} className="habit-item compact editing" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
                                                             <input type="text" defaultValue={h.text} id={`edit-text-${h.id}`} style={{ width: '100%', padding: '4px', marginBottom: '4px' }} />
                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                <label style={{ fontSize: '0.8rem' }}><input type="checkbox" defaultChecked={h.bucket} id={`edit-bucket-${h.id}`} /> {t('habit_new')}</label>
+                                                                <label style={{ fontSize: '0.8rem' }}><input type="checkbox" defaultChecked={!h.bucket} id={`edit-bucket-${h.id}`} /> {t('recurring')}</label>
                                                                 <div style={{ display: 'flex', gap: '4px' }}>
-                                                                    <button className="btn-icon" onClick={() => handleSaveEdit(h.id, document.getElementById(`edit-text-${h.id}`).value, document.getElementById(`edit-bucket-${h.id}`).checked)}><Icons.Save /></button>
+                                                                    <button className="btn-icon" onClick={() => handleSaveEdit(h.id, document.getElementById(`edit-text-${h.id}`).value, !document.getElementById(`edit-bucket-${h.id}`).checked)}><Icons.Save /></button>
                                                                     <button className="btn-icon" onClick={() => setEditingHabitId(null)}><Icons.X /></button>
                                                                 </div>
                                                             </div>

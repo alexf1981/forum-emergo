@@ -83,6 +83,26 @@ const HabitItem = ({
         onDecrement(habit.id);
     };
 
+    // Menu State
+    const [showMenu, setShowMenu] = useState(false);
+    const menuRef = useRef(null);
+
+    // Click outside listener
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowMenu(false);
+            }
+        };
+
+        if (showMenu) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showMenu]);
+
     // Derived Visuals
     const opacity = isPendingDelete ? 0.7 : (isDoneOneTime ? 0.5 : 1);
 
@@ -91,7 +111,9 @@ const HabitItem = ({
         borderLeft: `3px solid ${isPendingDelete ? '#ccc' : colColor}`,
         opacity: opacity,
         backgroundColor: isPendingDelete ? '#f9f9f9' : 'rgba(255, 255, 255, 0.8)',
-        transition: 'all 0.5s'
+        transition: 'all 0.5s',
+        zIndex: showMenu ? 50 : 1, // Ensure menu appears above valid siblings
+        position: 'relative' // Needed for z-index to work with stacking context of siblings
     };
 
     return (
@@ -164,10 +186,27 @@ const HabitItem = ({
                 </span>
             </div>
 
-            <div className="habit-controls" style={{ display: 'flex', gap: '2px' }}>
-                <button className="btn-icon small" onClick={() => onEdit(habit.id)} title={t('save')}><Icons.Edit /></button>
-                <button className="btn-icon small" onClick={() => onDelete(habit.id)} title={t('habit_delete_confirm')}><Icons.Trash /></button>
-                {/* Removed separate increment button for recurring */}
+            <div className="habit-controls habit-menu-container" ref={menuRef}>
+                <button
+                    className="btn-icon small menu-toggle"
+                    onClick={() => setShowMenu(!showMenu)}
+                    title="Menu"
+                >
+                    <Icons.Menu />
+                </button>
+
+                {showMenu && (
+                    <div className="habit-menu-dropdown">
+                        <button className="menu-item" onClick={() => { onEdit(habit.id); setShowMenu(false); }}>
+                            <Icons.Edit />
+                            <span>{t('edit')}</span>
+                        </button>
+                        <button className="menu-item delete" onClick={() => { onDelete(habit.id); setShowMenu(false); }}>
+                            <Icons.Trash />
+                            <span>{t('delete')}</span>
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
