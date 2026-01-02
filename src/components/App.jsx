@@ -144,8 +144,8 @@ function App() {
                 <button className="fab" onClick={() => setShowAddTaskModal(true)} title={t('habit_new')}>+</button>
             )}
 
-            <div className={`hero-placeholder ${isHeaderCompact ? 'compact' : ''}`} />
-            <div className={`hero-banner ${isHeaderCompact ? 'compact' : ''}`}>
+            <div className={`hero-placeholder ${isHeaderCompact || activeTab === 'tavern' ? 'compact' : ''}`} />
+            <div className={`hero-banner ${isHeaderCompact || activeTab === 'tavern' ? 'compact' : ''}`}>
                 <div className="hero-overlay header-content">
                     <h1>Forum Emergo</h1>
                     <div className="subtitle">{t('subtitle')}</div>
