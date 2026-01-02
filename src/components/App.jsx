@@ -174,6 +174,8 @@ function App() {
                 {activeTab === 'tavern' && (
                     <CapitalView
                         stats={stats}
+                        heroes={heroes}
+                        actions={actions}
                         formatNumber={formatNumber}
                     />
                 )}

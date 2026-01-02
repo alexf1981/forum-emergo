@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useCity } from '../../hooks/useCity';
 import CityLayout from '../city/CityLayout';
 import { useLanguage } from '../../context/LanguageContext';
+import BuildingModal from '../city/BuildingModal';
+import TavernInterior from '../city/interiors/TavernInterior';
 
-const CapitalView = ({ stats, formatNumber }) => {
+const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
     const { t } = useLanguage();
     const { buildings, resources, upgradeBuilding, buildBuilding } = useCity();
 
@@ -15,6 +17,34 @@ const CapitalView = ({ stats, formatNumber }) => {
         const x = 20 + Math.random() * 60;
         const y = 30 + Math.random() * 40; // Adjusted for overlay space
         buildBuilding('house', x, y);
+    };
+
+    const renderBuildingContent = () => {
+        if (!selectedBuilding) return null;
+
+        // Determine type - handle both ID and type properties if needed
+        // Assuming ID 'tavern' matches the created mockup building
+        if (selectedBuilding.type === 'tavern' || selectedBuilding.id === 'tavern') {
+            return (
+                <TavernInterior
+                    heroes={heroes}
+                    stats={stats}
+                    onRecruit={actions.recruitHero}
+                    formatNumber={formatNumber}
+                />
+            );
+        }
+
+        // Generic placeholder for now
+        return (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+                <p>Dit gebouw is nog in constructie.</p>
+                <div style={{ margin: '20px 0', opacity: 0.5 }}>🚧 🔨 🏗️</div>
+                <button className="btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                    Upgrade (Binnenkort)
+                </button>
+            </div>
+        );
     };
 
     return (
@@ -84,26 +114,28 @@ const CapitalView = ({ stats, formatNumber }) => {
                 </button>
             </div>
 
-            {/* Selection/Info Toast */}
+            {/* Building Modal Overlay */}
             {selectedBuilding && (
-                <div style={{
-                    position: 'absolute',
-                    top: '140px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    color: '#2c3e50',
-                    padding: '10px 20px',
-                    borderRadius: '30px',
-                    zIndex: 20,
-                    fontWeight: 'bold',
-                    boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
-                    animation: 'fadeIn 0.3s ease',
-                    cursor: 'pointer'
-                }} onClick={() => setSelectedBuilding(null)}>
-                    Geselecteerd: {selectedBuilding.name} (Lvl {selectedBuilding.level})
-                </div>
+                <BuildingModal
+                    building={{
+                        ...selectedBuilding,
+                        // Dynamically add header image based on type or ID
+                        headerImage: (() => {
+                            const type = selectedBuilding.type || selectedBuilding.id;
+                            if (type === 'town_hall') return './assets/city/town_hall.png';
+                            if (type === 'tavern') return './assets/city/tavern.png';
+                            if (type === 'library') return './assets/city/library.png';
+                            if (type === 'market') return './assets/city/market.png';
+                            if (type === 'house') return './assets/city/house.png';
+                            return null;
+                        })()
+                    }}
+                    onClose={() => setSelectedBuilding(null)}
+                >
+                    {renderBuildingContent()}
+                </BuildingModal>
             )}
+
         </div>
     );
 };
