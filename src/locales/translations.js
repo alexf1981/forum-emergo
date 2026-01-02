@@ -99,6 +99,7 @@ export const translations = {
         msg_habit_virtue_reward: "Task completed! (+10 Gold)",
         msg_added_task: "New task added!",
         msg_restored: "Chronicles restored!",
+        msg_check_email: "Check email for confirmation!",
         // Items (Generic)
         item_weapon: "Weapon",
         item_armor: "Armor",
@@ -210,6 +211,7 @@ export const translations = {
         msg_habit_virtue_reward: "Taak voltooid! (+10 Goud)",
         msg_added_task: "Nieuwe taak toegevoegd!",
         msg_restored: "Kronieken hersteld!",
+        msg_check_email: "Controleer je e-mail voor bevestiging!",
         // Items
         item_weapon: "Wapen",
         item_armor: "Pantser",
@@ -321,6 +323,7 @@ export const translations = {
         msg_habit_virtue_reward: "¡Tarea completada! (+10 Oro)",
         msg_added_task: "¡Nueva tarea añadida!",
         msg_restored: "¡Crónicas restauradas!",
+        msg_check_email: "¡Verifica tu correo para confirmar!",
         // Items
         item_weapon: "Arma",
         item_armor: "Armadura",
@@ -432,6 +435,7 @@ export const translations = {
         msg_habit_virtue_reward: "Aufgabe erledigt! (+10 Gold)",
         msg_added_task: "Neue Aufgabe hinzugefügt!",
         msg_restored: "Chroniken wiederhergestellt!",
+        msg_check_email: "Prüfe deine E-Mails zur Bestätigung!",
         // Items
         item_weapon: "Waffe",
         item_armor: "Rüstung",
