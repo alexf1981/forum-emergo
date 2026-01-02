@@ -7,7 +7,7 @@ import TavernInterior from '../city/interiors/TavernInterior';
 
 const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
     const { t } = useLanguage();
-    const { buildings, resources, upgradeBuilding, buildBuilding } = useCity();
+    const { buildings, resources, upgradeBuilding, buildBuilding, moveBuilding } = useCity();
 
     // UI State for selection
     const [selectedBuilding, setSelectedBuilding] = useState(null);
@@ -17,6 +17,18 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
         const x = 20 + Math.random() * 60;
         const y = 30 + Math.random() * 40; // Adjusted for overlay space
         buildBuilding('house', x, y);
+    };
+
+    const handleExport = () => {
+        const minimal = buildings.map(b => ({
+            id: b.id,
+            type: b.type,
+            x: Math.round(b.x),
+            y: Math.round(b.y),
+            name: b.name
+        }));
+        console.log(JSON.stringify(minimal, null, 2));
+        alert("Coördinaten staan in de Console (F12)!\n\nKopieer ze en stuur ze naar de ontwikkelaar.");
     };
 
     const renderBuildingContent = () => {
@@ -63,6 +75,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                 buildings={buildings}
                 // When a building is clicked from the layout
                 onBuildingClick={(b) => setSelectedBuilding(b)}
+                onBuildingMove={moveBuilding}
             />
 
             {/* Top Overlay: Header / Resources */}
@@ -97,8 +110,26 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                 position: 'absolute',
                 bottom: '90px', // Above BottomNav
                 right: '20px',
-                zIndex: 10
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
             }}>
+                <button
+                    className="btn"
+                    onClick={handleExport}
+                    style={{
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                        border: '2px solid #f1c40f',
+                        backgroundColor: '#f39c12',
+                        fontSize: '0.9rem',
+                        padding: '10px 15px',
+                        color: 'white'
+                    }}
+                >
+                    💾 EXPORT COORDS
+                </button>
+
                 <button
                     className="btn primary-btn-bounce"
                     onClick={handleBuildHouse}
