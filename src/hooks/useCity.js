@@ -16,7 +16,7 @@ const INITIAL_BUILDINGS = [
         "x": 74,
         "y": 46,
         "name": "Taverne",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1",
@@ -24,7 +24,7 @@ const INITIAL_BUILDINGS = [
         "x": 62,
         "y": 52,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_2",
@@ -32,7 +32,7 @@ const INITIAL_BUILDINGS = [
         "x": 29,
         "y": 58,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "library",
@@ -40,7 +40,7 @@ const INITIAL_BUILDINGS = [
         "x": 36,
         "y": 38,
         "name": "Bibliotheek",
-        "level": 1
+        "level": 0
     },
     {
         "id": "market",
@@ -48,7 +48,7 @@ const INITIAL_BUILDINGS = [
         "x": 42,
         "y": 61,
         "name": "Markt",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357972907",
@@ -56,7 +56,7 @@ const INITIAL_BUILDINGS = [
         "x": 52,
         "y": 68,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357973099",
@@ -64,7 +64,7 @@ const INITIAL_BUILDINGS = [
         "x": 79,
         "y": 74,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357973267",
@@ -72,7 +72,7 @@ const INITIAL_BUILDINGS = [
         "x": 20,
         "y": 36,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357973411",
@@ -80,7 +80,7 @@ const INITIAL_BUILDINGS = [
         "x": 27,
         "y": 30,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357973595",
@@ -88,7 +88,7 @@ const INITIAL_BUILDINGS = [
         "x": 33,
         "y": 75,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357973771",
@@ -96,7 +96,7 @@ const INITIAL_BUILDINGS = [
         "x": 27,
         "y": 41,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357973931",
@@ -104,7 +104,7 @@ const INITIAL_BUILDINGS = [
         "x": 19,
         "y": 55,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     },
     {
         "id": "house_1767357974083",
@@ -112,7 +112,7 @@ const INITIAL_BUILDINGS = [
         "x": 71,
         "y": 59,
         "name": "Woonhuis",
-        "level": 1
+        "level": 0
     }
 ];
 
@@ -127,29 +127,23 @@ export const useCity = () => {
         return buildings.find(b => b.type === type);
     }, [buildings]);
 
-    const buildBuilding = (type, x, y) => {
-        // Logic to add a new building
-        console.log(`Building ${type} at ${x}, ${y}`);
+    const buildBuilding = (type) => {
+        // Find the first unbuilt building of this type
+        const slot = buildings.find(b => b.type === type && b.level === 0);
 
-        // Check limits (e.g. max 10 houses)
-        if (type === 'house') {
-            const houseCount = buildings.filter(b => b.type === 'house').length;
-            if (houseCount >= 10) {
-                alert("Maximaal 10 huizen!");
-                return;
-            }
+        if (!slot) {
+            alert(`Geen ruimte meer voor ${type}!`);
+            return;
         }
 
-        const newBuilding = {
-            id: `${type}_${Date.now()}`,
-            type: type,
-            level: 1,
-            x: x,
-            y: y,
-            name: type === 'house' ? 'Woonhuis' : 'Gebouw'
-        };
+        console.log(`Building ${type} at pre-defined slot ${slot.id}`);
 
-        setBuildings(prev => [...prev, newBuilding]);
+        setBuildings(prev => prev.map(b => {
+            if (b.id === slot.id) {
+                return { ...b, level: 1 };
+            }
+            return b;
+        }));
     };
 
     const upgradeBuilding = (id) => {
