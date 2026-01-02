@@ -7,7 +7,7 @@ import HabitItem from '../HabitItem';
 
 import CityVisual from '../CityVisual';
 
-const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onDecrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, formatNumber }) => {
+const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onDecrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, onNotify, formatNumber }) => {
     const { t } = useLanguage();
     const { playerName } = useAuth();
     const [editingHabitId, setEditingHabitId] = useState(null);
@@ -87,6 +87,7 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                                         onEdit={setEditingHabitId}
                                                         onIncrement={onIncrementHabit}
                                                         onDecrement={onDecrementHabit}
+                                                        onNotify={onNotify} // NEW
                                                         formatNumber={formatNumber}
                                                         t={t}
                                                     />

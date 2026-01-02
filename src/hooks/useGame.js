@@ -27,11 +27,13 @@ export function useGame() {
     const log = (msg) => setCombatLog(prev => [{ id: Date.now() + Math.random(), time: new Date(), msg }, ...prev].slice(0, 20));
 
     // === ACTIONS: HABITS ===
-    const toggleHabit = (id) => {
+    const toggleHabit = (id, silent = false) => {
         const { newHabits, newStats, notifications: newNotifs } = GameLogic.processHabitToggle(habits, stats, id, GameLogic.getTodayString());
         setHabits(newHabits);
         setStats(newStats);
-        newNotifs.forEach(n => notify(n.msg, n.type));
+        if (!silent) {
+            newNotifs.forEach(n => notify(n.msg, n.type));
+        }
     };
 
     const incrementHabit = (id) => {

@@ -154,14 +154,15 @@ function App() {
                     <CityView
                         habits={habits}
                         stats={stats}
-                        rank={rank}
-                        score={score}
+                        rank="rank_1" // TODO: derive from stats
+                        score={0}     // TODO: derive
                         onToggleHabit={actions.toggleHabit}
-                        onIncrementHabit={handleIncrement}
+                        onIncrementHabit={actions.incrementHabit}
                         onDecrementHabit={actions.decrementHabit}
                         onAddHabit={actions.addHabit}
-                        onDeleteHabit={handleDelete}
+                        onDeleteHabit={actions.deleteHabit}
                         onUpdateHabit={actions.updateHabit}
+                        onNotify={actions.notify} // NEW
                         formatNumber={formatNumber}
                     />
                 )}

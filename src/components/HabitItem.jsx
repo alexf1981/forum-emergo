@@ -12,6 +12,7 @@ const HabitItem = ({
     onEdit,
     onIncrement,
     onDecrement,
+    onNotify,
     formatNumber,
     t
 }) => {
@@ -19,56 +20,97 @@ const HabitItem = ({
     const isDoneOneTime = habit.bucket && isDone;
     const isRecurring = !habit.bucket;
 
-    // Timer Logic for Mandata
+    // Timer Logic for One-Time Tasks
     const [progress, setProgress] = useState(0);
     const [isPendingDelete, setIsPendingDelete] = useState(false);
     const timerRef = useRef(null);
     const startTimeRef = useRef(null);
-    const DURATION = 15000; // 15 seconds
+    const DURATION = 10000; // 10 seconds
+
+    // Keep track of latest props to avoid stale closures in setTimeout
+    const callbacksRef = useRef({ onToggle, onDelete, habit, colType });
+
+    useEffect(() => {
+        callbacksRef.current = { onToggle, onDelete, habit, colType };
+    }, [onToggle, onDelete, habit, colType]);
+
+    const startTimer = () => {
+        setIsPendingDelete(true);
+        setProgress(0);
+        startTimeRef.current = Date.now();
+
+        // Notify immediately
+        if (colType === 'todo') {
+            onNotify({ key: 'msg_habit_todo_reward' }, "mandatum");
+        } else if (colType === 'vice') {
+            onNotify({ key: 'msg_habit_vice_penalty' }, "error");
+        } else {
+            onNotify({ key: 'msg_habit_virtue_reward' }, "success");
+        }
+
+        if (timerRef.current) clearInterval(timerRef.current);
+
+        timerRef.current = setInterval(() => {
+            const elapsed = Date.now() - startTimeRef.current;
+            const p = Math.min(100, (elapsed / DURATION) * 100);
+            setProgress(p);
+
+            if (elapsed >= DURATION) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+                setIsPendingDelete(false);
+
+                // Action on complete (Use Refs!)
+                const current = callbacksRef.current;
+                if (current.colType === 'todo') {
+                    current.onDelete(current.habit.id, true);
+                } else {
+                    current.onToggle(current.habit.id, true); // Silent toggle
+                }
+            }
+        }, 100);
+    };
+
+    const cancelTimer = () => {
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+        setIsPendingDelete(false);
+        setProgress(0);
+    };
+
+    const handleToggle = () => {
+        if (isRecurring) {
+            onToggle(habit.id);
+            return;
+        }
+
+        // One-time tasks (Virtue/Vice/Todo)
+        if (isDone) {
+            // Already done, uncheck immediately
+            onToggle(habit.id);
+        } else {
+            // Not done
+            if (isPendingDelete) {
+                // Currently counting down -> Cancel
+                cancelTimer();
+            } else {
+                // Start countdown
+                startTimer();
+            }
+        }
+    };
+
+    // cleanup
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, []);
 
     // Cooldown for Plus button
     const [cooldown, setCooldown] = useState(false);
-
-    useEffect(() => {
-        const shouldRun = isTodo && isDoneOneTime;
-
-        if (shouldRun) {
-            if (!startTimeRef.current) {
-                startTimeRef.current = Date.now();
-                setIsPendingDelete(true);
-                setProgress(0);
-            }
-
-            if (timerRef.current) clearInterval(timerRef.current);
-
-            timerRef.current = setInterval(() => {
-                const elapsed = Date.now() - startTimeRef.current;
-                const p = Math.min(100, (elapsed / DURATION) * 100);
-                setProgress(p);
-
-                if (elapsed >= DURATION) {
-                    clearInterval(timerRef.current);
-                    timerRef.current = null;
-                    onDelete(habit.id, true);
-                }
-            }, 100);
-        } else {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
-            startTimeRef.current = null;
-            setIsPendingDelete(false);
-            setProgress(0);
-        }
-
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
-        };
-    }, [isTodo, isDoneOneTime, habit.id, onDelete]);
 
     const handlePlus = (e) => {
         e.stopPropagation();
@@ -112,8 +154,8 @@ const HabitItem = ({
         opacity: opacity,
         backgroundColor: isPendingDelete ? '#f9f9f9' : 'rgba(255, 255, 255, 0.8)',
         transition: 'all 0.5s',
-        zIndex: showMenu ? 50 : 1, // Ensure menu appears above valid siblings
-        position: 'relative' // Needed for z-index to work with stacking context of siblings
+        zIndex: showMenu ? 50 : 1,
+        position: 'relative'
     };
 
     return (
@@ -156,13 +198,13 @@ const HabitItem = ({
                 ) : (
                     // Checkbox / Undo Circle
                     <div
-                        className={`habit-checkbox compact ${isDone ? 'checked' : ''}`}
+                        className={`habit-checkbox compact ${(isDone || isPendingDelete) ? 'checked' : ''}`}
                         style={{
                             borderColor: isPendingDelete ? '#999' : colColor,
                             position: 'relative',
                             overflow: 'hidden'
                         }}
-                        onClick={() => onToggle(habit.id)}
+                        onClick={handleToggle}
                     >
                         {isPendingDelete ? (
                             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
