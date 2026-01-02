@@ -9,7 +9,7 @@ const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber
     const navItems = [
         {
             id: 'city',
-            label: playerName ? t('city_of_player').replace('{name}', playerName) : t('nav_city'),
+            label: 'Taken en plichten',
             icon: './assets/nav_plichten.jpg'
         },
         { id: 'tavern', label: 'Stad', icon: './assets/nav_tavern.jpg' },

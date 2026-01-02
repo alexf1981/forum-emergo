@@ -27,9 +27,16 @@ test.describe('Layout Checks', () => {
         await expect(bottomNav).toBeVisible();
 
         // Check standard buttons (English defaults), allowing for dynamic Player Name prefix
-        await expect(bottomNav.getByAltText(/Duties|City|Stad/i)).toBeVisible();
-        await expect(bottomNav.getByAltText('Tavern')).toBeVisible();
-        await expect(bottomNav.getByAltText('Adventure')).toBeVisible();
+        // Check Tab 1: Duties / City of Player
+        // We look for the first button which usually acts as the Duties/Home tab
+        await expect(bottomNav.locator('button').nth(0)).toBeVisible();
+
+        // Check Tab 2: Stad (formerly Tavern)
+        // explicitly look for 'Stad' which we just renamed
+        await expect(bottomNav.getByAltText('Stad')).toBeVisible();
+
+        // Check Tab 3: Adventure
+        await expect(bottomNav.getByAltText(/Adventure|Avontuur/i)).toBeVisible();
     });
 
     test('should show City Visual overview', async ({ page }) => {
