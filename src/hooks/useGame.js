@@ -113,6 +113,10 @@ export function useGame() {
         setHabits(GameLogic.updateHabit(habits, id, { text: newText, bucket: newBucket }));
     };
 
+    const moveHabit = (activeId, overId) => {
+        setHabits(GameLogic.reorderHabits(habits, activeId, overId));
+    };
+
     // === ACTIONS: HEROES ===
     const recruitHero = () => {
         if (stats.gold < 100) { notify({ key: 'msg_recruit_fail_gold' }, "error"); return; }
@@ -301,6 +305,7 @@ export function useGame() {
             addHabit,
             deleteHabit,
             updateHabit,
+            moveHabit, // NEW
             recruitHero,
             healHero,
             goAdventure,

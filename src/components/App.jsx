@@ -162,6 +162,7 @@ function App() {
                         onAddHabit={actions.addHabit}
                         onDeleteHabit={actions.deleteHabit}
                         onUpdateHabit={actions.updateHabit}
+                        onMoveHabit={actions.moveHabit} // NEW
                         onNotify={actions.notify} // NEW
                         formatNumber={formatNumber}
                     />

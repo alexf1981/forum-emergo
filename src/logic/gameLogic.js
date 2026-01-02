@@ -167,6 +167,21 @@ export function updateHabit(habits, id, updates) {
     return habits.map(h => h.id === id ? { ...h, ...updates } : h);
 }
 
+export function reorderHabits(habits, activeId, overId) {
+    const activeIndex = habits.findIndex(h => h.id === activeId);
+    const overIndex = habits.findIndex(h => h.id === overId);
+
+    if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex) {
+        return habits;
+    }
+
+    const newHabits = [...habits];
+    const [movedHabit] = newHabits.splice(activeIndex, 1);
+    newHabits.splice(overIndex, 0, movedHabit);
+
+    return newHabits;
+}
+
 export function processHabitToggle(habits, stats, id, dateString) {
     let notifications = [];
     let newStats = { ...stats };
