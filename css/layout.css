@@ -134,6 +134,8 @@
         "visual";
     gap: var(--spacing-md);
     height: auto;
+    align-items: start;
+    /* Fix vertical stretching */
 }
 
 
