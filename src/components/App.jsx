@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import * as GameLogic from '../logic/gameLogic';
 import BottomNav from './layout/BottomNav';
 import CityView from './views/CityView';
-import TavernView from './views/TavernView';
+// import TavernView from './views/TavernView'; // Deprecated
+import CapitalView from './views/CapitalView'; // New City Builder View
 import AdventureView from './views/AdventureView';
 import AddTaskModal from './AddTaskModal';
 import SettingsModal from './SettingsModal';
@@ -139,7 +140,9 @@ function App() {
                 />
             )}
 
-            <button className="fab" onClick={() => setShowAddTaskModal(true)} title={t('habit_new')}>+</button>
+            {activeTab === 'city' && (
+                <button className="fab" onClick={() => setShowAddTaskModal(true)} title={t('habit_new')}>+</button>
+            )}
 
             <div className={`hero-placeholder ${isHeaderCompact ? 'compact' : ''}`} />
             <div className={`hero-banner ${isHeaderCompact ? 'compact' : ''}`}>
@@ -169,11 +172,8 @@ function App() {
                 )}
 
                 {activeTab === 'tavern' && (
-                    <TavernView
-                        heroes={heroes}
-                        gold={stats.gold}
-                        onRecruit={actions.recruitHero}
-                        onHeal={actions.healHero}
+                    <CapitalView
+                        stats={stats}
                         formatNumber={formatNumber}
                     />
                 )}

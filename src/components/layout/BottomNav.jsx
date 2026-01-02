@@ -12,7 +12,7 @@ const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber
             label: playerName ? t('city_of_player').replace('{name}', playerName) : t('nav_city'),
             icon: './assets/nav_plichten.jpg'
         },
-        { id: 'tavern', label: t('nav_tavern'), icon: './assets/nav_tavern.jpg' },
+        { id: 'tavern', label: 'Stad', icon: './assets/nav_tavern.jpg' },
         { id: 'adventure', label: t('nav_adventure'), icon: './assets/nav_quests.jpg' }
     ];
 
