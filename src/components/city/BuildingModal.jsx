@@ -2,7 +2,7 @@ import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import Icons from '../Icons';
 
-const BuildingModal = ({ building, onClose, children }) => {
+const BuildingModal = ({ building, onClose, onUpgrade, children }) => {
     const { t } = useLanguage();
 
     return (
@@ -58,6 +58,26 @@ const BuildingModal = ({ building, onClose, children }) => {
                             <h2 style={{ margin: 0, fontFamily: 'Trajan Pro, serif', fontSize: '1.2rem', textShadow: '2px 2px 0px #000' }}>
                                 {building.name} <span style={{ fontSize: '0.6em', color: '#ddd' }}>(Lvl {building.level})</span>
                             </h2>
+                            <button
+                                onClick={() => onUpgrade(building.id)}
+                                disabled={building.level >= 5}
+                                style={{
+                                    background: building.level >= 5 ? '#7f8c8d' : '#27ae60',
+                                    border: '1px solid #fff',
+                                    color: 'white',
+                                    borderRadius: '4px',
+                                    padding: '4px 8px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 'bold',
+                                    cursor: building.level >= 5 ? 'default' : 'pointer',
+                                    boxShadow: building.level >= 5 ? 'none' : '0 2px 5px rgba(0,0,0,0.5)',
+                                    marginLeft: 'auto',
+                                    marginRight: '30px', // Space for the X close button
+                                    opacity: building.level >= 5 ? 0.7 : 1
+                                }}
+                            >
+                                {building.level >= 5 ? 'Max Level' : '⬆️ Upgrade'}
+                            </button>
                         </div>
                         {/* Close X inside banner */}
                         <button onClick={onClose} style={{

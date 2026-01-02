@@ -11,7 +11,11 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
     const { buildings, resources, upgradeBuilding, buildBuilding } = useCity();
 
     // UI State for selection
-    const [selectedBuilding, setSelectedBuilding] = useState(null);
+    const [selectedBuildingId, setSelectedBuildingId] = useState(null);
+
+    const selectedBuilding = selectedBuildingId
+        ? buildings.find(b => b.id === selectedBuildingId)
+        : null;
 
     const renderBuildingContent = () => {
         if (!selectedBuilding) return null;
@@ -21,8 +25,9 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
         // Town Hall logic
         if (type === 'town_hall') {
             return (
+
                 <TownHallInterior
-                    onClose={() => setSelectedBuilding(null)}
+                    onClose={() => setSelectedBuildingId(null)}
                     buildings={buildings}
                     buildBuilding={buildBuilding}
                     resources={resources}
@@ -70,7 +75,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
             <CityLayout
                 buildings={buildings}
                 // When a building is clicked from the layout
-                onBuildingClick={(b) => setSelectedBuilding(b)}
+                onBuildingClick={(b) => setSelectedBuildingId(b.id)}
             />
 
             {/* Top Overlay: Header / Resources */}
@@ -111,7 +116,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                         // Dynamically add header image based on type or ID
                         headerImage: (() => {
                             const type = selectedBuilding.type || selectedBuilding.id;
-                            if (type === 'town_hall') return './assets/city/town_hall.png';
+                            if (type === 'town_hall') return `./assets/city/town_hall_${selectedBuilding.level || 1}.png`;
                             if (type === 'tavern') return './assets/city/tavern.png';
                             if (type === 'library') return './assets/city/library.png';
                             if (type === 'market') return './assets/city/market.png';
@@ -119,7 +124,8 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                             return null;
                         })()
                     }}
-                    onClose={() => setSelectedBuilding(null)}
+                    onClose={() => setSelectedBuildingId(null)}
+                    onUpgrade={upgradeBuilding}
                 >
                     {renderBuildingContent()}
                 </BuildingModal>

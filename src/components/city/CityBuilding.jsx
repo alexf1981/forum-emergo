@@ -3,18 +3,33 @@ import React, { useState, useEffect, useRef } from 'react';
 const CityBuilding = ({ building, onClick, onMove }) => {
     // Scale factor can be adjusted per building type if needed
     // Using percentages relative to container width (approx 1200px equivalent)
-    const getSize = (type) => {
+    const getSize = (type, level) => {
         switch (type) {
-            case 'town_hall': return { width: '20%' }; // Doubled from 10%
-            case 'tavern': return { width: '13%' }; // +50% from 8.5%
-            case 'library': return { width: '13.5%' }; // +50% from 9%
-            case 'house': return { width: '8.5%' }; // Reverted to 8.5%
-            case 'market': return { width: '7.5%' }; // Unchanged
+            case 'town_hall':
+                // Level specific sizing
+                if (level === 1) return { width: '10%' }; // 50% of 20%
+                if (level === 2) return { width: '15%' }; // slightly smaller than 16% as requested
+                return { width: '20%' };
+            case 'tavern': return { width: '13%' };
+            case 'library': return { width: '13.5%' };
+            case 'house': return { width: '8.5%' };
+            case 'market': return { width: '7.5%' };
             default: return { width: '4%' };
         }
     };
 
-    const size = getSize(building.type);
+    const size = getSize(building.type, building.level);
+
+    // Vertical shift logic for specific buildings
+    const getVerticalShift = (type, level) => {
+        if (type === 'town_hall') {
+            if (level === 1) return '-35%'; // Level 1 moved further down (standard is -50%, so -35% pushes it down relative to anchor)
+            return '-65%'; // Higher levels shift up
+        }
+        return '-50%'; // Default center
+    };
+
+    const translateY = getVerticalShift(building.type, building.level);
 
     // Variation Logic: Deterministic flip based on ID
     // Simple hash of the ID string to decide if we flip or not
@@ -92,7 +107,7 @@ const CityBuilding = ({ building, onClick, onMove }) => {
         left: `${building.x}%`,
         top: `${building.y}%`,
         width: size.width,
-        transform: `translate(-50%, -50%) scale(${perspectiveScale})`, // Apply scaling here
+        transform: `translate(-50%, ${translateY}) scale(${perspectiveScale})`, // Apply scaling here
         transformOrigin: 'bottom center', // Scale from the feet
         cursor: onMove ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
         transition: isDragging ? 'none' : 'transform 0.2s',
@@ -104,7 +119,7 @@ const CityBuilding = ({ building, onClick, onMove }) => {
     // Map type to image file
     const getBuildingImage = (type) => {
         switch (type) {
-            case 'town_hall': return './assets/city/town_hall.png';
+            case 'town_hall': return `./assets/city/town_hall_${building.level || 1}.png`;
             case 'tavern': return './assets/city/tavern.png';
             case 'library': return './assets/city/library.png';
             case 'house': return './assets/city/house.png';
