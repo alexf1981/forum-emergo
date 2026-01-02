@@ -20,6 +20,7 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
     // Drag and Drop Logic
     const [draggedHabitId, setDraggedHabitId] = useState(null);
     const [dragOverHabitId, setDragOverHabitId] = useState(null);
+    const [dragOverPos, setDragOverPos] = useState(null);
 
     const handleDragStart = (e, id) => {
         e.dataTransfer.effectAllowed = 'move';
@@ -30,23 +31,35 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
     const handleDragOver = (e, id) => {
         e.preventDefault(); // Necessary to allow dropping
         e.dataTransfer.dropEffect = 'move';
+
         if (draggedHabitId !== id) {
             setDragOverHabitId(id);
+
+            // Calculate position (top/bottom half)
+            const rect = e.currentTarget.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+                setDragOverPos('above');
+            } else {
+                setDragOverPos('below');
+            }
         }
     };
 
     const handleDragEnd = () => {
         setDraggedHabitId(null);
         setDragOverHabitId(null);
+        setDragOverPos(null);
     };
 
     const handleDrop = (e, targetId) => {
         e.preventDefault();
         if (draggedHabitId && targetId && draggedHabitId !== targetId) {
-            onMoveHabit(draggedHabitId, targetId);
+            onMoveHabit(draggedHabitId, targetId, dragOverPos);
         }
         setDraggedHabitId(null);
         setDragOverHabitId(null);
+        setDragOverPos(null);
     };
 
     return (
@@ -130,27 +143,12 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                                     if (isDraggable) {
                                                         const isDragOver = dragOverHabitId === h.id;
                                                         let placeholderStyle = {};
-                                                        if (isDragOver && draggedIndex !== -1 && draggedIndex !== index) {
-                                                            if (draggedIndex < index) {
-                                                                // Dragging down, drop after -> space below
-                                                                // BUT: inserting at index pushes current item down?
-                                                                // Wait: splice insert at `overIndex`. If I drop on B (index 1), A becomes index 1. B becomes index 0 ?? No.
-                                                                // Re-evaluate logic:
-                                                                // [A(0), B(1)]. Drop A on B.
-                                                                // Remove A. [B]. 
-                                                                // Insert at 1. [B, A].
-                                                                // A is AFTER B.
-                                                                // So B should shift UP? Or create space BELOW B?
-                                                                // If I hover B, and A will end up BELOW B, then B is "above" the slot.
-                                                                // So I should draw a slot BELOW B.
-                                                                placeholderStyle = { paddingBottom: '50px', transition: 'padding 0.2s' };
-                                                            } else {
-                                                                // Dragging up. [A(0), C(2)]. Drag C on A.
-                                                                // Remove C. [A].
-                                                                // Insert at 0. [C, A].
-                                                                // C is BEFORE A.
-                                                                // So A should shift DOWN. Space ABOVE A.
+
+                                                        if (isDragOver && dragOverPos) {
+                                                            if (dragOverPos === 'above') {
                                                                 placeholderStyle = { paddingTop: '50px', transition: 'padding 0.2s' };
+                                                            } else {
+                                                                placeholderStyle = { paddingBottom: '50px', transition: 'padding 0.2s' };
                                                             }
                                                         }
 

@@ -113,8 +113,8 @@ export function useGame() {
         setHabits(GameLogic.updateHabit(habits, id, { text: newText, bucket: newBucket }));
     };
 
-    const moveHabit = (activeId, overId) => {
-        setHabits(GameLogic.reorderHabits(habits, activeId, overId));
+    const moveHabit = (activeId, overId, position) => {
+        setHabits(GameLogic.reorderHabits(habits, activeId, overId, position));
     };
 
     // === ACTIONS: HEROES ===

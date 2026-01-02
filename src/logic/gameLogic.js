@@ -167,17 +167,35 @@ export function updateHabit(habits, id, updates) {
     return habits.map(h => h.id === id ? { ...h, ...updates } : h);
 }
 
-export function reorderHabits(habits, activeId, overId) {
+export function reorderHabits(habits, activeId, overId, position = 'below') {
     const activeIndex = habits.findIndex(h => h.id === activeId);
     const overIndex = habits.findIndex(h => h.id === overId);
 
-    if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex) {
+    if (activeIndex === -1 || overIndex === -1) {
         return habits;
     }
 
+    // Create copy
     const newHabits = [...habits];
+
+    // Remove active item
     const [movedHabit] = newHabits.splice(activeIndex, 1);
-    newHabits.splice(overIndex, 0, movedHabit);
+
+    // Adjust overIndex because of removal
+    // If active was before over, over shifts down by 1
+    let adjustedOverIndex = overIndex;
+    if (activeIndex < overIndex) {
+        adjustedOverIndex -= 1;
+    }
+
+    // Determine insertion index
+    let insertIndex = adjustedOverIndex;
+    if (position === 'below') {
+        insertIndex += 1;
+    }
+
+    // Insert
+    newHabits.splice(insertIndex, 0, movedHabit);
 
     return newHabits;
 }
