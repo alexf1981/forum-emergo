@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - heading "Forum Emergo" [level=1] [ref=e7]
+  - generic [ref=e9]:
+    - generic [ref=e13]:
+      - generic "Stadhuis (Lvl 1)" [ref=e14] [cursor=pointer]:
+        - generic [ref=e15]:
+          - img "Stadhuis" [ref=e16]
+          - generic [ref=e17]: "1"
+        - generic: Stadhuis
+      - generic "Taverne (Lvl 1)" [ref=e18] [cursor=pointer]:
+        - generic [ref=e19]:
+          - img "Taverne" [ref=e20]
+          - generic [ref=e21]: "1"
+        - generic: Taverne
+      - generic "Woonhuis (Lvl 1)" [ref=e22] [cursor=pointer]:
+        - generic [ref=e23]:
+          - img "Woonhuis" [ref=e24]
+          - generic [ref=e25]: "1"
+        - generic: Woonhuis
+      - generic "Woonhuis (Lvl 1)" [ref=e26] [cursor=pointer]:
+        - generic [ref=e27]:
+          - img "Woonhuis" [ref=e28]
+          - generic [ref=e29]: "1"
+        - generic: Woonhuis
+      - generic "Bibliotheek (Lvl 1)" [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]:
+          - img "Bibliotheek" [ref=e32]
+          - generic [ref=e33]: "1"
+        - generic: Bibliotheek
+      - generic "Markt (Lvl 1)" [ref=e34] [cursor=pointer]:
+        - generic [ref=e35]:
+          - img "Markt" [ref=e36]
+          - generic [ref=e37]: "1"
+        - generic: Markt
+    - generic [ref=e38]:
+      - generic [ref=e39]: Duties
+      - generic [ref=e40]:
+        - generic "Goud" [ref=e41]: 🪙 200
+        - generic "Hout" [ref=e42]: 🌲 100
+        - generic "Steen" [ref=e43]: 🪨 50
+    - button "🏗️ Bouw Huis (50g)" [ref=e45] [cursor=pointer]
+  - generic [ref=e47]:
+    - generic [ref=e48]:
+      - img "Goud" [ref=e50]
+      - generic: "200"
+    - generic:
+      - button "Taken en plichten" [ref=e51] [cursor=pointer]:
+        - img "Taken en plichten" [ref=e53]
+      - button "Stad" [ref=e54] [cursor=pointer]:
+        - img "Stad" [ref=e56]
+      - button "Adventure" [ref=e57] [cursor=pointer]:
+        - img "Adventure" [ref=e59]
+    - button "Profiel Lokaal Opslaan" [ref=e60] [cursor=pointer]:
+      - generic [ref=e61]:
+        - img "Profiel" [ref=e62]
+        - generic "Lokaal Opslaan" [ref=e63]
+```

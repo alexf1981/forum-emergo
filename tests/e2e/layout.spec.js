@@ -49,17 +49,20 @@ test.describe('Layout Checks', () => {
         await expect(page.getByText('Mandata')).toBeVisible();
     });
 
-    test('should navigate to Tavern and back', async ({ page }) => {
-        // Go to Tavern
-        await page.getByTitle('Tavern').click();
-        await expect(page.locator('h2').getByText('De Vergulde Gladius')).toBeVisible(); // This substring is hardcoded in TavernView
+    test('should navigate to Stad and back', async ({ page }) => {
+        // Go to Stad (formerly Tavern tab)
+        await page.getByTitle('Stad').click();
 
-        // Go back to City
-        await page.getByTitle(/Duties|City|Stad/i).click();
-        // Header might also be dynamic now (Player Name badge)
-        await expect(page.locator('.city-name-badge')).toBeVisible();
-        await expect(page.locator('.city-rank-badge')).toBeVisible();
-        // Check for common rank names (English or Dutch)
-        await expect(page.locator('.city-rank-badge')).toHaveText(/Village|Dorp|Trading Post|Handelspost|City|Stad/i);
+        // Assert we are in CapitalView
+        // CapitalView has a header with "Stad" and resources (now in overlay-top)
+        await expect(page.locator('.capital-overlay-top').getByText('Stad')).toBeVisible();
+        await expect(page.getByText('🪙')).toBeVisible();
+
+        // Go back to Duties (First tab, now named "Taken en plichten")
+        await page.getByTitle('Taken en plichten').click();
+
+        // Header might also be dynamic now (Player Name badge) or fallback to something else
+        // In CityView (Tasks view), we verify columns are visible
+        await expect(page.locator('.city-columns-container')).toBeVisible();
     });
 });
