@@ -250,7 +250,17 @@ export function processHabitToggle(habits, stats, id, dateString) {
 }
 
 export function resetDailyHabits(habits) {
-    return habits.map(h => {
+    // First, remove Mandata (todo) tasks that are completed.
+    // They are one-time challenges for that day.
+    const remainingHabits = habits.filter(h => {
+        if (h.type === 'todo' && h.completed) {
+            return false; // Remove!
+        }
+        return true;
+    });
+
+    // Reset daily state for recurring habits
+    return remainingHabits.map(h => {
         if (h.type === 'virtue' || h.type === 'vice' || !h.type) {
             // Keep history, but ensure completed is false for visual state if used elsewhere
             return { ...h, completed: false };

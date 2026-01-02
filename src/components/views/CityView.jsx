@@ -22,6 +22,18 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
     const [dragOverHabitId, setDragOverHabitId] = useState(null);
     const [dragOverPos, setDragOverPos] = useState(null);
 
+    // Immediate Reward Logic: Pending Completion State
+    const [pendingIds, setPendingIds] = useState(new Set());
+
+    const handlePending = (id, isPending) => {
+        setPendingIds(prev => {
+            const newSet = new Set(prev);
+            if (isPending) newSet.add(id);
+            else newSet.delete(id);
+            return newSet;
+        });
+    };
+
     const handleDragStart = (e, id) => {
         e.dataTransfer.effectAllowed = 'move';
         // Delay state update to allow browser to capture drag image before collapsing
@@ -92,7 +104,9 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                                 const dailyCount = h.history.filter(d => d === today).length;
                                                 const isDone = dailyCount > 0;
 
-                                                if (colType !== 'todo' && h.bucket && isDone) {
+                                                // If it's done AND bucket AND not pending, move to completed.
+                                                // If it's pending, it stays in active even if done.
+                                                if (h.bucket && isDone && !pendingIds.has(h.id)) {
                                                     completedBucketHabits.push(h);
                                                 } else {
                                                     activeHabits.push(h);
@@ -137,6 +151,8 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
                                                             onNotify={onNotify}
                                                             formatNumber={formatNumber}
                                                             t={t}
+                                                            onPending={handlePending}
+                                                            isPending={pendingIds.has(h.id)}
                                                         />
                                                     );
 

@@ -14,7 +14,8 @@ const HabitItem = ({
     onDecrement,
     onNotify,
     formatNumber,
-    t
+    t,
+    onPending
 }) => {
     const isTodo = colType === 'todo';
     const isDoneOneTime = habit.bucket && isDone;
@@ -35,18 +36,13 @@ const HabitItem = ({
     }, [onToggle, onDelete, habit, colType]);
 
     const startTimer = () => {
+        // Immediate Effect on Click
+        if (onPending) onPending(habit.id, true);
+        onToggle(habit.id); // Triggers gold update + completion state
+
         setIsPendingDelete(true);
         setProgress(0);
         startTimeRef.current = Date.now();
-
-        // Notify immediately
-        if (colType === 'todo') {
-            onNotify({ key: 'msg_habit_todo_reward' }, "mandatum");
-        } else if (colType === 'vice') {
-            onNotify({ key: 'msg_habit_vice_penalty' }, "error");
-        } else {
-            onNotify({ key: 'msg_habit_virtue_reward' }, "success");
-        }
 
         if (timerRef.current) clearInterval(timerRef.current);
 
@@ -60,13 +56,8 @@ const HabitItem = ({
                 timerRef.current = null;
                 setIsPendingDelete(false);
 
-                // Action on complete (Use Refs!)
-                const current = callbacksRef.current;
-                if (current.colType === 'todo') {
-                    current.onDelete(current.habit.id, true);
-                } else {
-                    current.onToggle(current.habit.id, true); // Silent toggle
-                }
+                // Finalize: Release pending state so it can move to completed list
+                if (onPending) onPending(habit.id, false);
             }
         }, 100);
     };
@@ -78,6 +69,10 @@ const HabitItem = ({
         }
         setIsPendingDelete(false);
         setProgress(0);
+
+        // Undo Effect
+        onToggle(habit.id); // Refunds gold + unchecks
+        if (onPending) onPending(habit.id, false);
     };
 
     const handleToggle = () => {
@@ -87,16 +82,16 @@ const HabitItem = ({
         }
 
         // One-time tasks (Virtue/Vice/Todo)
-        if (isDone) {
-            // Already done, uncheck immediately
+        if (isDone && !isPendingDelete) {
+            // Already done (and verified), uncheck immediately (re-open)
             onToggle(habit.id);
         } else {
-            // Not done
+            // Not done OR currently in undo-window
             if (isPendingDelete) {
-                // Currently counting down -> Cancel
+                // Currently counting down -> Undo!
                 cancelTimer();
             } else {
-                // Start countdown
+                // Start countdown (and immediate reward)
                 startTimer();
             }
         }
