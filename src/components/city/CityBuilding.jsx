@@ -37,30 +37,40 @@ const CityBuilding = ({ building, onClick, onMove }) => {
         building.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 2 !== 0;
 
 
-    // Drag Logic (Dormant if onMove is not passed)
+    // Drag & Click Logic
     const [isDragging, setIsDragging] = useState(false);
     const dragStartPos = useRef(null);
+    const isPointerDown = useRef(false);
 
-    const handleMouseDown = (e) => {
-        if (!onMove) return; // Only enable drag if onMove is provided
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragging(true);
-        dragStartPos.current = { x: e.clientX, y: e.clientY };
+    // Unified Start Logic caused by visual element
+    const handlePointerDown = (clientX, clientY, e) => {
+        isPointerDown.current = true;
+        dragStartPos.current = { x: clientX, y: clientY };
+
+        // If in Edit Mode, we capture immediately
+        if (onMove) {
+            setIsDragging(true);
+            e.stopPropagation(); // Stop map panning
+            // e.preventDefault(); // Optional: prevent selection, but let's be careful with touch scroll
+        }
+        // In Normal Mode, we let it bubble so Map can Pan, 
+        // BUT we still track start pos to detect our own "Click" on release.
     };
 
     useEffect(() => {
-        if (!isDragging) return;
+        if (!isPointerDown.current && !isDragging) return;
 
-        const handleMouseMove = (e) => {
+        const handleMoveEvent = (clientX, clientY) => {
+            if (!onMove || !isDragging) return; // Only move calculation if in Edit Mode
+
             const container = document.querySelector('.city-map-container');
             if (!container) return;
 
             const rect = container.getBoundingClientRect();
 
             // Calculate percentage positions
-            let newX = ((e.clientX - rect.left) / rect.width) * 100;
-            let newY = ((e.clientY - rect.top) / rect.height) * 100;
+            let newX = ((clientX - rect.left) / rect.width) * 100;
+            let newY = ((clientY - rect.top) / rect.height) * 100;
 
             // Clamp
             newX = Math.max(0, Math.min(100, newX));
@@ -69,29 +79,64 @@ const CityBuilding = ({ building, onClick, onMove }) => {
             onMove(building.id, newX, newY);
         };
 
-        const handleMouseUp = (e) => {
-            setIsDragging(false);
-
-            // Check if it was a Click or a Drag
-            // If moved less than 5 pixels, treat as click
+        const handleUpEvent = (clientX, clientY) => {
+            // Calculate distance
+            let wasClick = false;
             if (dragStartPos.current) {
-                const dx = Math.abs(e.clientX - dragStartPos.current.x);
-                const dy = Math.abs(e.clientY - dragStartPos.current.y);
-                if (dx < 5 && dy < 5 && onClick) {
-                    onClick(building);
-                }
+                const dist = Math.hypot(clientX - dragStartPos.current.x, clientY - dragStartPos.current.y);
+                // If moved less than 10px, it's a click
+                if (dist < 10) wasClick = true;
             }
+
+            if (wasClick) {
+                if (onClick) onClick(building);
+            }
+
+            // Reset
+            setIsDragging(false);
+            isPointerDown.current = false;
             dragStartPos.current = null;
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
+        const onMouseMove = (e) => handleMoveEvent(e.clientX, e.clientY);
+        const onMouseUp = (e) => handleUpEvent(e.clientX, e.clientY);
+
+        const onTouchMove = (e) => {
+            if (isDragging) e.preventDefault(); // Block scroll only if dragging
+            const t = e.touches[0];
+            handleMoveEvent(t.clientX, t.clientY);
+        };
+        const onTouchEnd = (e) => {
+            // Touch end doesn't have coords, use last known? 
+            // Or just trust if it was a short tap. 
+            // For simple click detection on touch, we can use changedTouches if needed, 
+            // but effectively if we haven't 'moved' significantly...
+            // Standard click might be better for touch fallback, but let's try using the start pos.
+            // Actually, handleUp needs clientX/Y to check distance.
+            const t = e.changedTouches[0];
+            handleUpEvent(t.clientX, t.clientY);
+        };
+
+        // Attach to window to catch release outside element
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('touchmove', onTouchMove, { passive: false });
+        window.addEventListener('touchend', onTouchEnd);
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('touchend', onTouchEnd);
         };
-    }, [isDragging, building.id, onMove, onClick]);
+    }, [isDragging, onMove, building, onClick]);
+
+    // Use specific handlers for element
+    const onMouseDown = (e) => handlePointerDown(e.clientX, e.clientY, e);
+    const onTouchStart = (e) => {
+        const t = e.touches[0];
+        handlePointerDown(t.clientX, t.clientY, e);
+    };
 
 
     // Depth Scaling Calculation
@@ -134,10 +179,9 @@ const CityBuilding = ({ building, onClick, onMove }) => {
         <div
             className="city-building"
             style={style}
-            onMouseDown={handleMouseDown}
-            onClick={(e) => {
-                if (!onMove && onClick) onClick(building); // Fallback for normal mode
-            }}
+            onMouseDown={onMouseDown}
+            onTouchStart={onTouchStart}
+            // onClick logic is handled in onMouseUp now
             title={`${building.name} (Lvl ${building.level})`}
         >
             <div style={{

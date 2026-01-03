@@ -12,20 +12,40 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
 
     // UI State for selection
     const [selectedBuildingId, setSelectedBuildingId] = useState(null);
+    const [isEditMode, setIsEditMode] = useState(localStorage.getItem('CITY_EDIT_MODE') === 'true');
+    // Local state for dragging visual updates
+    const [localBuildings, setLocalBuildings] = useState(buildings);
+
+    // Sync local state when buildings prop changes (e.g. initial load or upgrades)
+    React.useEffect(() => {
+        setLocalBuildings(buildings);
+    }, [buildings]);
+
+    // Listen for Edit Mode changes from Admin Panel
+    React.useEffect(() => {
+        const handleEditModeChange = () => {
+            setIsEditMode(localStorage.getItem('CITY_EDIT_MODE') === 'true');
+        };
+
+        window.addEventListener('city-edit-mode-change', handleEditModeChange);
+        window.addEventListener('storage', handleEditModeChange);
+
+        return () => {
+            window.removeEventListener('city-edit-mode-change', handleEditModeChange);
+            window.removeEventListener('storage', handleEditModeChange);
+        };
+    }, []);
 
     const selectedBuilding = selectedBuildingId
         ? buildings.find(b => b.id === selectedBuildingId)
         : null;
 
     const renderBuildingContent = () => {
+        // ... (keep existing renderBuildingContent logic)
         if (!selectedBuilding) return null;
-
         const type = selectedBuilding.type || selectedBuilding.id;
-
-        // Town Hall logic
         if (type === 'town_hall') {
             return (
-
                 <TownHallInterior
                     onClose={() => setSelectedBuildingId(null)}
                     buildings={buildings}
@@ -35,8 +55,6 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                 />
             );
         }
-
-        // Tavern logic
         if (type === 'tavern') {
             return (
                 <TavernInterior
@@ -47,8 +65,6 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                 />
             );
         }
-
-        // Generic placeholder for others
         return (
             <div style={{ textAlign: 'center', padding: '20px' }}>
                 <p>Dit gebouw is nog in constructie.</p>
@@ -60,9 +76,24 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
         );
     };
 
+    // Drag Logic updates local state
+    const handleLocalMove = (id, newX, newY) => {
+        setLocalBuildings(prev => prev.map(b =>
+            b.id === id ? { ...b, x: newX, y: newY } : b
+        ));
+    };
+
+    const handleExportCoords = () => {
+        console.log('--- EXPORT COORDINATES ---');
+        localBuildings.forEach(b => {
+            console.log(`Building '${b.type || b.id}': { x: ${Math.round(b.x)}, y: ${Math.round(b.y)} }`);
+        });
+        alert('Coordinaten geëxporteerd naar Console (F12)');
+    };
+
     return (
         <div className="capital-view" style={{
-            position: 'fixed', // Force full viewport coverage
+            position: 'fixed',
             top: 0,
             left: 0,
             right: 0,
@@ -73,15 +104,17 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
         }}>
             {/* Main City Background Layer */}
             <CityLayout
-                buildings={buildings}
+                buildings={localBuildings} // Use local moved state
                 // When a building is clicked from the layout
                 onBuildingClick={(b) => setSelectedBuildingId(b.id)}
+                // Enable dragging ONLY if Edit Mode is active
+                onBuildingMove={isEditMode ? handleLocalMove : null}
             />
 
             {/* Top Overlay: Header / Resources */}
             <div className="capital-overlay-top" style={{
                 position: 'absolute',
-                top: '70px', // Below the Hero Header
+                top: '70px',
                 left: '10px',
                 right: '10px',
                 display: 'flex',
@@ -95,8 +128,14 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                 boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
                 border: '1px solid rgba(255,255,255,0.1)'
             }}>
-                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', textShadow: '0 2px 4px black' }}>
+                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', textShadow: '0 2px 4px black', display: 'flex', alignItems: 'center' }}>
                     {t('nav_city') || 'Stad'}
+                    {isEditMode && (
+                        <>
+                            <span style={{ fontSize: '0.7em', color: '#e74c3c', marginLeft: '10px', background: 'white', padding: '0 4px', borderRadius: '4px', marginRight: '10px' }}>🛠️ ADMIN</span>
+                            <button onClick={handleExportCoords} style={{ fontSize: '0.7rem', cursor: 'pointer', padding: '2px 5px' }}>💾 Export Coords</button>
+                        </>
+                    )}
                 </div>
                 <div style={{ display: 'flex', gap: '15px', fontWeight: '500' }}>
                     <span title="Goud">🪙 {formatNumber(stats.gold)}</span>

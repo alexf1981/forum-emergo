@@ -6,10 +6,19 @@ import '../../css/components.css'; // Reuse basic styles or add specific admin C
 const AdminDashboard = ({ onClose }) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [editMode, setEditMode] = useState(localStorage.getItem('CITY_EDIT_MODE') === 'true');
 
     useEffect(() => {
         loadData();
     }, []);
+
+    const toggleEditMode = () => {
+        const newValue = !editMode;
+        setEditMode(newValue);
+        localStorage.setItem('CITY_EDIT_MODE', newValue);
+        // Dispatch custom event for immediate update in CapitalView
+        window.dispatchEvent(new Event('city-edit-mode-change'));
+    };
 
     const loadData = async () => {
         setLoading(true);
@@ -33,8 +42,18 @@ const AdminDashboard = ({ onClose }) => {
     return (
         <div className="modal-overlay" style={{ zIndex: 2000 }}>
             <div className="modal-content" style={{ maxWidth: '800px', width: '90%' }}>
-                <div className="modal-header">
-                    <h2>Keizerlijk Overzicht (Admin)</h2>
+                <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        <h2>Keizerlijk Overzicht</h2>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem', cursor: 'pointer', background: editMode ? '#fff' : 'rgba(255,255,255,0.5)', padding: '2px 8px', borderRadius: '4px' }}>
+                            <input
+                                type="checkbox"
+                                checked={editMode}
+                                onChange={toggleEditMode}
+                            />
+                            Stad Bewerken
+                        </label>
+                    </div>
                     <button className="btn-icon" onClick={onClose}>X</button>
                 </div>
                 <div className="modal-body">

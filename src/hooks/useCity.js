@@ -5,24 +5,24 @@ const INITIAL_BUILDINGS = [
     {
         "id": "town_hall",
         "type": "town_hall",
-        "x": 50,
-        "y": 41,
+        "x": 55,
+        "y": 38,
         "name": "Stadhuis",
         "level": 1
     },
     {
         "id": "tavern",
         "type": "tavern",
-        "x": 74,
-        "y": 46,
+        "x": 75,
+        "y": 36,
         "name": "Taverne",
         "level": 0
     },
     {
         "id": "house_1",
         "type": "house",
-        "x": 62,
-        "y": 52,
+        "x": 67,
+        "y": 37,
         "name": "Woonhuis",
         "level": 0
     },
@@ -37,8 +37,8 @@ const INITIAL_BUILDINGS = [
     {
         "id": "library",
         "type": "library",
-        "x": 36,
-        "y": 38,
+        "x": 68,
+        "y": 64,
         "name": "Bibliotheek",
         "level": 0
     },
@@ -46,71 +46,71 @@ const INITIAL_BUILDINGS = [
         "id": "market",
         "type": "market",
         "x": 42,
-        "y": 61,
+        "y": 52,
         "name": "Markt",
         "level": 0
     },
     {
         "id": "house_1767357972907",
         "type": "house",
-        "x": 52,
-        "y": 68,
+        "x": 51,
+        "y": 52,
         "name": "Woonhuis",
         "level": 0
     },
     {
         "id": "house_1767357973099",
         "type": "house",
-        "x": 79,
-        "y": 74,
+        "x": 41,
+        "y": 35,
         "name": "Woonhuis",
         "level": 0
     },
     {
         "id": "house_1767357973267",
         "type": "house",
-        "x": 20,
-        "y": 36,
+        "x": 16,
+        "y": 40,
         "name": "Woonhuis",
         "level": 0
     },
     {
         "id": "house_1767357973411",
         "type": "house",
-        "x": 27,
-        "y": 30,
+        "x": 28,
+        "y": 31,
         "name": "Woonhuis",
         "level": 0
     },
     {
         "id": "house_1767357973595",
         "type": "house",
-        "x": 33,
-        "y": 75,
+        "x": 9,
+        "y": 69,
         "name": "Woonhuis",
         "level": 0
     },
     {
         "id": "house_1767357973771",
         "type": "house",
-        "x": 27,
-        "y": 41,
+        "x": 26,
+        "y": 45,
         "name": "Woonhuis",
         "level": 0
     },
     {
         "id": "house_1767357973931",
         "type": "house",
-        "x": 19,
-        "y": 55,
+        "x": 30,
+        "y": 80,
         "name": "Woonhuis",
         "level": 0
     },
     {
         "id": "house_1767357974083",
         "type": "house",
-        "x": 71,
-        "y": 59,
+        "x": 87,
+        "y": 61,
         "name": "Woonhuis",
         "level": 0
     }
