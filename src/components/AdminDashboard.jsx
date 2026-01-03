@@ -3,7 +3,7 @@ import { AdminService } from '../services/adminService';
 import Icons from './Icons';
 import '../../css/components.css'; // Reuse basic styles or add specific admin CSS
 
-const AdminDashboard = ({ onClose }) => {
+const AdminDashboard = ({ onClose, actions }) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(localStorage.getItem('CITY_EDIT_MODE') === 'true');
@@ -85,6 +85,36 @@ const AdminDashboard = ({ onClose }) => {
                     )}
                     <div className="modal-actions">
                         <button className="btn" onClick={loadData}>VERVERSEN</button>
+                    </div>
+
+                    {/* CHEAT ACTIONS */}
+                    <div style={{ padding: '15px', borderTop: '1px solid #ddd', marginTop: '15px' }}>
+                        <h3 style={{ marginTop: 0, color: '#e74c3c', fontSize: '1rem' }}>⚡ God Mode Actions</h3>
+                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                            <button
+                                className="btn"
+                                onClick={() => {
+                                    if (window.confirm("Zeker weten? Alle gebouwen behalve Stadhuis worden gereset.")) {
+                                        if (actions && actions.adminResetCity) actions.adminResetCity();
+                                        else alert("Action not found");
+                                    }
+                                }}
+                                style={{ backgroundColor: '#e74c3c', borderColor: '#c0392b' }}
+                            >
+                                🏚️ Stad Ontruimen
+                            </button>
+
+                            <button
+                                className="btn"
+                                onClick={() => {
+                                    if (actions && actions.adminAddGold) actions.adminAddGold();
+                                    else alert("Action not found");
+                                }}
+                                style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
+                            >
+                                💰 +1 Miljoen Goud
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

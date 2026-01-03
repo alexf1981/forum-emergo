@@ -8,7 +8,7 @@ import AdminDashboard from './AdminDashboard';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../locales/translations';
 
-const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRomanNumerals, onLogin }) => {
+const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRomanNumerals, onLogin, actions }) => {
     const { user, playerName, updatePlayerName } = useAuth();
     const [localPlayerName, setLocalPlayerName] = useState(playerName || '');
 
@@ -26,7 +26,7 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
     const isAdmin = user?.email && ADMINS.includes(user.email);
 
     if (showAdmin) {
-        return <AdminDashboard onClose={() => setShowAdmin(false)} />;
+        return <AdminDashboard onClose={() => setShowAdmin(false)} actions={actions} />;
     }
 
     const handleLogout = async () => {

@@ -163,6 +163,26 @@ export function useGame() {
         setBuildings(prev => GameLogic.moveBuilding(prev, id, x, y));
     };
 
+    // === ADMIN ACTIONS ===
+    const adminAddGold = () => {
+        setStats(prev => ({ ...prev, gold: prev.gold + 1000000 }));
+        notify("1 Miljoen Goud toegevoegd!", "success");
+    };
+
+    const adminResetCity = () => {
+        setBuildings([
+            { id: "town_hall", type: "town_hall", x: 55, y: 38, name: "Stadhuis", level: 1 },
+            // ... reset other unique buildings if needed, but request said ONLY Town Hall Level 1
+            // We'll keep the predefined layout structure but set levels to 0 for everything else?
+            // Actually, simplest is to reset to INITIAL_BUILDINGS.
+            // But wait, user said "Remove all buildings except town hall". 
+            // Our INITIAL_BUILDINGS has everything at level 0 (except Town Hall).
+            // So resetting to INITIAL_BUILDINGS effectively clears the "built" state.
+        ]);
+        setBuildings(GameLogic.INITIAL_BUILDINGS);
+        notify("Stad ontruimd! Stadhuis is level 1.", "success");
+    };
+
 
     // === EXPORT / IMPORT ===
     // These manipulate state directly, so they belong here
@@ -315,7 +335,13 @@ export function useGame() {
             // City
             buildBuilding,
             upgradeBuilding,
+            buildBuilding,
+            upgradeBuilding,
             moveBuilding,
+
+            // Admin
+            adminAddGold,
+            adminResetCity
         },
         isLoggedIn: !!user,
         isNewUser, // NEW

@@ -214,6 +214,7 @@ function App() {
                     setAuthFromStart(false); // Normal login from settings
                     setShowAuthModal(true);
                 }}
+                actions={actions}
             />}
 
             <AuthModal
