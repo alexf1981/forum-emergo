@@ -18,8 +18,10 @@ const HabitItem = ({
     onPending
 }) => {
     const isTodo = colType === 'todo';
-    const isDoneOneTime = habit.bucket && isDone;
-    const isRecurring = !habit.bucket;
+    // Determine recurrence based on explicit property first, fallback to legacy 'bucket' logic
+    const isRecurring = habit.recurring !== undefined ? habit.recurring : !habit.bucket;
+    // One-time tasks are those that are NOT recurring
+    const isDoneOneTime = !isRecurring && isDone;
 
     // Timer Logic for One-Time Tasks
     const [progress, setProgress] = useState(0);

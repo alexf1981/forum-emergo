@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Icons from './Icons';
+import Flag from './layout/Flag';
 import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/auth';
 import AdminDashboard from './AdminDashboard';
@@ -102,36 +103,30 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                         <div className="settings-row" style={{ marginBottom: '10px', flexDirection: 'column', alignItems: 'flex-start' }}>
                             <span style={{ marginBottom: '5px' }}>Taal / Language</span>
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                {['en', 'nl', 'es', 'de'].map(langKey => {
-                                    const FlagIcon = {
-                                        en: Icons.FlagUK,
-                                        nl: Icons.FlagNL,
-                                        es: Icons.FlagES,
-                                        de: Icons.FlagDE
-                                    }[langKey];
-
-                                    return (
-                                        <button
-                                            key={langKey}
-                                            onClick={() => changeLanguage(langKey)}
-                                            style={{
-                                                fontSize: '1.5rem',
-                                                padding: '5px',
-                                                border: language === langKey ? '2px solid #8E1600' : '1px solid #ccc',
-                                                borderRadius: '5px',
-                                                backgroundColor: language === langKey ? '#fff0e0' : 'white',
-                                                cursor: 'pointer',
-                                                opacity: language === langKey ? 1 : 0.7,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}
-                                            title={translations[langKey].name}
-                                        >
-                                            {FlagIcon ? <FlagIcon /> : translations[langKey].flag}
-                                        </button>
-                                    );
-                                })}
+                                {['en', 'nl', 'es', 'de'].map(langKey => (
+                                    <button
+                                        key={langKey}
+                                        onClick={() => changeLanguage(langKey)}
+                                        style={{
+                                            fontSize: '1.5rem',
+                                            padding: '0',
+                                            width: '40px',
+                                            height: '40px',
+                                            border: language === langKey ? '2px solid #8E1600' : '1px solid #ccc',
+                                            borderRadius: '50%',
+                                            backgroundColor: language === langKey ? '#fff0e0' : 'white',
+                                            cursor: 'pointer',
+                                            opacity: language === langKey ? 1 : 0.7,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            overflow: 'hidden'
+                                        }}
+                                        title={translations[langKey].name}
+                                    >
+                                        <Flag code={langKey} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </button>
+                                ))}
                             </div>
                         </div>
 

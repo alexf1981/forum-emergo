@@ -5,7 +5,7 @@ import '../../css/components.css'
 import { useLanguage } from '../context/LanguageContext';
 
 const AuthModal = ({ isOpen, onClose, onLoginSuccess, initialMode = 'login', closeOnOverlayClick = true }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [isLogin, setIsLogin] = useState(initialMode === 'login')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -40,6 +40,18 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess, initialMode = 'login', clo
             if (result.error) {
                 setMessage(result.error.message)
             } else {
+                // SUCCESS
+                // Sync current local language to profile immediately to prevent overwrite by default 'en'
+                if (result.data?.user) {
+                    const { user } = result.data;
+                    // Fire and forget update
+                    import('../services/supabaseClient').then(({ supabase }) => {
+                        supabase.from('profiles').update({ language }).eq('id', user.id).then(({ error }) => {
+                            if (error) console.warn("Failed to sync language on auth:", error);
+                        });
+                    });
+                }
+
                 if (isLogin) {
                     if (onLoginSuccess) {
                         onLoginSuccess(email);

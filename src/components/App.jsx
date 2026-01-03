@@ -30,7 +30,7 @@ function App() {
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome } = useGame();
+    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, isNewUser, isCloudSynchronized } = useGame();
 
     // Scroll listener & First Visit Check
     useEffect(() => {
@@ -62,6 +62,22 @@ function App() {
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // === SEEDING FOR NEW CLOUD USERS ===
+    useEffect(() => {
+        // If we are a new user (cloud confirmed no data) and local habits are empty, seed defaults
+        if (isNewUser && isCloudSynchronized && habits.length === 0) {
+            const newHabits = [
+                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
+                { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
+                { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
+                { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
+                { id: Date.now() + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
+            ];
+            actions.replaceHabits(newHabits, true);
+            actions.notify(t('msg_enjoy_rome'), "success");
+        }
+    }, [isNewUser, isCloudSynchronized, habits, actions, t]);
 
     // Helper Wrappers for UI logic mixing with Game logic
     const handleIncrement = (id, e) => {
@@ -168,7 +184,25 @@ function App() {
                         setShowFirstVisitModal(false);
                         // Dismiss daily welcome for local play (start fresh)
                         actions.dismissWelcome();
-                        actions.notify("Veel plezier in Rome!", "success");
+                        actions.notify(t('msg_enjoy_rome'), "success");
+
+                        // Seed Default Habits if empty OR legacy default
+                        // Legacy default was "Ochtendgymnastiek" (id 1) and "Latijn studeren" (id 2)
+                        // Seed Default Habits if empty OR legacy default
+                        // Legacy default was "Ochtendgymnastiek" (id 1) and "Latijn studeren" (id 2)
+                        const isLegacy = habits.length > 0 && habits.some(h => h.text === "Ochtendgymnastiek" || h.text === "Walk 10.000 steps" || h.text === "Latijn studeren");
+
+                        if (habits.length === 0 || isLegacy) {
+                            const newHabits = [
+                                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
+                                { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
+                                { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
+                                { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
+                                { id: Date.now() + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
+                            ];
+                            actions.replaceHabits(newHabits, true);
+                        }
+                        // We already notified "Enjoy Rome" above
                     }}
                 />
             )}

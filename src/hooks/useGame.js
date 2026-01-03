@@ -8,10 +8,7 @@ export function useGame() {
     // === STATE ===
     const [stats, setStats] = useLocalStorage('romestats', { gold: 200, know: 0, pop: 100 });
     const [heroes, setHeroes] = useLocalStorage('romeheroes', []); // We handle init logic in default val context if needed, but [] is safe fallback
-    const [habits, setHabits] = useLocalStorage('romehabits', [
-        { id: 1, text: "Ochtendgymnastiek", completed: false, history: [] },
-        { id: 2, text: "Latijn studeren", completed: false, history: [] }
-    ]);
+    const [habits, setHabits] = useLocalStorage('romehabits', []);
 
     // Notifications State (Local UI state, not persisted)
     const [notifications, setNotifications] = useState([]);
@@ -117,6 +114,11 @@ export function useGame() {
         setHabits(GameLogic.reorderHabits(habits, activeId, overId, position));
     };
 
+    const replaceHabits = (newHabits, silent = false) => {
+        setHabits(newHabits);
+        if (!silent) notify({ key: 'msg_restored' }, "success");
+    };
+
     // === ACTIONS: HEROES ===
     const recruitHero = () => {
         if (stats.gold < 100) { notify({ key: 'msg_recruit_fail_gold' }, "error"); return; }
@@ -210,6 +212,7 @@ export function useGame() {
     const { user } = useAuth();
     const [saveStatus, setSaveStatus] = useState('idle'); // 'idle', 'saving', 'saved', 'error'
     const [isCloudSynchronized, setIsCloudSynchronized] = useState(false);
+    const [isNewUser, setIsNewUser] = useState(false);
 
     // 1. Initial Load from Cloud when user logs in
     useEffect(() => {
@@ -218,6 +221,7 @@ export function useGame() {
                 // Reset sync status because we are loading new user data
                 // We do NOT want to auto-save local stale data over this new user's cloud data
                 setIsCloudSynchronized(false);
+                setIsNewUser(false);
                 setSaveStatus('loading');
 
                 try {
@@ -226,6 +230,10 @@ export function useGame() {
                         setStats(cloudData.romestats);
                         setHabits(cloudData.romehabits);
                         setHeroes(cloudData.romeheroes);
+                        setIsNewUser(false);
+                    } else {
+                        // Valid load but no data found -> New User (or wiped)
+                        setIsNewUser(true);
                     }
                     setSaveStatus('saved');
                 } catch (error) {
@@ -242,6 +250,7 @@ export function useGame() {
             } else {
                 // No user? No sync needed, but we are "synchronized" with local (noop)
                 setIsCloudSynchronized(false);
+                setIsNewUser(false);
             }
         };
         syncFromCloud();
@@ -313,8 +322,11 @@ export function useGame() {
             importData,
             getExportData,
             notify,
-            dismissWelcome // NEW
+            dismissWelcome, // NEW
+            replaceHabits
         },
-        isLoggedIn: !!user
+        isLoggedIn: !!user,
+        isNewUser, // NEW
+        isCloudSynchronized // Exposed for checks if needed
     };
 }
