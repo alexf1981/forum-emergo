@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as GameLogic from '../logic/gameLogic';
 import BottomNav from './layout/BottomNav';
+import HeroBanner from './layout/HeroBanner';
 import CityView from './views/CityView';
 // import TavernView from './views/TavernView'; // Deprecated
 import CapitalView from './views/CapitalView'; // New City Builder View
@@ -9,6 +10,7 @@ import AddTaskModal from './AddTaskModal';
 import SettingsModal from './SettingsModal';
 import AuthModal from './AuthModal';
 import DailyWelcome from './DailyWelcome';
+import WelcomeModal from './WelcomeModal';
 import { useGame } from '../hooks/useGame';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +23,8 @@ function App() {
     const [showSettings, setShowSettings] = useState(false);
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [authInitialMode, setAuthInitialMode] = useState('login'); // 'login' or 'register'
+    const [showFirstVisitModal, setShowFirstVisitModal] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [selectedQuest, setSelectedQuest] = useState(null);
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
@@ -28,9 +32,10 @@ function App() {
     // === HOOK ===
     const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome } = useGame();
 
-    // Scroll listener
+    // Scroll listener & First Visit Check
     useEffect(() => {
         const handleScroll = () => {
+            // ...
             const scrollPos = window.scrollY || document.documentElement.scrollTop;
             setIsHeaderCompact(prev => {
                 if (!prev && scrollPos > 80) return true;
@@ -41,11 +46,18 @@ function App() {
 
         window.addEventListener('scroll', handleScroll, { passive: true });
 
-        // Check for logout message (persisted across reload)
+        // Check for logout message
         const logoutMsg = localStorage.getItem('logout_message');
         if (logoutMsg) {
             setTimeout(() => actions.notify(logoutMsg, "info"), 500);
             localStorage.removeItem('logout_message');
+        }
+
+        // Check for First Visit
+        const hasVisited = localStorage.getItem('has_visited');
+        if (!hasVisited) {
+            // No history? Show Welcome!
+            setShowFirstVisitModal(true);
         }
 
         return () => window.removeEventListener('scroll', handleScroll);
@@ -100,6 +112,8 @@ function App() {
         reader.readAsText(file);
     };
 
+    const [authFromStart, setAuthFromStart] = useState(false);
+
     // Derived State
     const score = GameLogic.getScore(stats);
     const rank = GameLogic.getCityRank(stats);
@@ -107,14 +121,59 @@ function App() {
     const handleLoginSuccess = (email) => {
         setShowAuthModal(false);
         setShowSettings(false);
+        setAuthFromStart(false);
+
+        // If we came from start page, we can now mark as visited
+        if (!localStorage.getItem('has_visited')) {
+            localStorage.setItem('has_visited', 'true');
+        }
+
         actions.notify(t('login_success') + ` ${email}`, "success");
     };
 
-
+    const handleAuthClose = () => {
+        setShowAuthModal(false);
+        // If we were in the start flow, go back to start page
+        if (authFromStart) {
+            setShowFirstVisitModal(true);
+            setAuthFromStart(false); // Reset this so if we play local later it handles correctly? Or just fine. 
+            // Actually if we go back to start, we are reset.
+        }
+    };
 
     return (
         <div className="wrapper">
-            {showWelcome && <DailyWelcome onDismiss={actions.dismissWelcome} />}
+            {/* First Visit Modal - Highest Priority */}
+            {showFirstVisitModal && (
+                <WelcomeModal
+                    onLogin={() => {
+                        // Don't mark visited yet
+                        setShowFirstVisitModal(false);
+                        setAuthInitialMode('login');
+                        setAuthFromStart(true);
+                        setShowAuthModal(true);
+                    }}
+                    onRegister={() => {
+                        // Don't mark visited yet
+                        setShowFirstVisitModal(false);
+                        // Dismiss daily welcome for new registrations logic handled later? 
+                        // Actually if we register, we eventually login/confirm.
+                        actions.dismissWelcome(); // Suppress Ave Keizer for registration flow
+                        setAuthInitialMode('register');
+                        setAuthFromStart(true);
+                        setShowAuthModal(true);
+                    }}
+                    onPlayLocal={() => {
+                        localStorage.setItem('has_visited', 'true');
+                        setShowFirstVisitModal(false);
+                        // Dismiss daily welcome for local play (start fresh)
+                        actions.dismissWelcome();
+                        actions.notify("Veel plezier in Rome!", "success");
+                    }}
+                />
+            )}
+
+            {showWelcome && !showFirstVisitModal && !showAuthModal && <DailyWelcome onDismiss={actions.dismissWelcome} />}
             {showSettings && <SettingsModal
                 onClose={() => setShowSettings(false)}
                 onExport={handleExport}
@@ -122,15 +181,18 @@ function App() {
                 useRomanNumerals={useRomanNumerals}
                 toggleRomanNumerals={() => setUseRomanNumerals(prev => !prev)}
                 onLogin={() => {
-                    // Start login flow: show auth modal, keep settings open in background (it will be closed on success)
+                    setAuthInitialMode('login');
+                    setAuthFromStart(false); // Normal login from settings
                     setShowAuthModal(true);
                 }}
             />}
 
             <AuthModal
                 isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
+                onClose={handleAuthClose}
                 onLoginSuccess={handleLoginSuccess}
+                initialMode={authInitialMode}
+                closeOnOverlayClick={!authFromStart}
             />
 
             {showAddTaskModal && (
@@ -145,12 +207,7 @@ function App() {
             )}
 
             <div className={`hero-placeholder ${isHeaderCompact || activeTab === 'tavern' ? 'compact' : ''}`} />
-            <div className={`hero-banner ${isHeaderCompact || activeTab === 'tavern' ? 'compact' : ''}`}>
-                <div className="hero-overlay header-content">
-                    <h1>Forum Emergo</h1>
-                    <div className="subtitle">{t('subtitle')}</div>
-                </div>
-            </div>
+            <HeroBanner isCompact={isHeaderCompact || activeTab === 'tavern'} />
 
             <div className="app-container">
                 {activeTab === 'city' && (

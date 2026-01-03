@@ -1,15 +1,26 @@
+
 import React, { useState } from 'react'
 import { signUp, signIn } from '../services/auth'
 import '../../css/components.css'
 import { useLanguage } from '../context/LanguageContext';
 
-const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
+const AuthModal = ({ isOpen, onClose, onLoginSuccess, initialMode = 'login', closeOnOverlayClick = true }) => {
     const { t } = useLanguage();
-    const [isLogin, setIsLogin] = useState(true)
+    const [isLogin, setIsLogin] = useState(initialMode === 'login')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState('')
+
+
+
+    // Reset mode when opening
+    React.useEffect(() => {
+        if (isOpen) {
+            setIsLogin(initialMode === 'login');
+            setMessage('');
+        }
+    }, [isOpen, initialMode]);
 
     if (!isOpen) return null
 
@@ -48,7 +59,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     }
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay" onClick={() => closeOnOverlayClick && onClose()}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2>{isLogin ? t('login_header') : t('register_header')}</h2>
