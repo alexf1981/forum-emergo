@@ -186,13 +186,8 @@ function App() {
                         actions.dismissWelcome();
                         actions.notify(t('msg_enjoy_rome'), "success");
 
-                        // Seed Default Habits if empty OR legacy default
-                        // Legacy default was "Ochtendgymnastiek" (id 1) and "Latijn studeren" (id 2)
-                        // Seed Default Habits if empty OR legacy default
-                        // Legacy default was "Ochtendgymnastiek" (id 1) and "Latijn studeren" (id 2)
-                        const isLegacy = habits.length > 0 && habits.some(h => h.text === "Ochtendgymnastiek" || h.text === "Walk 10.000 steps" || h.text === "Latijn studeren");
-
-                        if (habits.length === 0 || isLegacy) {
+                        // Seed Default Habits if empty
+                        if (habits.length === 0) {
                             const newHabits = [
                                 { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
                                 { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
