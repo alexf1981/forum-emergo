@@ -12,23 +12,31 @@ const BuildingModal = ({ building, onClose, onUpgrade, children }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 100, // Above everything
+            zIndex: 3000, // Significantly higher to ensure it's above hero bar (often 1000-2000)
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.4)', // Dim background slightly
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Slightly darker
+            backdropFilter: 'blur(2px)', // Nice effect
+            padding: '20px', // Ensure 20px gap from all screen edges
+            paddingTop: '80px', // Extra visual breathing room from top (and avoids notch/browser bars)
             animation: 'fadeIn 0.2s ease-out'
         }} onClick={onClose}>
 
             {/* Modal Content - Floating Page */}
             <div className="modal-content" style={{
                 position: 'relative',
-                width: '90%',
+                width: '100%',
                 maxWidth: '600px',
-                // Overrides specific to this building view if needed, but keeping base modal-content style
+                maxHeight: '100%', // Use flex parent limits (padding handles the max height implicitly)
+                display: 'flex',
+                flexDirection: 'column',
                 padding: '0',
                 overflow: 'hidden',
-                animation: 'slideUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
+                animation: 'slideUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)',
+                background: '#f4e4bc',
+                borderRadius: '8px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.5)' // Floating shadow
             }} onClick={(e) => e.stopPropagation()}>
 
                 {/* Optional Header Image Banner */}
@@ -82,20 +90,22 @@ const BuildingModal = ({ building, onClose, onUpgrade, children }) => {
                         {/* Close X inside banner */}
                         <button onClick={onClose} style={{
                             position: 'absolute',
-                            top: '5px',
-                            right: '5px',
-                            background: 'rgba(0,0,0,0.5)',
-                            border: '1px solid #fff',
+                            top: '10px',
+                            right: '10px',
+                            background: 'rgba(0,0,0,0.6)',
+                            border: '2px solid #fff',
                             borderRadius: '50%',
-                            width: '24px',
-                            height: '24px',
+                            width: '32px', // Larger for touch
+                            height: '32px',
                             color: '#fff',
-                            fontSize: '1rem',
+                            fontSize: '1.2rem',
+                            fontWeight: 'bold',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            lineHeight: 1
+                            lineHeight: 1,
+                            zIndex: 10
                         }}>×</button>
                     </div>
                 ) : (
@@ -109,7 +119,11 @@ const BuildingModal = ({ building, onClose, onUpgrade, children }) => {
                 )}
 
                 {/* Body */}
-                <div className="modal-body" style={{ padding: '20px' }}>
+                <div className="modal-body" style={{
+                    padding: '20px',
+                    overflowY: 'auto',
+                    overscrollBehavior: 'contain' // Prevent background scroll
+                }}>
                     {children}
                 </div>
 

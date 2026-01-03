@@ -48,15 +48,17 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
         return (
             <div style={{
                 display: 'flex',
+                flexWrap: 'wrap', // Allow wrapping on small screens
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                gap: '10px',
                 padding: '15px',
                 background: 'rgba(255, 255, 255, 0.6)', // Lighter background for readability
                 marginBottom: '10px',
                 borderRadius: '8px',
                 border: '1px solid rgba(139, 69, 19, 0.3)'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: '1 1 auto' }}>
                     <img
                         src={imagePath}
                         alt={name}
@@ -87,7 +89,9 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
                         border: 'none',
                         color: 'white',
                         fontWeight: 'bold',
-                        boxShadow: (isCompleted || !available) ? 'none' : '0 4px 0 #219150'
+                        boxShadow: (isCompleted || !available) ? 'none' : '0 4px 0 #219150',
+                        flex: '0 0 auto', // Don't shrink
+                        marginLeft: 'auto' // Push to right if space permits
                     }}
                 >
                     {isCompleted ? 'Voltooid' : 'Bouwen'}
