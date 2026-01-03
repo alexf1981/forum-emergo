@@ -9,6 +9,7 @@ export function useGame() {
     const [stats, setStats] = useLocalStorage('romestats', { gold: 200, know: 0, pop: 100 });
     const [heroes, setHeroes] = useLocalStorage('romeheroes', []); // We handle init logic in default val context if needed, but [] is safe fallback
     const [habits, setHabits] = useLocalStorage('romehabits', []);
+    const [lastWelcomeDate, setLastWelcomeDate] = useLocalStorage('rome_last_welcome', '');
 
     // Notifications State (Local UI state, not persisted)
     const [notifications, setNotifications] = useState([]);
@@ -175,6 +176,7 @@ export function useGame() {
                         setStats(cloudData.romestats);
                         setHabits(cloudData.romehabits);
                         setHeroes(cloudData.romeheroes);
+                        if (cloudData.romelastwelcome) setLastWelcomeDate(cloudData.romelastwelcome);
                         setIsNewUser(false);
                     } else {
                         // Valid load but no data found -> New User (or wiped)
@@ -210,7 +212,8 @@ export function useGame() {
             const dataToSave = {
                 romestats: stats,
                 romehabits: habits,
-                romeheroes: heroes
+                romeheroes: heroes,
+                romelastwelcome: lastWelcomeDate
             };
 
             // Reduced timeout to 200ms to persist faster and feel snappier
@@ -222,22 +225,24 @@ export function useGame() {
 
             return () => clearTimeout(timeoutId);
         }
-    }, [stats, habits, heroes, user, isCloudSynchronized]);
+    }, [stats, habits, heroes, lastWelcomeDate, user, isCloudSynchronized]);
 
     // === DAILY WELCOME ===
     const [showWelcome, setShowWelcome] = useState(false);
 
     useEffect(() => {
-        const lastDate = localStorage.getItem('rome_last_welcome');
         const today = GameLogic.getTodayString();
-        if (lastDate !== today) {
+        // Check state instead of localStorage
+        if (lastWelcomeDate !== today) {
             setShowWelcome(true);
+        } else {
+            setShowWelcome(false);
         }
-    }, []);
+    }, [lastWelcomeDate]);
 
     const dismissWelcome = () => {
         const today = GameLogic.getTodayString();
-        localStorage.setItem('rome_last_welcome', today);
+        setLastWelcomeDate(today); // Updates state -> trigger save
         setShowWelcome(false);
         setHabits(prev => GameLogic.resetDailyHabits(prev));
     };
