@@ -310,3 +310,125 @@ export const upgradeBuilding = (buildings, id) => {
 export const moveBuilding = (buildings, id, x, y) => {
     return buildings.map(b => b.id === id ? { ...b, x, y } : b);
 };
+
+// --- POPULATION LOGIC ---
+export const POPULATION_PER_LEVEL = {
+    0: 0,
+    1: 100,      // Tent/Hut
+    2: 500,      // Houten Huis
+    3: 2500,     // Stenen Domus
+    4: 15000,    // Insula
+    5: 100000    // Villa Complex
+};
+
+export const HOUSE_LEVELS = {
+    1: { name: "Tent", desc: "Een eenvoudige schuilplaats." },
+    2: { name: "Houten Huis", desc: "Een stevige woning voor een gezin." },
+    3: { name: "Stenen Domus", desc: "Een comfortabel huis voor de middenklasse." },
+    4: { name: "Insula", desc: "Een appartementencomplex voor velen." },
+    5: { name: "Villa Complex", desc: "Een luxueus landgoed voor de elite." }
+};
+
+export const getCityPopulation = (buildings) => {
+    if (!buildings) return 0;
+    return buildings.reduce((total, b) => {
+        if (b.type === 'house') {
+            return total + (POPULATION_PER_LEVEL[b.level] || 0);
+        }
+        return total;
+    }, 0);
+};
+
+
+// ==============================================================================
+// ECONOMY CONSTANTS
+// ==============================================================================
+
+export const BASE_TASK_GOLD = 5;
+
+// Building Costs (Level 1)
+export const BUILDING_COSTS = {
+    house: 100,
+    tavern: 2500,  // Unlock Cost
+    library: 5000,
+    market: 10000,
+    town_hall: 0   // Already exists
+};
+
+// Upgrade Costs (Per Level)
+export const UPGRADE_COSTS = {
+    town_hall: { 2: 2500, 3: 50000, 4: 500000, 5: 10000000 },
+    house: { 2: 750, 3: 5000, 4: 75000, 5: 1500000 },
+    tavern: { 2: 5000, 3: 25000, 4: 100000, 5: 500000 },
+    library: { 2: 5000, 3: 25000, 4: 100000, 5: 500000 },
+    market: { 2: 10000, 3: 50000, 4: 250000, 5: 1000000 }
+};
+
+export const TOWN_HALL_MULTIPLIERS = {
+    1: 1,
+    2: 10,
+    3: 100,
+    4: 1000,
+    5: 10000
+};
+
+export const getTownHallLevel = (buildings) => {
+    const th = buildings.find(b => b.type === 'town_hall');
+    return th ? th.level : 1;
+};
+
+export const getActiveMultiplier = (buildings) => {
+    const lvl = getTownHallLevel(buildings);
+    return TOWN_HALL_MULTIPLIERS[lvl] || 1;
+};
+
+export const getGoldReward = (buildings, base = BASE_TASK_GOLD) => {
+    return base * getActiveMultiplier(buildings);
+};
+
+// --- RESEARCH LOGIC ---
+
+export const RESEARCH_TYPES = {
+    tax: {
+        id: 'tax',
+        name: 'Belastinghervorming',
+        maxLevel: 30,
+        baseCost: 250,
+        costMult: 1.2,
+        desc: "Verhoogt belastinginkomsten met 1% per niveau."
+    },
+    interest: {
+        id: 'interest',
+        name: 'Bankieren',
+        maxLevel: 20,
+        baseCost: 1000,
+        costMult: 1.3,
+        desc: "Ontvang dagelijks 0.1% rente over je goudvoorraad."
+    }
+};
+
+export function getResearchCost(typeId, currentLevel) {
+    const r = RESEARCH_TYPES[typeId];
+    if (!r) return 999999999;
+
+    // Level 0 -> 1 costs baseCost
+    // Level 1 -> 2 costs baseCost * mult^1
+    return Math.floor(r.baseCost * Math.pow(r.costMult, currentLevel));
+}
+
+// Calculate Passive Income (Tax + Interest)
+export function getDailyPassiveIncome(stats, population, researchState) {
+    // Tax Income
+    const taxLvl = researchState.tax || 0;
+    const taxRate = taxLvl * 0.01; // 1% per level
+    // 1 citizen = 1 gold value. Tax = 1 * taxRate
+    const taxIncome = Math.floor(population * taxRate);
+
+    // Interest Income
+    const interestLvl = researchState.interest || 0;
+    const interestRate = interestLvl * 0.001; // 0.1% per level
+    let interestIncome = Math.floor(stats.gold * interestRate);
+    if (interestIncome > 200000) interestIncome = 200000; // Cap hardcoded for safety
+
+    return { taxIncome, interestIncome, total: taxIncome + interestIncome };
+}

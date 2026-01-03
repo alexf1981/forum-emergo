@@ -12,6 +12,7 @@ export function useGame() {
     const [lastWelcomeDate, setLastWelcomeDate] = useLocalStorage('rome_last_welcome', '');
     const [buildings, setBuildings] = useLocalStorage('romebuildings', GameLogic.INITIAL_BUILDINGS);
     const [resources, setResources] = useLocalStorage('romeresources', GameLogic.INITIAL_RESOURCES);
+    const [research, setResearch] = useLocalStorage('romeresearch', {});
 
     // Notifications State (Local UI state, not persisted)
     const [notifications, setNotifications] = useState([]);
@@ -43,26 +44,32 @@ export function useGame() {
         const type = habit.type || 'virtue';
         const today = GameLogic.getTodayString();
 
-        // Update Stats
+        // 1. Calculate Earnings FIRST (Synchronously)
+        let earnedGold = 0;
+        if (type === 'vice') {
+            earnedGold = -20;
+        } else if (type === 'todo') {
+            // Base 50
+            earnedGold = GameLogic.getGoldReward(buildings, 50);
+        } else {
+            // Base 10
+            earnedGold = GameLogic.getGoldReward(buildings, 10);
+        }
+
+        // 2. Update Stats using the calculated value
         setStats(s => {
-            let newGold = s.gold;
-            if (type === 'vice') {
-                newGold = Math.max(0, s.gold - 20);
-            } else if (type === 'todo') {
-                newGold = s.gold + 50;
-            } else {
-                newGold = s.gold + 10;
-            }
+            let newGold = s.gold + earnedGold;
+            if (newGold < 0) newGold = 0; // Prevent negative from vice
             return { ...s, gold: newGold };
         });
 
-        // Notify
+        // 3. Notify using the same calculated value
         if (type === 'vice') {
             notify({ key: 'msg_habit_vice_penalty' }, "error");
         } else if (type === 'todo') {
-            notify({ key: 'msg_habit_todo_reward' }, "mandatum");
+            notify({ key: 'msg_habit_todo_reward', args: { gold: earnedGold } }, "mandatum");
         } else {
-            notify({ key: 'msg_habit_virtue_reward' }, "success");
+            notify({ key: 'msg_habit_virtue_reward', args: { gold: earnedGold } }, "success");
         }
 
         // Update Habits
@@ -144,23 +151,80 @@ export function useGame() {
 
     // === ACTIONS: CITY ===
     const buildBuilding = (type) => {
+        // 1. Cost Check
+        const cost = GameLogic.BUILDING_COSTS[type] || 0;
+        if (stats.gold < cost) {
+            notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
+            return;
+        }
+
         const result = GameLogic.buildBuilding(buildings, type);
         if (result.success) {
             setBuildings(result.newBuildings);
-            notify({ key: 'msg_added_task', args: { task: type } }, "success"); // Reuse msg or make new one
+            setStats(s => ({ ...s, gold: s.gold - cost }));
+            notify(`${type} gebouwd! (-${cost} goud)`, "success");
         } else {
             notify(result.msg, "error");
         }
     };
 
     const upgradeBuilding = (id) => {
-        // TODO: Resource check
+        const building = buildings.find(b => b.id === id);
+        if (!building) return;
+
+        const type = building.type || building.id; // type fallback
+        const nextLevel = (building.level || 0) + 1;
+
+        // Lookup cost in Upgrade Table depending on type
+        // Town Hall and House have specific tables. Others use generic formula or TBD.
+        // For now, let's look for explicitly defined costs first.
+        let cost = 0;
+        if (GameLogic.UPGRADE_COSTS[type] && GameLogic.UPGRADE_COSTS[type][nextLevel]) {
+            cost = GameLogic.UPGRADE_COSTS[type][nextLevel];
+        } else {
+            // Fallback or "Max Level" check
+            if (nextLevel > 5) {
+                notify("Dit gebouw is al maximaal niveau!", "info");
+                return;
+            }
+            // Generic fallback if not defined?
+            notify("Geen upgrade kosten gevonden voor dit gebouw.", "error");
+            return;
+        }
+
+        if (stats.gold < cost) {
+            notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
+            return;
+        }
+
         setBuildings(prev => GameLogic.upgradeBuilding(prev, id));
-        notify("Gebouw geüpgraded!", "success");
+        setStats(s => ({ ...s, gold: s.gold - cost }));
+        notify(`Gebouw geüpgraded naar niveau ${nextLevel}! (-${cost} goud)`, "success");
     };
 
     const moveBuilding = (id, x, y) => {
         setBuildings(prev => GameLogic.moveBuilding(prev, id, x, y));
+    };
+
+    // === ACTIONS: RESEARCH ===
+    const doResearch = (typeId) => {
+        const currentLevel = research[typeId] || 0;
+        const cost = GameLogic.getResearchCost(typeId, currentLevel);
+        const rType = GameLogic.RESEARCH_TYPES[typeId];
+
+        if (currentLevel >= rType.maxLevel) {
+            notify("Maximaal niveau bereikt!", "info");
+            return;
+        }
+
+        if (stats.gold < cost) {
+            notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
+            return;
+        }
+
+        setStats(s => ({ ...s, gold: s.gold - cost }));
+        setResearch(prev => ({ ...prev, [typeId]: currentLevel + 1 }));
+        notify(`${rType.name} onderzocht! (Niveau ${currentLevel + 1})`, "success");
     };
 
     // === ADMIN ACTIONS ===
@@ -170,15 +234,6 @@ export function useGame() {
     };
 
     const adminResetCity = () => {
-        setBuildings([
-            { id: "town_hall", type: "town_hall", x: 55, y: 38, name: "Stadhuis", level: 1 },
-            // ... reset other unique buildings if needed, but request said ONLY Town Hall Level 1
-            // We'll keep the predefined layout structure but set levels to 0 for everything else?
-            // Actually, simplest is to reset to INITIAL_BUILDINGS.
-            // But wait, user said "Remove all buildings except town hall". 
-            // Our INITIAL_BUILDINGS has everything at level 0 (except Town Hall).
-            // So resetting to INITIAL_BUILDINGS effectively clears the "built" state.
-        ]);
         setBuildings(GameLogic.INITIAL_BUILDINGS);
         notify("Stad ontruimd! Stadhuis is level 1.", "success");
     };
@@ -231,6 +286,7 @@ export function useGame() {
                         if (cloudData.romelastwelcome) setLastWelcomeDate(cloudData.romelastwelcome);
                         if (cloudData.romebuildings) setBuildings(cloudData.romebuildings);
                         if (cloudData.romeresources) setResources(cloudData.romeresources);
+                        if (cloudData.romeresearch) setResearch(cloudData.romeresearch);
                         setIsNewUser(false);
                     } else {
                         // Valid load but no data found -> New User (or wiped)
@@ -269,7 +325,8 @@ export function useGame() {
                 romeheroes: heroes,
                 romelastwelcome: lastWelcomeDate,
                 romebuildings: buildings,
-                romeresources: resources
+                romeresources: resources,
+                romeresearch: research
             };
 
             // Reduced timeout to 200ms to persist faster and feel snappier
@@ -279,9 +336,8 @@ export function useGame() {
                 setSaveStatus(success ? 'saved' : 'error');
             }, 200);
 
-            return () => clearTimeout(timeoutId);
         }
-    }, [stats, habits, heroes, lastWelcomeDate, buildings, resources, user, isCloudSynchronized]);
+    }, [stats, habits, heroes, lastWelcomeDate, buildings, resources, research, user, isCloudSynchronized]);
 
     // === DAILY WELCOME ===
     const [showWelcome, setShowWelcome] = useState(false);
@@ -298,6 +354,17 @@ export function useGame() {
 
     const dismissWelcome = () => {
         const today = GameLogic.getTodayString();
+
+        // Calculate Passive Income
+        const population = GameLogic.getCityPopulation(buildings);
+        const income = GameLogic.getDailyPassiveIncome(stats, population, research);
+
+        if (income.total > 0) {
+            setStats(s => ({ ...s, gold: s.gold + income.total }));
+            const msg = `Dagelijks inkomen: ${income.total} Goud (${income.taxIncome} Belasting + ${income.interestIncome} Rente)`;
+            notify(msg, "success");
+        }
+
         setLastWelcomeDate(today); // Updates state -> trigger save
         setShowWelcome(false);
         setHabits(prev => GameLogic.resetDailyHabits(prev));
@@ -310,6 +377,7 @@ export function useGame() {
         habits,
         buildings, // NEW
         resources, // NEW
+        research, // NEW
         notifications,
         combatLog,
         saveStatus, // Export status
@@ -335,9 +403,10 @@ export function useGame() {
             // City
             buildBuilding,
             upgradeBuilding,
-            buildBuilding,
-            upgradeBuilding,
             moveBuilding,
+
+            // Research
+            doResearch,
 
             // Admin
             adminAddGold,

@@ -1,8 +1,9 @@
 import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import Icons from '../Icons';
+import * as GameLogic from '../../logic/gameLogic';
 
-const BuildingModal = ({ building, onClose, onUpgrade, children }) => {
+const BuildingModal = ({ building, onClose, onUpgrade, children, formatNumber, playerGold }) => {
     const { t } = useLanguage();
 
     return (
@@ -66,26 +67,48 @@ const BuildingModal = ({ building, onClose, onUpgrade, children }) => {
                             <h2 style={{ margin: 0, fontFamily: 'Trajan Pro, serif', fontSize: '1.2rem', textShadow: '2px 2px 0px #000' }}>
                                 {building.name} <span style={{ fontSize: '0.6em', color: '#ddd' }}>(Lvl {building.level})</span>
                             </h2>
-                            <button
-                                onClick={() => onUpgrade(building.id)}
-                                disabled={building.level >= 5}
-                                style={{
-                                    background: building.level >= 5 ? '#7f8c8d' : '#27ae60',
-                                    border: '1px solid #fff',
-                                    color: 'white',
-                                    borderRadius: '4px',
-                                    padding: '4px 8px',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 'bold',
-                                    cursor: building.level >= 5 ? 'default' : 'pointer',
-                                    boxShadow: building.level >= 5 ? 'none' : '0 2px 5px rgba(0,0,0,0.5)',
-                                    marginLeft: 'auto',
-                                    marginRight: '30px', // Space for the X close button
-                                    opacity: building.level >= 5 ? 0.7 : 1
-                                }}
-                            >
-                                {building.level >= 5 ? 'Max Level' : '⬆️ Upgrade'}
-                            </button>
+                            {(() => {
+                                // Logic inside IIFE to keep it self-contained within this render block for the header
+                                if (building.level >= 5) {
+                                    return (
+                                        <button disabled style={{
+                                            background: '#7f8c8d', border: '1px solid #fff', color: 'white', borderRadius: '4px',
+                                            padding: '4px 8px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'default',
+                                            marginLeft: 'auto', marginRight: '30px', opacity: 0.7
+                                        }}>
+                                            Max Level
+                                        </button>
+                                    );
+                                }
+
+                                const type = building.type || building.id;
+                                const nextLvl = (building.level || 1) + 1;
+                                const cost = GameLogic.UPGRADE_COSTS[type]?.[nextLvl] || 0;
+                                const canAfford = playerGold >= cost;
+
+                                return (
+                                    <button
+                                        onClick={() => onUpgrade(building.id)}
+                                        disabled={!canAfford}
+                                        style={{
+                                            background: canAfford ? '#27ae60' : '#e74c3c',
+                                            border: '1px solid #fff',
+                                            color: 'white',
+                                            borderRadius: '4px',
+                                            padding: '4px 8px',
+                                            fontSize: '0.8rem',
+                                            fontWeight: 'bold',
+                                            cursor: canAfford ? 'pointer' : 'not-allowed',
+                                            boxShadow: canAfford ? '0 2px 5px rgba(0,0,0,0.5)' : 'none',
+                                            marginLeft: 'auto',
+                                            marginRight: '30px',
+                                            opacity: canAfford ? 1 : 0.7
+                                        }}
+                                    >
+                                        ⬆️ Upgrade ({formatNumber ? formatNumber(cost) : cost} 🪙)
+                                    </button>
+                                );
+                            })()}
                         </div>
                         {/* Close X inside banner */}
                         <button onClick={onClose} style={{

@@ -1,4 +1,5 @@
 import React from 'react';
+import * as GameLogic from '../../../logic/gameLogic';
 
 const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats }) => {
 
@@ -117,25 +118,25 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
                 <BuildingOption
                     type="house"
                     name="Woonhuis"
-                    cost="50 Goud"
+                    cost={`${GameLogic.BUILDING_COSTS.house} Goud`}
                     imagePath="./assets/city/house.png"
                 />
                 <BuildingOption
                     type="tavern"
                     name="Taverne"
-                    cost="100 Goud"
+                    cost={`${GameLogic.BUILDING_COSTS.tavern} Goud`}
                     imagePath="./assets/city/tavern.png"
                 />
                 <BuildingOption
                     type="library"
                     name="Bibliotheek"
-                    cost="150 Goud"
+                    cost={`${GameLogic.BUILDING_COSTS.library} Goud`}
                     imagePath="./assets/city/library.png"
                 />
                 <BuildingOption
                     type="market"
                     name="Markt"
-                    cost="100 Goud"
+                    cost={`${GameLogic.BUILDING_COSTS.market} Goud`}
                     imagePath="./assets/city/market.png"
                 />
             </div>

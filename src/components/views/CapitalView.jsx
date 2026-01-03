@@ -4,8 +4,11 @@ import { useLanguage } from '../../context/LanguageContext';
 import BuildingModal from '../city/BuildingModal';
 import TavernInterior from '../city/interiors/TavernInterior';
 import TownHallInterior from '../city/interiors/TownHallInterior';
+import LibraryInterior from '../city/interiors/LibraryInterior';
+import HouseInterior from '../city/interiors/HouseInterior';
+import * as GameLogic from '../../logic/gameLogic';
 
-const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resources }) => {
+const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resources, research }) => {
     const { t } = useLanguage();
 
     // UI State for selection
@@ -63,6 +66,24 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                 />
             );
         }
+        if (type === 'library') {
+            return (
+                <LibraryInterior
+                    research={research}
+                    doResearch={actions.doResearch}
+                    stats={stats}
+                />
+            );
+        }
+        if (type === 'house') {
+            return (
+                <HouseInterior
+                    building={selectedBuilding} // Needs specific building data for Level
+                    buildings={buildings}
+                    stats={stats}
+                />
+            );
+        }
         return (
             <div style={{ textAlign: 'center', padding: '20px' }}>
                 <p>Dit gebouw is nog in constructie.</p>
@@ -88,6 +109,10 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
         });
         alert('Coordinaten geëxporteerd naar Console (F12)');
     };
+
+    // Calculate derived stats for display
+    const population = GameLogic.getCityPopulation(buildings);
+    const passiveIncome = GameLogic.getDailyPassiveIncome(stats, population, research || {});
 
     return (
         <div className="capital-view" style={{
@@ -137,6 +162,24 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                 </div>
                 <div style={{ display: 'flex', gap: '15px', fontWeight: '500' }}>
                     <span title="Goud">🪙 {formatNumber(stats.gold)}</span>
+                    <span title="Bevolking">👥 {formatNumber(population)}</span>
+                    {/* Tax */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} title="Dagelijkse Belasting">
+                        <span style={{ fontSize: '1.0rem' }}>🏛️</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+                            <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#2ecc71' }}>+{formatNumber(passiveIncome.taxIncome)}</span>
+                            <span style={{ fontSize: '0.6rem', opacity: 0.8 }}>Tax/Dag</span>
+                        </div>
+                    </div>
+
+                    {/* Interest */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} title="Dagelijkse Rente">
+                        <span style={{ fontSize: '1.0rem' }}>📈</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+                            <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#3498db' }}>+{formatNumber(passiveIncome.interestIncome)}</span>
+                            <span style={{ fontSize: '0.6rem', opacity: 0.8 }}>Rente/Dag</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -161,6 +204,8 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                     }}
                     onClose={() => setSelectedBuildingId(null)}
                     onUpgrade={actions.upgradeBuilding}
+                    formatNumber={formatNumber}
+                    playerGold={stats.gold}
                 >
                     {renderBuildingContent()}
                 </BuildingModal>
