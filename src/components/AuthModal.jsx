@@ -18,27 +18,32 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         setLoading(true)
         setMessage('')
 
-        let result
-        if (isLogin) {
-            result = await signIn(email, password)
-        } else {
-            result = await signUp(email, password)
-        }
-
-        setLoading(false)
-
-        if (result.error) {
-            setMessage(result.error.message)
-        } else {
+        try {
+            let result
             if (isLogin) {
-                if (onLoginSuccess) {
-                    onLoginSuccess(email);
-                } else {
-                    onClose();
-                }
+                result = await signIn(email, password)
             } else {
-                setMessage(t('msg_check_email') || 'Check email for confirmation!') // Added fallback or need key
+                result = await signUp(email, password)
             }
+
+            if (result.error) {
+                setMessage(result.error.message)
+            } else {
+                if (isLogin) {
+                    if (onLoginSuccess) {
+                        onLoginSuccess(email);
+                    } else {
+                        onClose();
+                    }
+                } else {
+                    setMessage(t('msg_check_email') || 'Check email for confirmation!')
+                }
+            }
+        } catch (error) {
+            console.error("Auth error:", error)
+            setMessage(error.message || "An unexpected error occurred.")
+        } finally {
+            setLoading(false)
         }
     }
 
