@@ -30,7 +30,7 @@ function App() {
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, isNewUser, isCloudSynchronized } = useGame();
+    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, isNewUser, isCloudSynchronized, buildings, resources } = useGame();
 
     // Scroll listener & First Visit Check
     useEffect(() => {
@@ -262,6 +262,8 @@ function App() {
                         stats={stats}
                         heroes={heroes}
                         actions={actions}
+                        buildings={buildings}
+                        resources={resources}
                         formatNumber={formatNumber}
                     />
                 )}

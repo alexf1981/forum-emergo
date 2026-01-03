@@ -10,6 +10,8 @@ export function useGame() {
     const [heroes, setHeroes] = useLocalStorage('romeheroes', []); // We handle init logic in default val context if needed, but [] is safe fallback
     const [habits, setHabits] = useLocalStorage('romehabits', []);
     const [lastWelcomeDate, setLastWelcomeDate] = useLocalStorage('rome_last_welcome', '');
+    const [buildings, setBuildings] = useLocalStorage('romebuildings', GameLogic.INITIAL_BUILDINGS);
+    const [resources, setResources] = useLocalStorage('romeresources', GameLogic.INITIAL_RESOURCES);
 
     // Notifications State (Local UI state, not persisted)
     const [notifications, setNotifications] = useState([]);
@@ -140,6 +142,28 @@ export function useGame() {
 
 
 
+    // === ACTIONS: CITY ===
+    const buildBuilding = (type) => {
+        const result = GameLogic.buildBuilding(buildings, type);
+        if (result.success) {
+            setBuildings(result.newBuildings);
+            notify({ key: 'msg_added_task', args: { task: type } }, "success"); // Reuse msg or make new one
+        } else {
+            notify(result.msg, "error");
+        }
+    };
+
+    const upgradeBuilding = (id) => {
+        // TODO: Resource check
+        setBuildings(prev => GameLogic.upgradeBuilding(prev, id));
+        notify("Gebouw geüpgraded!", "success");
+    };
+
+    const moveBuilding = (id, x, y) => {
+        setBuildings(prev => GameLogic.moveBuilding(prev, id, x, y));
+    };
+
+
     // === EXPORT / IMPORT ===
     // These manipulate state directly, so they belong here
     const importData = (data) => {
@@ -147,11 +171,19 @@ export function useGame() {
             setStats(data.romestats);
             setHabits(data.romehabits);
             setHeroes(data.romeheroes);
+            if (data.romebuildings) setBuildings(data.romebuildings);
+            if (data.romeresources) setResources(data.romeresources);
             notify({ key: 'msg_restored' }, "success");
         }
     };
 
-    const getExportData = () => ({ romestats: stats, romehabits: habits, romeheroes: heroes });
+    const getExportData = () => ({
+        romestats: stats,
+        romehabits: habits,
+        romeheroes: heroes,
+        romebuildings: buildings,
+        romeresources: resources
+    });
 
 
     // === SYNC WITH SUPABASE ===
@@ -177,6 +209,8 @@ export function useGame() {
                         setHabits(cloudData.romehabits);
                         setHeroes(cloudData.romeheroes);
                         if (cloudData.romelastwelcome) setLastWelcomeDate(cloudData.romelastwelcome);
+                        if (cloudData.romebuildings) setBuildings(cloudData.romebuildings);
+                        if (cloudData.romeresources) setResources(cloudData.romeresources);
                         setIsNewUser(false);
                     } else {
                         // Valid load but no data found -> New User (or wiped)
@@ -213,7 +247,9 @@ export function useGame() {
                 romestats: stats,
                 romehabits: habits,
                 romeheroes: heroes,
-                romelastwelcome: lastWelcomeDate
+                romelastwelcome: lastWelcomeDate,
+                romebuildings: buildings,
+                romeresources: resources
             };
 
             // Reduced timeout to 200ms to persist faster and feel snappier
@@ -225,7 +261,7 @@ export function useGame() {
 
             return () => clearTimeout(timeoutId);
         }
-    }, [stats, habits, heroes, lastWelcomeDate, user, isCloudSynchronized]);
+    }, [stats, habits, heroes, lastWelcomeDate, buildings, resources, user, isCloudSynchronized]);
 
     // === DAILY WELCOME ===
     const [showWelcome, setShowWelcome] = useState(false);
@@ -252,6 +288,8 @@ export function useGame() {
         stats,
         heroes,
         habits,
+        buildings, // NEW
+        resources, // NEW
         notifications,
         combatLog,
         saveStatus, // Export status
@@ -272,7 +310,12 @@ export function useGame() {
             getExportData,
             notify,
             dismissWelcome, // NEW
-            replaceHabits
+            replaceHabits,
+
+            // City
+            buildBuilding,
+            upgradeBuilding,
+            moveBuilding,
         },
         isLoggedIn: !!user,
         isNewUser, // NEW

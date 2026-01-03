@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { useCity } from '../../hooks/useCity';
 import CityLayout from '../city/CityLayout';
 import { useLanguage } from '../../context/LanguageContext';
 import BuildingModal from '../city/BuildingModal';
 import TavernInterior from '../city/interiors/TavernInterior';
 import TownHallInterior from '../city/interiors/TownHallInterior';
 
-const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
+const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resources }) => {
     const { t } = useLanguage();
-    const { buildings, resources, upgradeBuilding, buildBuilding } = useCity();
 
     // UI State for selection
     const [selectedBuildingId, setSelectedBuildingId] = useState(null);
@@ -49,7 +47,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                 <TownHallInterior
                     onClose={() => setSelectedBuildingId(null)}
                     buildings={buildings}
-                    buildBuilding={buildBuilding}
+                    buildBuilding={actions.buildBuilding}
                     resources={resources}
                     stats={stats}
                 />
@@ -139,8 +137,6 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                 </div>
                 <div style={{ display: 'flex', gap: '15px', fontWeight: '500' }}>
                     <span title="Goud">🪙 {formatNumber(stats.gold)}</span>
-                    <span title="Hout">🌲 {formatNumber(resources.wood)}</span>
-                    <span title="Steen">🪨 {formatNumber(resources.stone)}</span>
                 </div>
             </div>
 
@@ -164,7 +160,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber }) => {
                         })()
                     }}
                     onClose={() => setSelectedBuildingId(null)}
-                    onUpgrade={upgradeBuilding}
+                    onUpgrade={actions.upgradeBuilding}
                 >
                     {renderBuildingContent()}
                 </BuildingModal>
