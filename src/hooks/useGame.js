@@ -137,62 +137,7 @@ export function useGame() {
         log({ key: 'msg_heal_success' });
     };
 
-    const goAdventure = (heroId, questId) => {
-        const hero = heroes.find(h => h.id === heroId);
-        const quest = GameLogic.QUESTS.find(q => q.id === questId);
-        if (!quest) { notify({ key: 'msg_select_mission' }, "warning"); return; }
-        if (hero.hp <= 5) { notify({ key: 'msg_hero_wounded', args: { name: hero.name } }, "error"); return; }
 
-        if (hero.hp <= 5) { notify({ key: 'msg_hero_wounded', args: { name: hero.name } }, "error"); return; }
-
-        // Use translated quest name in args? Or pass quest object? 
-        // We can pass simple quest name, but if quest name is translated dynamically in view it's better.
-        // But QUEST names are in translations.js? No, they are in gameLogic.js as "name" property (Dutch).
-        // I should probably translate quest name too. `quest_${quest.id}` is the key.
-        log({ key: 'msg_hero_depart', args: { name: hero.name, quest: quest.id } }); // Pass quest ID to resolve translation
-
-        // Async result handling in hook? Ideally UI shouldn't wait, but we use setTimeout for effect
-        setTimeout(() => {
-            const result = GameLogic.calculateBattleResult(hero, quest);
-            if (result.success) {
-                log({
-                    key: 'msg_win',
-                    args: {
-                        xp: result.earnedXp,
-                        gold: result.earnedGold,
-                        loot: result.lootMsg // This is a nested message object {key, args}
-                    }
-                });
-                if (result.lootMsg) notify(result.lootMsg, "success"); // lootMsg is already { key, args } from gameLogic
-                setHeroes(prev => prev.map(h => {
-                    if (h.id !== heroId) return h;
-                    if (result.leveledUp) {
-                        log({ key: 'msg_levelup', args: { name: h.name, lvl: result.newLvl } });
-                        notify({ key: 'msg_levelup_toast', args: { name: h.name } }, "success");
-                    }
-                    return { ...h, xp: result.newXp, lvl: result.newLvl, str: result.newStr, hp: result.hp, items: result.newItems };
-                }));
-                setStats(s => ({ ...s, gold: s.gold + result.earnedGold }));
-            } else {
-                log({ key: 'msg_loss', args: { name: hero.name, dmg: result.dmgTaken } });
-                setHeroes(prev => prev.map(h => h.id === heroId ? { ...h, hp: result.hp } : h));
-                notify({ key: 'msg_defeat_title' }, "error");
-            }
-        }, 500);
-    };
-
-    const fightBoss = () => {
-        const totalStr = heroes.reduce((acc, h) => acc + h.str + h.items.reduce((s, i) => s + i.bonus, 0) + h.lvl, 0);
-        log({ key: 'msg_hydra_fight', args: { str: totalStr } });
-        if (totalStr > 250) {
-            log({ key: 'msg_hydra_win' });
-            notify({ key: 'msg_hydra_win_toast' }, "success");
-            setStats(s => ({ ...s, gold: s.gold + 50000 }));
-        } else {
-            log({ key: 'msg_hydra_fail' });
-            notify({ key: 'msg_hydra_fail_toast' }, "error");
-        }
-    };
 
     // === EXPORT / IMPORT ===
     // These manipulate state directly, so they belong here
@@ -317,8 +262,7 @@ export function useGame() {
             moveHabit, // NEW
             recruitHero,
             healHero,
-            goAdventure,
-            fightBoss,
+
             importData,
             getExportData,
             notify,

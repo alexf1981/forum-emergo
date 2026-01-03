@@ -267,15 +267,7 @@ function App() {
                 )}
 
                 {activeTab === 'adventure' && (
-                    <AdventureView
-                        heroes={heroes}
-                        selectedQuest={selectedQuest}
-                        onSelectQuest={setSelectedQuest}
-                        onGoAdventure={actions.goAdventure}
-                        onFightBoss={actions.fightBoss}
-                        formatNumber={formatNumber}
-                        combatLog={combatLog}
-                    />
+                    <AdventureView />
                 )}
 
                 <div className="toast-container">
