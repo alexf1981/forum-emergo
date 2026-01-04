@@ -146,13 +146,13 @@ function getPopulation() {
 // --- MAIN LOOP 365 DAYS ---
 
 console.log("Starting Simulation...");
-// Define widths: Dag(4), Goud(9), Rente(6), Tax(6), Gebouwen(38), Helden(7), Onderzoek(20), Gekocht(30)
+// Define widths: Dag(4), Goud(9), Taken(6), Rente(6), Tax(6), Gebouwen(38), Helden(7), Onderzoek(20), Gekocht(30)
 const P = (s, w) => String(s).padEnd(w);
 const PNum = (s, w) => String(s).padStart(w);
 
 // Header
-console.log(`| ${P("Dag", 3)} | ${P("Goud", 9)} | ${P("Rente", 5)} | ${P("Tax", 5)} | ${P("Gebouwen", 38)} | ${P("Helden", 6)} | ${P("Onderzoek", 19)} | ${P("Gekocht", 40)} |`);
-console.log(`|${"-".repeat(5)}|${"-".repeat(11)}|${"-".repeat(7)}|${"-".repeat(7)}|${"-".repeat(40)}|${"-".repeat(8)}|${"-".repeat(21)}|${"-".repeat(42)}|`);
+console.log(`| ${P("Dag", 3)} | ${P("Goud", 9)} | ${P("Taken", 6)} | ${P("Rente", 5)} | ${P("Tax", 5)} | ${P("Gebouwen", 38)} | ${P("Helden", 6)} | ${P("Onderzoek", 19)} | ${P("Gekocht", 30)} |`);
+console.log(`|${"-".repeat(5)}|${"-".repeat(11)}|${"-".repeat(8)}|${"-".repeat(7)}|${"-".repeat(7)}|${"-".repeat(40)}|${"-".repeat(8)}|${"-".repeat(21)}|${"-".repeat(32)}|`);
 
 for (let day = 1; day <= 365; day++) {
 
@@ -292,19 +292,22 @@ for (let day = 1; day <= 365; day++) {
     const rows = Math.max(1, dailyPurchases.length);
     for (let i = 0; i < rows; i++) {
         const purchase = dailyPurchases[i] || "";
+        // Truncate purchase if too long for 30 chars?
+        let purchaseDisplay = purchase;
+        if (purchaseDisplay.length > 30) purchaseDisplay = purchaseDisplay.substring(0, 27) + "...";
+
         if (i === 0) {
-            console.log(`| ${PNum(day, 3)} | ${PNum(stats.gold, 9)} | ${PNum(interestIncome, 5)} | ${PNum(taxIncome, 5)} | ${P(buildStr, 38)} | ${PNum(heroes.length, 6)} | ${P(researchStr, 19)} | ${P(purchase, 40)} |`);
+            console.log(`| ${PNum(day, 3)} | ${PNum(stats.gold, 9)} | ${PNum(activeIncome, 6)} | ${PNum(interestIncome, 5)} | ${PNum(taxIncome, 5)} | ${P(buildStr, 38)} | ${PNum(heroes.length, 6)} | ${P(researchStr, 19)} | ${P(purchaseDisplay, 30)} |`);
         } else {
-            console.log(`| ${P("", 3)} | ${P("", 9)} | ${P("", 5)} | ${P("", 5)} | ${P("", 38)} | ${P("", 6)} | ${P("", 19)} | ${P(purchase, 40)} |`);
+            console.log(`| ${P("", 3)} | ${P("", 9)} | ${P("", 6)} | ${P("", 5)} | ${P("", 5)} | ${P("", 38)} | ${P("", 6)} | ${P("", 19)} | ${P(purchaseDisplay, 30)} |`);
         }
     }
     // Separator line for readability between days? Optional, maybe only if multi-line
     if (rows > 1) {
-        console.log(`|${"-".repeat(5)}|${"-".repeat(11)}|${"-".repeat(7)}|${"-".repeat(7)}|${"-".repeat(40)}|${"-".repeat(8)}|${"-".repeat(21)}|${"-".repeat(42)}|`);
+        console.log(`|${"-".repeat(5)}|${"-".repeat(11)}|${"-".repeat(8)}|${"-".repeat(7)}|${"-".repeat(7)}|${"-".repeat(40)}|${"-".repeat(8)}|${"-".repeat(21)}|${"-".repeat(32)}|`);
     } else {
         // Just to keep grid tight? No separator line for single rows to save space, 
         // or maybe simple separator everywhere? User asked for "one item per line", didn't ask for grid lines.
         // Let's leave it without extra grid lines unless it's a new day block.
     }
 }
-
