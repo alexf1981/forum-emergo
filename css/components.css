@@ -583,3 +583,9 @@
     color: #333;
     background: #f0f0f0;
 }
+/* Daily Welcome Video */
+@media (min-width: 1200px) {
+    .welcome-video {
+        display: block !important;
+    }
+}

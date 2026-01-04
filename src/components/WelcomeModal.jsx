@@ -1,14 +1,58 @@
-
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import HeroBanner from './layout/HeroBanner';
 import '../../css/components.css';
 import { translations } from '../locales/translations';
 import Flag from './layout/Flag';
 
+const VIDEO_FILES = [
+    './assets/city/Introduction.mp4',
+    './assets/city/Introduction II.mp4',
+    './assets/city/Introduction III.mp4'
+];
+
 const WelcomeModal = ({ onLogin, onRegister, onPlayLocal }) => {
     // Import everything we need from LanguageContext
     const { t, changeLanguage, language } = useLanguage();
+
+    const [currentVideo, setCurrentVideo] = useState(null);
+    const [isVideoVisible, setIsVideoVisible] = useState(false);
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        let timeoutId;
+
+        const playRandomVideo = () => {
+            const randomVideo = VIDEO_FILES[Math.floor(Math.random() * VIDEO_FILES.length)];
+            setCurrentVideo(randomVideo);
+            // Small delay to allow source update before fading in
+            setTimeout(() => setIsVideoVisible(true), 100);
+        };
+
+        // Initial delay of 5 seconds
+        timeoutId = setTimeout(() => {
+            playRandomVideo();
+        }, 5000);
+
+        return () => clearTimeout(timeoutId);
+    }, []);
+
+    const handleVideoEnded = () => {
+        setIsVideoVisible(false); // Fade out
+
+        // Wait for fade out (2s) + 15s delay = 17s total before next video
+        setTimeout(() => {
+            const randomVideo = VIDEO_FILES[Math.floor(Math.random() * VIDEO_FILES.length)];
+            setCurrentVideo(randomVideo);
+            setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.currentTime = 0;
+                    videoRef.current.play().catch(e => console.log("Auto-play prevented", e));
+                    setIsVideoVisible(true);
+                }
+            }, 100);
+        }, 17000);
+    };
 
     return (
         <div className="modal-overlay" style={{
@@ -81,6 +125,31 @@ const WelcomeModal = ({ onLogin, onRegister, onPlayLocal }) => {
                     </div>
                 </div>
             </div>
+            {/* Introduction Video for Wide Screens */}
+            {currentVideo && (
+                <video
+                    ref={videoRef}
+                    className="welcome-video"
+                    src={currentVideo}
+                    autoPlay
+                    muted
+                    playsInline
+                    onEnded={handleVideoEnded}
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        width: '300px',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                        border: '2px solid var(--color-gold, #C5A059)',
+                        zIndex: 10000,
+                        display: 'none', // Hidden by default, shown via CSS for wide screens
+                        transition: 'opacity 2s ease-in-out',
+                        opacity: isVideoVisible ? 1 : 0
+                    }}
+                />
+            )}
         </div>
     );
 };
