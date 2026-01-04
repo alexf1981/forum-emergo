@@ -1,7 +1,8 @@
 {
   "name": "Forum Emergo",
   "short_name": "Forum Emergo",
-  "start_url": "./index.html",
+  "start_url": "../",
+  "scope": "../",
   "display": "standalone",
   "background_color": "#F5F5F0",
   "theme_color": "#8E1600",
