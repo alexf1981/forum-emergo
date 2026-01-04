@@ -7,8 +7,8 @@ import Flag from './layout/Flag';
 
 const VIDEO_FILES = [
     './assets/city/Introduction.mp4',
-    './assets/city/Introduction II.mp4',
-    './assets/city/Introduction III.mp4'
+    './assets/city/Introduction_II.mp4',
+    './assets/city/Introduction_III.mp4'
 ];
 
 const WelcomeModal = ({ onLogin, onRegister, onPlayLocal }) => {

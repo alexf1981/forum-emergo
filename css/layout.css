@@ -927,3 +927,23 @@
         margin-top: 10px;
     }
 }
+/* Force Compact Hero on Mobile */
+@media (max-width: 768px) {
+    .hero-banner {
+        min-height: 50px !important;
+        padding: 5px 20px !important;
+    }
+
+    .hero-banner .subtitle {
+        display: none !important;
+    }
+
+    .hero-banner h1 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Adjust placeholder to match compact height */
+    .hero-placeholder {
+        height: 60px !important;
+    }
+}
