@@ -276,20 +276,15 @@ export function resetDailyHabits(habits) {
 export const INITIAL_RESOURCES = {};
 
 export const INITIAL_BUILDINGS = [
-    { id: "town_hall", type: "town_hall", x: 55, y: 38, name: "Stadhuis", level: 1 },
-    { id: "tavern", type: "tavern", x: 75, y: 36, name: "Taverne", level: 0 },
-    { id: "house_1", type: "house", x: 67, y: 37, name: "Woonhuis", level: 0 },
-    { id: "house_2", type: "house", x: 29, y: 58, name: "Woonhuis", level: 0 },
-    { id: "library", type: "library", x: 68, y: 64, name: "Bibliotheek", level: 0 },
-    { id: "market", type: "market", x: 42, y: 52, name: "Markt", level: 0 },
-    { id: "house_1767357972907", type: "house", x: 51, y: 52, name: "Woonhuis", level: 0 },
-    { id: "house_1767357973099", type: "house", x: 41, y: 35, name: "Woonhuis", level: 0 },
-    { id: "house_1767357973267", type: "house", x: 16, y: 40, name: "Woonhuis", level: 0 },
-    { id: "house_1767357973411", type: "house", x: 28, y: 31, name: "Woonhuis", level: 0 },
-    { id: "house_1767357973595", type: "house", x: 9, y: 69, name: "Woonhuis", level: 0 },
-    { id: "house_1767357973771", type: "house", x: 26, y: 45, name: "Woonhuis", level: 0 },
-    { id: "house_1767357973931", type: "house", x: 30, y: 80, name: "Woonhuis", level: 0 },
-    { id: "house_1767357974083", type: "house", x: 87, y: 61, name: "Woonhuis", level: 0 }
+    { id: "town_hall", type: "town_hall", x: 53, y: 47, name: "Stadhuis", level: 1 },
+    { id: "tavern", type: "tavern", x: 40, y: 64, name: "Taverne", level: 0 },
+    { id: "library", type: "library", x: 67, y: 51, name: "Bibliotheek", level: 0 },
+    { id: "market", type: "market", x: 76, y: 71, name: "Markt", level: 0 },
+    { id: "house_1", type: "house", x: 72, y: 42, name: "Woonhuis", level: 0 },
+    { id: "house_2", type: "house", x: 9, y: 73, name: "Woonhuis", level: 0 },
+    { id: "house_3", type: "house", x: 87, y: 63, name: "Woonhuis", level: 0 },
+    { id: "house_4", type: "house", x: 34, y: 42, name: "Woonhuis", level: 0 },
+    { id: "house_5", type: "house", x: 21, y: 48, name: "Woonhuis", level: 0 }
 ];
 
 export const buildBuilding = (buildings, type) => {
@@ -314,11 +309,11 @@ export const moveBuilding = (buildings, id, x, y) => {
 // --- POPULATION LOGIC ---
 export const POPULATION_PER_LEVEL = {
     0: 0,
-    1: 100,      // Tent/Hut
-    2: 500,      // Houten Huis
-    3: 2500,     // Stenen Domus
-    4: 15000,    // Insula
-    5: 100000    // Villa Complex
+    1: 200,      // Tent/Hut
+    2: 1000,     // Houten Huis
+    3: 5000,     // Stenen Domus
+    4: 30000,    // Insula
+    5: 200000    // Villa Complex
 };
 
 export const HOUSE_LEVELS = {

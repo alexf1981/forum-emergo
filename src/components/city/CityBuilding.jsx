@@ -11,8 +11,10 @@ const CityBuilding = ({ building, onClick, onMove }) => {
     const translateY = getVerticalShift();
 
     // Variation Logic: Deterministic flip based on ID
-    const shouldFlip = building.type === 'house' &&
-        building.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 2 !== 0;
+    // House: flips randomly based on ID
+    // Market: ALWAYS flip (user request)
+    const shouldFlip = building.type === 'market' || (building.type === 'house' &&
+        building.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 2 !== 0);
 
 
     // Drag & Click Logic
@@ -22,6 +24,72 @@ const CityBuilding = ({ building, onClick, onMove }) => {
 
     // Unified Start Logic caused by visual element
     const handlePointerDown = (clientX, clientY, e) => {
+        // --- TRANSPARENCY CHECK ---
+        // We only proceed if the clicked pixel is opaque.
+        // If transparent, we ignore this event and let it bubble/pass-through manually if needed.
+        if (e.target.tagName === 'IMG') {
+            const img = e.target;
+            const canvas = document.createElement('canvas');
+            canvas.width = 1;
+            canvas.height = 1;
+            const ctx = canvas.getContext('2d');
+
+            const rect = img.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            // Map to natural dimensions
+            const naturalX = (x / rect.width) * img.naturalWidth;
+            const naturalY = (y / rect.height) * img.naturalHeight;
+
+            try {
+                // Draw 1x1 pixel from the image source location
+                ctx.drawImage(img, naturalX, naturalY, 1, 1, 0, 0, 1, 1);
+                const pixel = ctx.getImageData(0, 0, 1, 1).data;
+                const alpha = pixel[3];
+
+                if (alpha < 10) {
+                    // Transparent!
+                    // To let the underlying element receive the event, we momentarily hide this one.
+                    e.target.style.pointerEvents = 'none';
+                    // We also need to hide the parent wrapper potentially if it catches events?
+                    // But the event handler is on the wrapper 'div' usually? 
+                    // UPDATE: The handler is on the wrapper div. `e.target` is the IMG.
+                    // We need to hide the wrapper div to find what's truly under the building.
+
+                    const wrapper = e.currentTarget;
+                    const originalPointerEvents = wrapper.style.pointerEvents;
+                    wrapper.style.pointerEvents = 'none';
+
+                    // Re-fire event at the same coordinates
+                    const elementBelow = document.elementFromPoint(clientX, clientY);
+
+                    // Dispatch
+                    if (elementBelow) {
+                        const newEvent = new MouseEvent(e.type, {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window,
+                            clientX: clientX,
+                            clientY: clientY,
+                            buttons: e.buttons
+                        });
+                        elementBelow.dispatchEvent(newEvent);
+                    }
+
+                    // Restore
+                    wrapper.style.pointerEvents = originalPointerEvents;
+                    e.target.style.pointerEvents = 'auto'; // Restore img too just in case
+
+                    return; // Stop processing for this building
+                }
+            } catch (err) {
+                console.warn("Hit test failed (CORS?):", err);
+                // Fallback: assume opaque to allow interaction
+            }
+        }
+        // --------------------------
+
         isPointerDown.current = true;
         dragStartPos.current = { x: clientX, y: clientY };
 
@@ -31,8 +99,6 @@ const CityBuilding = ({ building, onClick, onMove }) => {
             e.stopPropagation(); // Stop map panning
             // e.preventDefault(); // Optional: prevent selection, but let's be careful with touch scroll
         }
-        // In Normal Mode, we let it bubble so Map can Pan, 
-        // BUT we still track start pos to detect our own "Click" on release.
     };
 
     useEffect(() => {
@@ -117,16 +183,27 @@ const CityBuilding = ({ building, onClick, onMove }) => {
     // Y=100 -> Scale 2 (Foreground)
     const perspectiveScale = Math.max(0.1, building.y / 50);
 
+    // Specific Type Scaling (User Request: 50% smaller for these types)
+    let typeScale = 1.0;
+    if (['tavern', 'market', 'library'].includes(building.type)) {
+        typeScale = 0.5 * 0.9; // 50% base, then 10% smaller per latest request = 0.45
+    } else if (building.type === 'town_hall') {
+        typeScale = 1.1; // 10% larger
+    }
+
+    const finalScale = perspectiveScale * typeScale;
+
     const style = {
         position: 'absolute',
         left: `${building.x}%`,
         top: `${building.y}%`,
-        // Natural size logic: width/height auto, but max constrained
+        // Natural size logic: width/height auto
+        // User explicitly requested to allow overflow/no shrinking.
         width: 'auto',
         height: 'auto',
-        maxWidth: '30%', // Safety cap
-        maxHeight: '40%', // Safety cap
-        transform: `translate(-50%, ${translateY}) scale(${perspectiveScale})`,
+        // maxWidth: '30%', // REMOVED
+        // maxHeight: '40%', // REMOVED
+        transform: `translate(-50%, ${translateY}) scale(${finalScale})`,
         transformOrigin: 'bottom center',
         cursor: onMove ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
         transition: isDragging ? 'none' : 'transform 0.2s',
@@ -170,9 +247,10 @@ const CityBuilding = ({ building, onClick, onMove }) => {
                     <img
                         src={imageSrc}
                         alt={building.name}
+                        crossOrigin="anonymous" // Required for canvas hit testing of local/external images
                         style={{
-                            // Respect natural aspect ratio
-                            maxWidth: '100%',
+                            // Respect natural aspect ratio, but allow full size even if container is constrained
+                            maxWidth: 'none',
                             height: 'auto',
                             filter: 'drop-shadow(0px 5px 5px rgba(0,0,0,0.5))',
                             display: 'block',
