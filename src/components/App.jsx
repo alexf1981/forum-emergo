@@ -30,7 +30,7 @@ function App() {
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, isNewUser, isCloudSynchronized, buildings, resources, research } = useGame();
+    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research } = useGame();
 
     // Scroll listener & First Visit Check
     useEffect(() => {
@@ -208,7 +208,17 @@ function App() {
                 />
             )}
 
-            {showWelcome && !showFirstVisitModal && !showAuthModal && <DailyWelcome onDismiss={actions.dismissWelcome} />}
+            {showWelcome && !showFirstVisitModal && !showAuthModal && (
+                <DailyWelcome
+                    onDismiss={actions.dismissWelcome}
+                    habits={habits}
+                    stats={stats}
+                    buildings={buildings}
+                    research={research}
+                    lastWelcomeDate={lastWelcomeDate}
+                    formatNumber={formatNumber}
+                />
+            )}
             {showSettings && <SettingsModal
                 onClose={() => setShowSettings(false)}
                 onExport={handleExport}

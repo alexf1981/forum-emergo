@@ -417,7 +417,7 @@ export function useGame() {
 
         if (income.total > 0) {
             setStats(s => ({ ...s, gold: s.gold + income.total }));
-            notify({ key: 'msg_daily_income', args: { total: income.total, tax: income.taxIncome, interest: income.interestIncome } }, "success");
+            // Notification is now shown in the DailyWelcome modal
         }
 
         setLastWelcomeDate(today); // Updates state -> trigger save
@@ -437,6 +437,7 @@ export function useGame() {
         combatLog,
         saveStatus, // Export status
         showWelcome, // NEW
+        lastWelcomeDate, // NEW
         // Actions
         actions: {
             toggleHabit,

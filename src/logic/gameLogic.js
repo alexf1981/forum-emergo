@@ -29,7 +29,13 @@ export const ENEMY_TYPES = [
 ];
 
 // --- HELPERS ---
-export const getTodayString = () => new Date().toISOString().split('T')[0];
+export const getTodayString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 // --- PURE LOGIC ---
 
@@ -250,6 +256,8 @@ export function processHabitToggle(habits, stats, id, dateString) {
 }
 
 export function resetDailyHabits(habits) {
+    const today = getTodayString();
+
     // First, remove Mandata (todo) tasks that are completed.
     // They are one-time challenges for that day.
     const remainingHabits = habits.filter(h => {
@@ -261,11 +269,14 @@ export function resetDailyHabits(habits) {
 
     // Reset daily state for recurring habits
     return remainingHabits.map(h => {
+        // Clear history for TODAY to ensure counts reset to 0
+        const newHistory = (h.history || []).filter(date => date !== today);
+
         if (h.type === 'virtue' || h.type === 'vice' || !h.type) {
-            // Keep history, but ensure completed is false for visual state if used elsewhere
-            return { ...h, completed: false };
+            // Keep history (minus today), ensure completed is false for visual state
+            return { ...h, completed: false, history: newHistory };
         }
-        return h;
+        return { ...h, history: newHistory };
     });
 }
 

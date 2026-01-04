@@ -220,7 +220,7 @@ const HabitItem = ({
                 <span className="habit-text" style={isDone && colType === 'todo' ? { textDecoration: 'line-through', color: '#888' } : {}}>
                     {habit.text}
                     {!habit.bucket && dailyCount > 0 && <span style={{ marginLeft: '4px', color: 'var(--color-gold)', fontWeight: 'bold' }}>({formatNumber(dailyCount)})</span>}
-                    {colType === 'vice' && dailyCount > 0 && <span style={{ marginLeft: '4px', color: '#ff4444', fontWeight: 'bold' }}>(-20g)</span>}
+
                     {isPendingDelete && <span style={{ marginLeft: '8px', fontSize: '0.8em', color: '#999', fontStyle: 'italic' }}>({Math.ceil((DURATION - (progress / 100) * DURATION) / 1000)}s)</span>}
                 </span>
             </div>
