@@ -104,16 +104,26 @@ const AdminDashboard = ({ onClose, actions }) => {
                                 🏚️ Stad Ontruimen
                             </button>
 
-                            <button
-                                className="btn"
-                                onClick={() => {
-                                    if (actions && actions.adminAddGold) actions.adminAddGold();
-                                    else alert("Action not found");
-                                }}
-                                style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
-                            >
-                                💰 +1 Miljoen Goud
-                            </button>
+                            <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                                <input
+                                    type="number"
+                                    placeholder="Goud hoeveelheid"
+                                    id="adminGoldInput"
+                                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '120px' }}
+                                />
+                                <button
+                                    className="btn"
+                                    onClick={() => {
+                                        const val = document.getElementById('adminGoldInput').value;
+                                        if (val && actions && actions.adminSetGold) actions.adminSetGold(val);
+                                        else if (!val) alert("Vul een bedrag in");
+                                        else alert("Action not found");
+                                    }}
+                                    style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
+                                >
+                                    💰 Zet Goud
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

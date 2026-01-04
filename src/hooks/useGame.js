@@ -262,9 +262,9 @@ export function useGame() {
     };
 
     // === ADMIN ACTIONS ===
-    const adminAddGold = () => {
-        setStats(prev => ({ ...prev, gold: prev.gold + 10000000 }));
-        notify("10 Miljoen Goud toegevoegd!", "success");
+    const adminSetGold = (amount) => {
+        setStats(prev => ({ ...prev, gold: parseInt(amount, 10) }));
+        notify(`Goud gezet op ${amount}!`, "success");
     };
 
     const adminResetCity = () => {
@@ -451,7 +451,7 @@ export function useGame() {
             doResearch,
 
             // Admin
-            adminAddGold,
+            adminSetGold,
             adminResetCity
         },
         isLoggedIn: !!user,
