@@ -30,11 +30,11 @@ const TOWN_HALL_MULTIPLIERS = {
 // 3. Building Upgrade Costs
 const UPGRADE_COSTS = {
     // Current Level -> Cost to reach next level
-    town_hall: { 1: 0, 2: 2500, 3: 50000, 4: 500000, 5: 10000000 },
+    town_hall: { 1: 0, 2: 1000, 3: 50000, 4: 500000, 5: 10000000 },
     house: { 1: 0, 2: 750, 3: 5000, 4: 75000, 5: 1500000 },
-    tavern: { 1: 2500, 2: 5000, 3: 25000, 4: 100000, 5: 500000 }, // Lvl 1 is Unlock Cost
-    library: { 1: 5000, 2: 5000, 3: 25000, 4: 100000, 5: 500000 }, // Lvl 1 is Unlock Cost
-    market: { 1: 10000, 2: 10000, 3: 50000, 4: 250000, 5: 1000000 } // Lvl 1 is Unlock Cost
+    tavern: { 1: 250, 2: 5000, 3: 25000, 4: 100000, 5: 500000 }, // Lvl 1 is Unlock Cost
+    library: { 1: 250, 2: 5000, 3: 25000, 4: 100000, 5: 500000 }, // Lvl 1 is Unlock Cost
+    market: { 1: 250, 2: 10000, 3: 50000, 4: 250000, 5: 1000000 } // Lvl 1 is Unlock Cost
 };
 
 // 4. House Costs (Dynamic)

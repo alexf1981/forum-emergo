@@ -94,7 +94,7 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                                 }
 
                                 const type = building.type || building.id;
-                                const nextLvl = (building.level || 1) + 1;
+                                const nextLvl = (building.level !== undefined ? building.level : 0) + 1;
                                 const cost = GameLogic.UPGRADE_COSTS[type]?.[nextLvl] || 0;
                                 const canAfford = playerGold >= cost;
 

@@ -344,9 +344,9 @@ export const BASE_TASK_GOLD = 5;
 // Building Costs (Level 1)
 export const BUILDING_COSTS = {
     house: 100,
-    tavern: 2500,  // Unlock Cost
-    library: 5000,
-    market: 10000,
+    tavern: 250,  // Unlock Cost
+    library: 250,
+    market: 250,
     town_hall: 0   // Already exists
 };
 
@@ -363,11 +363,12 @@ export const getDynamicBuildingCost = (type, buildings) => {
 
 // Upgrade Costs (Per Level)
 export const UPGRADE_COSTS = {
-    town_hall: { 2: 2500, 3: 50000, 4: 500000, 5: 10000000 },
-    house: { 2: 750, 3: 5000, 4: 75000, 5: 1500000 },
-    tavern: { 2: 5000, 3: 25000, 4: 100000, 5: 500000 },
-    library: { 2: 5000, 3: 25000, 4: 100000, 5: 500000 },
-    market: { 2: 10000, 3: 50000, 4: 250000, 5: 1000000 }
+    // Current Level -> Cost to reach next level
+    town_hall: { 1: 0, 2: 1000, 3: 50000, 4: 500000, 5: 10000000 },
+    house: { 1: 0, 2: 750, 3: 5000, 4: 75000, 5: 1500000 },
+    tavern: { 1: 250, 2: 5000, 3: 25000, 4: 100000, 5: 500000 }, // Lvl 1 is Unlock Cost
+    library: { 1: 250, 2: 5000, 3: 25000, 4: 100000, 5: 500000 }, // Lvl 1 is Unlock Cost
+    market: { 1: 250, 2: 10000, 3: 50000, 4: 250000, 5: 1000000 } // Lvl 1 is Unlock Cost
 };
 
 export const TOWN_HALL_MULTIPLIERS = {
