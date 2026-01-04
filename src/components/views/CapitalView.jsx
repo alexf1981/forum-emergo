@@ -154,7 +154,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                 border: '1px solid rgba(255,255,255,0.1)'
             }}>
                 <div style={{ fontWeight: 'bold', fontSize: '1.1rem', textShadow: '0 2px 4px black', display: 'flex', alignItems: 'center' }}>
-                    {t('nav_city') || 'Stad'}
+                    {/* {t('nav_city') || 'Stad'} REMOVED as per request */}
                     {isEditMode && (
                         <>
                             <span style={{ fontSize: '0.7em', color: '#e74c3c', marginLeft: '10px', background: 'white', padding: '0 4px', borderRadius: '4px', marginRight: '10px' }}>🛠️ ADMIN</span>
@@ -163,7 +163,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                     )}
                 </div>
                 <div style={{ display: 'flex', gap: '15px', fontWeight: '500' }}>
-                    <span title="Goud">🪙 {formatNumber(stats.gold)}</span>
+                    {/* Gold Removed as per request */}
                     <span title="Bevolking">👥 {formatNumber(population)}</span>
                     {/* Tax */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} title="Dagelijkse Belasting">
