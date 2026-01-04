@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const CityBuilding = ({ building, onClick, onMove }) => {
+const CityBuilding = ({ building, onClick, onMove, globalScale = 1 }) => {
     // Scale factor can be adjusted per building type if needed
     // The user requested that "2x pixels = 2x size", so we rely on natural image size (auto)
     // but capped to avoid massive overflows.
@@ -191,7 +191,7 @@ const CityBuilding = ({ building, onClick, onMove }) => {
         typeScale = 1.1; // 10% larger
     }
 
-    const finalScale = perspectiveScale * typeScale;
+    const finalScale = perspectiveScale * typeScale * globalScale;
 
     const style = {
         position: 'absolute',

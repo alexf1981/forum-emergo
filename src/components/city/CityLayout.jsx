@@ -69,6 +69,58 @@ const CityLayout = ({ buildings, onBuildingClick, onBuildingMove }) => {
     }, [isPanning]);
 
 
+    // Layout State for JS-based "Cover" logic
+    const [containerStyle, setContainerStyle] = useState({});
+
+    // Scale Factor Logic (Responsive Buildings)
+    const [scaleFactor, setScaleFactor] = useState(1);
+
+    useEffect(() => {
+        const updateLayout = () => {
+            if (wrapperRef.current && containerRef.current) {
+                const wrapperW = wrapperRef.current.offsetWidth;
+                const wrapperH = wrapperRef.current.offsetHeight;
+
+                const wrapperRatio = wrapperW / wrapperH;
+                const mapRatio = 16 / 9;
+
+                // "Cover" Logic
+                // If Wrapper is wider than Map (e.g. 21:9 vs 16:9), match Width (Height overflows).
+                // If Wrapper is taller than Map (e.g. 4:3 vs 16:9), match Height (Width overflows).
+                let newStyle = {};
+                if (wrapperRatio > mapRatio) {
+                    newStyle = { width: '100%', height: 'auto' };
+                } else {
+                    newStyle = { width: 'auto', height: '100%' };
+                }
+                setContainerStyle(newStyle);
+
+                // Calculate Scale Factor (Width-based)
+                // We need to wait for the DOM to update from the style change? 
+                // Actually, we can calculate what the width WILL be.
+                let calculatedWidth = 0;
+                if (wrapperRatio > mapRatio) {
+                    calculatedWidth = wrapperW;
+                } else {
+                    // If height is 100% of wrapper, width is height * 1.777
+                    calculatedWidth = wrapperH * mapRatio;
+                }
+                setScaleFactor(calculatedWidth / 1920);
+            }
+        };
+
+        // Initial call
+        updateLayout();
+
+        // Watch for resizes on the WRAPPER (the available space)
+        const observer = new ResizeObserver(updateLayout);
+        if (wrapperRef.current) {
+            observer.observe(wrapperRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
     return (
         <div
             ref={wrapperRef}
@@ -94,30 +146,13 @@ const CityLayout = ({ buildings, onBuildingClick, onBuildingMove }) => {
                     aspect-ratio: 16/9;
                     transition: transform 0.1s ease-out;
                 }
-                
-                /* Case 1: Screen is wider than 16:9 -> Fit Width, Crop Top/Bottom */
-                /* No panning needed/possible in X direction here usually */
-                @media (min-aspect-ratio: 16/9) {
-                    .city-map-container {
-                        width: 100%;
-                        height: auto;
-                    }
-                }
-
-                /* Case 2: Screen is taller than 16:9 -> Fit Height, Crop Left/Right */
-                /* Panning allowed here */
-                @media (max-aspect-ratio: 16/9) {
-                    .city-map-container {
-                        width: auto;
-                        height: 100%;
-                    }
-                }
             `}</style>
 
             {/* The Map Container - Maintains 16:9 and Scales to Cover */}
             <div
                 ref={containerRef}
                 className="city-map-container"
+                style={containerStyle}
             >
                 {/* Background Image */}
                 <div style={{
@@ -160,6 +195,7 @@ const CityLayout = ({ buildings, onBuildingClick, onBuildingMove }) => {
                         <CityBuilding
                             key={building.id}
                             building={building}
+                            globalScale={scaleFactor} // Pass the responsive scale
                             onClick={(b) => {
                                 // Prevent building click if panning
                                 if (Math.abs(panX - currentPan.current) < 5) {
