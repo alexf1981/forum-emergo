@@ -2,37 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const CityBuilding = ({ building, onClick, onMove }) => {
     // Scale factor can be adjusted per building type if needed
-    // Using percentages relative to container width (approx 1200px equivalent)
-    const getSize = (type, level) => {
-        switch (type) {
-            case 'town_hall':
-                // Level specific sizing
-                if (level === 1) return { width: '10%' }; // 50% of 20%
-                if (level === 2) return { width: '15%' }; // slightly smaller than 16% as requested
-                return { width: '20%' };
-            case 'tavern': return { width: '13%' };
-            case 'library': return { width: '13.5%' };
-            case 'house': return { width: '8.5%' };
-            case 'market': return { width: '7.5%' };
-            default: return { width: '4%' };
-        }
-    };
+    // The user requested that "2x pixels = 2x size", so we rely on natural image size (auto)
+    // but capped to avoid massive overflows.
+    // We also apply the perspective scale.
 
-    const size = getSize(building.type, building.level);
+    const getVerticalShift = () => '-100%'; // Always anchor at bottom
 
-    // Vertical shift logic for specific buildings
-    const getVerticalShift = (type, level) => {
-        if (type === 'town_hall') {
-            if (level === 1) return '-35%'; // Level 1 moved further down (standard is -50%, so -35% pushes it down relative to anchor)
-            return '-65%'; // Higher levels shift up
-        }
-        return '-50%'; // Default center
-    };
-
-    const translateY = getVerticalShift(building.type, building.level);
+    const translateY = getVerticalShift();
 
     // Variation Logic: Deterministic flip based on ID
-    // Simple hash of the ID string to decide if we flip or not
     const shouldFlip = building.type === 'house' &&
         building.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 2 !== 0;
 
@@ -107,12 +85,6 @@ const CityBuilding = ({ building, onClick, onMove }) => {
             handleMoveEvent(t.clientX, t.clientY);
         };
         const onTouchEnd = (e) => {
-            // Touch end doesn't have coords, use last known? 
-            // Or just trust if it was a short tap. 
-            // For simple click detection on touch, we can use changedTouches if needed, 
-            // but effectively if we haven't 'moved' significantly...
-            // Standard click might be better for touch fallback, but let's try using the start pos.
-            // Actually, handleUp needs clientX/Y to check distance.
             const t = e.changedTouches[0];
             handleUpEvent(t.clientX, t.clientY);
         };
@@ -145,15 +117,17 @@ const CityBuilding = ({ building, onClick, onMove }) => {
     // Y=100 -> Scale 2 (Foreground)
     const perspectiveScale = Math.max(0.1, building.y / 50);
 
-
-    // Defines styles for positioning
     const style = {
         position: 'absolute',
         left: `${building.x}%`,
         top: `${building.y}%`,
-        width: size.width,
-        transform: `translate(-50%, ${translateY}) scale(${perspectiveScale})`, // Apply scaling here
-        transformOrigin: 'bottom center', // Scale from the feet
+        // Natural size logic: width/height auto, but max constrained
+        width: 'auto',
+        height: 'auto',
+        maxWidth: '30%', // Safety cap
+        maxHeight: '40%', // Safety cap
+        transform: `translate(-50%, ${translateY}) scale(${perspectiveScale})`,
+        transformOrigin: 'bottom center',
         cursor: onMove ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
         transition: isDragging ? 'none' : 'transform 0.2s',
         zIndex: isDragging ? 1000 : Math.floor(building.y),
@@ -161,14 +135,17 @@ const CityBuilding = ({ building, onClick, onMove }) => {
 
     if (building.level === 0) return null; // Invisible if not built
 
-    // Map type to image file
+    // Map type to image file using dynamic levels for ALL types
     const getBuildingImage = (type) => {
+        const lvl = building.level || 1;
+        // All types now follow standard naming convention: type_level.png
+        // Except maybe if file doesn't exist? We assume manual crop succeeded for all.
         switch (type) {
-            case 'town_hall': return `./assets/city/town_hall_${building.level || 1}.png`;
-            case 'tavern': return './assets/city/tavern.png';
-            case 'library': return './assets/city/library.png';
-            case 'house': return './assets/city/house.png';
-            case 'market': return './assets/city/market.png';
+            case 'town_hall': return `./assets/city/town_hall_${lvl}.png`;
+            case 'house': return `./assets/city/house_${lvl}.png`;
+            case 'tavern': return `./assets/city/tavern_${lvl}.png`;
+            case 'library': return `./assets/city/library_${lvl}.png`;
+            case 'market': return `./assets/city/market_${lvl}.png`;
             default: return null;
         }
     };
@@ -181,24 +158,25 @@ const CityBuilding = ({ building, onClick, onMove }) => {
             style={style}
             onMouseDown={onMouseDown}
             onTouchStart={onTouchStart}
-            // onClick logic is handled in onMouseUp now
             title={`${building.name} (Lvl ${building.level})`}
         >
             <div style={{
                 position: 'relative',
                 transition: 'transform 0.1s',
-                width: '100%' // Ensure inner wrapper fills container
+                display: 'flex',
+                justifyContent: 'center'
             }}>
                 {imageSrc ? (
                     <img
                         src={imageSrc}
                         alt={building.name}
                         style={{
-                            width: '100%', // Fill the container width
+                            // Respect natural aspect ratio
+                            maxWidth: '100%',
                             height: 'auto',
                             filter: 'drop-shadow(0px 5px 5px rgba(0,0,0,0.5))',
                             display: 'block',
-                            transform: shouldFlip ? 'scaleX(-1)' : 'none' // Flip visual only
+                            transform: shouldFlip ? 'scaleX(-1)' : 'none'
                         }}
                     />
                 ) : (
