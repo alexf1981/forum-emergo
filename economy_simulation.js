@@ -190,7 +190,7 @@ for (let day = 1; day <= 365; day++) {
         if (stats.gold >= costTH) {
             stats.gold -= costTH;
             th.level++;
-            dailyPurchases.push(`TH Lvl ${th.level}`);
+            dailyPurchases.push(`TH Lvl ${th.level} (-${costTH})`);
             purchased = true;
             continue;
         }
@@ -206,7 +206,7 @@ for (let day = 1; day <= 365; day++) {
         if (bestHouse && stats.gold >= minHouseCost) {
             stats.gold -= minHouseCost;
             bestHouse.level++;
-            dailyPurchases.push(`Huis Lvl ${bestHouse.level}`);
+            dailyPurchases.push(`Huis Lvl ${bestHouse.level} (-${minHouseCost})`);
             purchased = true;
             continue;
         }
@@ -217,7 +217,7 @@ for (let day = 1; day <= 365; day++) {
         if (stats.gold >= costLib) {
             stats.gold -= costLib;
             lib.level++;
-            dailyPurchases.push(`Lib Lvl ${lib.level}`);
+            dailyPurchases.push(`Lib Lvl ${lib.level} (-${costLib})`);
             purchased = true;
             continue;
         }
@@ -231,7 +231,7 @@ for (let day = 1; day <= 365; day++) {
             if (research.tax < caps.tax && stats.gold >= costTax) {
                 stats.gold -= costTax;
                 research.tax++;
-                dailyPurchases.push(`Tax ${research.tax}`);
+                dailyPurchases.push(`Tax ${research.tax} (-${costTax})`);
                 purchased = true;
                 continue;
             }
@@ -240,7 +240,7 @@ for (let day = 1; day <= 365; day++) {
             if (research.interest < caps.interest && stats.gold >= costInt) {
                 stats.gold -= costInt;
                 research.interest++;
-                dailyPurchases.push(`Int ${research.interest}`);
+                dailyPurchases.push(`Int ${research.interest} (-${costInt})`);
                 purchased = true;
                 continue;
             }
@@ -252,7 +252,7 @@ for (let day = 1; day <= 365; day++) {
         if (stats.gold >= costTav) {
             stats.gold -= costTav;
             tav.level++;
-            dailyPurchases.push(`Tav Lvl ${tav.level}`);
+            dailyPurchases.push(`Tav Lvl ${tav.level} (-${costTav})`);
             purchased = true;
             continue;
         }
@@ -261,7 +261,7 @@ for (let day = 1; day <= 365; day++) {
         if (heroes.length < heroCap && heroes.length < 10 && stats.gold >= HERO_COST) {
             stats.gold -= HERO_COST;
             heroes.push({ id: Date.now() });
-            dailyPurchases.push(`Held (${heroes.length})`);
+            dailyPurchases.push(`Held (${heroes.length}) (-${HERO_COST})`);
             purchased = true;
             continue;
         }
@@ -272,7 +272,7 @@ for (let day = 1; day <= 365; day++) {
         if (stats.gold >= costMkt) {
             stats.gold -= costMkt;
             mkt.level++;
-            dailyPurchases.push(`Mkt Lvl ${mkt.level}`);
+            dailyPurchases.push(`Mkt Lvl ${mkt.level} (-${costMkt})`);
             purchased = true;
             continue;
         }
@@ -288,9 +288,23 @@ for (let day = 1; day <= 365; day++) {
     const buildStr = `TH:${thL} Tav:${tavL} Lib:${libL} Mkt:${mktL} H:${houseStr}`;
     const researchStr = `Tax:${research.tax} Int:${research.interest}`;
 
-    // Format purchases: truncate if too long?
-    let purchaseStr = dailyPurchases.join(", ");
-    if (purchaseStr.length > 40) purchaseStr = purchaseStr.substring(0, 37) + "...";
-
-    console.log(`| ${PNum(day, 3)} | ${PNum(stats.gold, 9)} | ${PNum(interestIncome, 5)} | ${PNum(taxIncome, 5)} | ${P(buildStr, 38)} | ${PNum(heroes.length, 6)} | ${P(researchStr, 19)} | ${P(purchaseStr, 40)} |`);
+    // Format purchases: Multi-line
+    const rows = Math.max(1, dailyPurchases.length);
+    for (let i = 0; i < rows; i++) {
+        const purchase = dailyPurchases[i] || "";
+        if (i === 0) {
+            console.log(`| ${PNum(day, 3)} | ${PNum(stats.gold, 9)} | ${PNum(interestIncome, 5)} | ${PNum(taxIncome, 5)} | ${P(buildStr, 38)} | ${PNum(heroes.length, 6)} | ${P(researchStr, 19)} | ${P(purchase, 40)} |`);
+        } else {
+            console.log(`| ${P("", 3)} | ${P("", 9)} | ${P("", 5)} | ${P("", 5)} | ${P("", 38)} | ${P("", 6)} | ${P("", 19)} | ${P(purchase, 40)} |`);
+        }
+    }
+    // Separator line for readability between days? Optional, maybe only if multi-line
+    if (rows > 1) {
+        console.log(`|${"-".repeat(5)}|${"-".repeat(11)}|${"-".repeat(7)}|${"-".repeat(7)}|${"-".repeat(40)}|${"-".repeat(8)}|${"-".repeat(21)}|${"-".repeat(42)}|`);
+    } else {
+        // Just to keep grid tight? No separator line for single rows to save space, 
+        // or maybe simple separator everywhere? User asked for "one item per line", didn't ask for grid lines.
+        // Let's leave it without extra grid lines unless it's a new day block.
+    }
 }
+
