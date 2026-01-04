@@ -43,25 +43,7 @@ const HouseInterior = ({ building, buildings, upgradeBuilding, stats }) => {
 
     return (
         <div style={{ padding: '10px', color: '#2c3e50' }}>
-            <h3 style={{ borderBottom: '2px solid #7f8c8d', paddingBottom: '5px' }}>Woonhuis Statistieken</h3>
-
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-                <thead>
-                    <tr style={{ background: '#ecf0f1', borderBottom: '2px solid #bdc3c7' }}>
-                        <th style={{ padding: '10px', textAlign: 'left' }}>Lvl</th>
-                        <th style={{ padding: '10px', textAlign: 'left' }}>Type</th>
-                        <th style={{ padding: '10px', textAlign: 'left' }}>Pop.</th>
-                        <th style={{ padding: '10px', textAlign: 'left' }}>Kosten</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows}
-                </tbody>
-            </table>
-
-            <div style={{ marginTop: '20px', fontStyle: 'italic', fontSize: '0.9rem', color: '#7f8c8d' }}>
-                * Hogere bevolking zorgt voor meer belastinginkomsten.
-            </div>
+            {/* Table has been moved to BuildingModal generic implementation */}
         </div>
     );
 };

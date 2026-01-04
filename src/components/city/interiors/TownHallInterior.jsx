@@ -40,10 +40,10 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
         if (type === 'house') {
             const hasSpace = canBuild('house');
             isCompleted = !hasSpace;
-            statusText = isCompleted ? 'Voltooid' : `Kosten: ${cost}`;
+            statusText = isCompleted ? 'Voltooid' : '';
         } else {
             isCompleted = built;
-            statusText = isCompleted ? 'Voltooid' : `Kosten: ${cost}`;
+            statusText = isCompleted ? 'Voltooid' : '';
         }
 
         return (
@@ -79,7 +79,7 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
                     </div>
                 </div>
                 {(() => {
-                    const numericCost = GameLogic.BUILDING_COSTS[type];
+                    const numericCost = GameLogic.getDynamicBuildingCost(type, buildings);
                     const canAfford = stats.gold >= numericCost;
                     const isLocked = !available; // No space or max level global logic
 
@@ -118,7 +118,7 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
                                 <span>Voltooid</span>
                             ) : (
                                 <>
-                                    <span>🔨</span>
+                                    <span>🪙</span>
                                     <span>{numericCost}</span>
                                 </>
                             )}

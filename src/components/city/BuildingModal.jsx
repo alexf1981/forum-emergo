@@ -179,8 +179,59 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                     overscrollBehavior: 'contain' // Prevent background scroll
                 }}>
                     {children}
-                </div>
+                    {/* UPGRADE TABLE - HouseInterior Style */}
+                    <div style={{ marginTop: '20px', color: '#2c3e50' }}>
+                        <h3 style={{ borderBottom: '2px solid #7f8c8d', paddingBottom: '5px', marginBottom: '10px', fontSize: '1.1rem' }}>
+                            {building.name ? building.name.split(' ')[0] : 'Gebouw'} Statistieken
+                        </h3>
 
+                        {/* Removed specific scrolling implementation here to let the modal body scroll */}
+                        <div style={{}}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                                <thead>
+                                    <tr style={{ background: '#ecf0f1', borderBottom: '2px solid #bdc3c7' }}>
+                                        <th style={{ padding: '10px', textAlign: 'left' }}>Lvl</th>
+                                        <th style={{ padding: '10px', textAlign: 'left' }}>Naam</th>
+                                        <th style={{ padding: '10px', textAlign: 'left' }}>Effect</th>
+                                        <th style={{ padding: '10px', textAlign: 'left' }}>Kosten</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[1, 2, 3, 4, 5].map(lvl => {
+                                        const type = building.type || building.id;
+                                        const cost = GameLogic.UPGRADE_COSTS[type]?.[lvl] || (lvl === 1 ? GameLogic.BUILDING_COSTS[type] : 0);
+                                        const benefit = GameLogic.getBuildingBenefit(type, lvl);
+                                        const name = GameLogic.getBuildingName ? GameLogic.getBuildingName(type, lvl) : `${type} ${lvl}`;
+                                        const isCurrent = building.level === lvl;
+
+                                        return (
+                                            <tr key={lvl} style={{
+                                                background: isCurrent ? '#ebf5fb' : 'transparent',
+                                                fontWeight: isCurrent ? 'bold' : 'normal',
+                                                color: isCurrent ? '#2980b9' : '#2c3e50',
+                                                borderBottom: '1px solid #bdc3c7'
+                                            }}>
+                                                <td style={{ padding: '10px' }}>{lvl}</td>
+                                                <td style={{ padding: '10px' }}>{name}</td>
+                                                <td style={{ padding: '10px' }}>{benefit}</td>
+                                                <td style={{ padding: '10px' }}>
+                                                    {lvl === 1 && cost === 0 ? '-' : (
+                                                        <>
+                                                            {formatNumber ? formatNumber(cost) : cost} <span style={{ fontSize: '0.8em' }}>🪙</span>
+                                                        </>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style={{ marginTop: '10px', fontStyle: 'italic', fontSize: '0.8rem', color: '#7f8c8d' }}>
+                            * Upgrade gebouwen om je stad te laten groeien.
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <style>{`

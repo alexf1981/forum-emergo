@@ -350,6 +350,17 @@ export const BUILDING_COSTS = {
     town_hall: 0   // Already exists
 };
 
+// Helper for dynamic costs (e.g. houses scale with count)
+export const getDynamicBuildingCost = (type, buildings) => {
+    if (type === 'house') {
+        const houseCount = buildings.filter(b => b.type === 'house' && b.level > 0).length;
+        // 1st house (count 0) = 100
+        // 2nd house (count 1) = 200
+        return 100 * (houseCount + 1);
+    }
+    return BUILDING_COSTS[type] || 0;
+};
+
 // Upgrade Costs (Per Level)
 export const UPGRADE_COSTS = {
     town_hall: { 2: 2500, 3: 50000, 4: 500000, 5: 10000000 },
@@ -447,3 +458,47 @@ export function getLibraryLevel(buildings) {
     const lib = buildings.find(b => b.type === 'library');
     return lib ? lib.level : 0;
 }
+
+export const getBuildingBenefit = (type, level) => {
+    if (level === 0) return "-";
+
+    switch (type) {
+        case 'town_hall':
+            const mult = TOWN_HALL_MULTIPLIERS[level] || 1;
+            const reward = BASE_TASK_GOLD * mult;
+            return `Taakbeloning: ${reward}g`;
+        case 'house':
+            const pop = POPULATION_PER_LEVEL[level] || 0;
+            return `Bevolking: ${pop}`;
+        case 'library':
+            const caps = RESEARCH_CAPS[level];
+            if (!caps) return "Geen onderzoek";
+            return `Max Tax: ${caps.tax} / Bank: ${caps.interest}`;
+        case 'market':
+            if (level === 1) return "Handel Vrijgespeeld";
+            return "Betere prijzen";
+        case 'tavern':
+            if (level === 1) return "Helden Vrijgespeeld";
+            return "Betere helden";
+        default:
+            return "-";
+    }
+};
+
+export const getBuildingName = (type, level) => {
+    if (type === 'house') {
+        return HOUSE_LEVELS[level]?.name || `Woonhuis ${level}`;
+    }
+    const baseNames = {
+        town_hall: "Stadhuis",
+        library: "Bibliotheek",
+        market: "Markt",
+        tavern: "Taverne",
+        house: "Woonhuis"
+    };
+    const base = baseNames[type] || type;
+
+    // Roman numerals for levels
+    const romans = ["", "I", "II", "III", "IV", "V"];
+    return `${base} ${romans[level] || level}`;
+};

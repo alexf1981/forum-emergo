@@ -152,7 +152,7 @@ export function useGame() {
     // === ACTIONS: CITY ===
     const buildBuilding = (type) => {
         // 1. Cost Check
-        const cost = GameLogic.BUILDING_COSTS[type] || 0;
+        const cost = GameLogic.getDynamicBuildingCost(type, buildings);
         if (stats.gold < cost) {
             notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
             return;
