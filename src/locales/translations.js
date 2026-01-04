@@ -97,7 +97,73 @@ export const translations = {
         heal_btn: "Heal",
         stat_xp: "XP",
         stat_hp: "HP",
-        stat_power: "Power"
+        stat_power: "Power",
+        // Buildings
+        building_town_hall: "Town Hall",
+        building_tavern: "Tavern",
+        building_library: "Library",
+        building_market: "Market",
+        building_house: "House",
+        // Research
+        research_tax: "Tax Reform",
+        research_interest: "Banking",
+        // Toasts
+        // UI Labels
+        lbl_level: "Lvl",
+        lbl_name: "Name",
+        lbl_effect: "Effect",
+        lbl_cost: "Cost",
+        lbl_max: "MAX",
+        lbl_locked: "Locked",
+        lbl_completed: "Completed",
+        txt_upgrade_building: "Upgrade buildings to grow your city.",
+        // Town Hall
+        header_town_hall: "City Administration",
+        desc_town_hall: "Manage your city and construct new buildings.",
+        btn_build: "Build",
+        msg_built: "Built",
+        // Library
+        header_library: "Royal Library",
+        desc_library: "Gather knowledge to rule more efficiently.",
+        // Tavern
+        header_tavern: "Recruit a New Hero",
+        btn_upgrade_tavern: "Upgrade Tavern",
+
+        // Benefits
+        benefit_town_hall: "Task Reward: {amount}g",
+        benefit_house: "Population: {amount}",
+        benefit_library: "Max Tax: {tax} / Bank: {interest}",
+        benefit_market_unlock: "Trading Unlocked",
+        benefit_market_prices: "Better Prices",
+        benefit_tavern: "Max {amount} heroes",
+        benefit_unknown: "Unknown Effect",
+        lbl_stats: "Statistics",
+        lbl_current_heroes: "Current Heroes ({count}/{max})",
+        msg_no_heroes: "No heroes in service...",
+        msg_under_construction: "This building is under construction.",
+        btn_upgrade_soon: "Upgrade (Coming Soon)",
+        lbl_language: "Language",
+        // Research Descriptions
+        desc_research_tax: "Increases tax income by 1% per level.",
+        desc_research_interest: "Receive daily 0.1% interest on your gold reserves.",
+        msg_town_hall_intro: "Lord, here you can order the expansion of our glorious city.",
+
+        msg_max_heroes: "Maximum number of heroes (10) reached!",
+        msg_tavern_upgrade_required: "Tavern upgrade required! (Limit: {cap})",
+        msg_not_enough_gold: "Not enough gold! (Required: {cost})",
+        msg_no_space: "No space left for {building}!",
+        msg_building_built: "{building} built! (-{cost} Gold)",
+        msg_building_max_level: "This building is already at max level!",
+        msg_no_upgrade_cost: "No upgrade cost found.",
+        msg_townhall_required: "Town Hall upgrade required first!",
+        msg_building_upgraded: "Building upgraded to level {level}! (-{cost} Gold)",
+        msg_research_max_level: "Maximum level reached!",
+        msg_library_required: "Library upgrade (Level {level}) required!",
+        msg_research_complete: "{research} researched! (Level {level})",
+        msg_admin_gold_set: "Gold set to {amount}!",
+        msg_admin_reset: "City reset! Town Hall is level 1.",
+        msg_sync_error: "Could not sync with cloud",
+        msg_daily_income: "Daily Income: {total} Gold ({tax} Tax + {interest} Interest)"
     },
     nl: {
         flag: "🇳🇱",
@@ -196,7 +262,73 @@ export const translations = {
         heal_btn: "Genees",
         stat_xp: "XP",
         stat_hp: "HP",
-        stat_power: "Kracht"
+        stat_power: "Kracht",
+        // Buildings
+        building_town_hall: "Stadhuis",
+        building_tavern: "Taveerne",
+        building_library: "Bibliotheek",
+        building_market: "Markt",
+        building_house: "Woonhuis",
+        // Research
+        research_tax: "Belastinghervorming",
+        research_interest: "Bankieren",
+        // Toasts
+        // UI Labels
+        lbl_level: "Lvl",
+        lbl_name: "Naam",
+        lbl_effect: "Effect",
+        lbl_cost: "Kosten",
+        lbl_max: "MAX",
+        lbl_locked: "Vergrendeld",
+        lbl_completed: "Voltooid",
+        txt_upgrade_building: "Upgrade gebouwen om je stad te laten groeien.",
+        // Town Hall
+        header_town_hall: "Stadsbestuur",
+        desc_town_hall: "Beheer je stad en bouw nieuwe gebouwen.",
+        btn_build: "Bouwen",
+        msg_built: "Gebouwd",
+        // Library
+        header_library: "Koninklijke Bibliotheek",
+        desc_library: "Vergaar kennis om uw rijk efficiënter te besturen.",
+        // Tavern
+        header_tavern: "Rekruteer een Nieuwe Held",
+        btn_upgrade_tavern: "Upgrade Taveerne",
+
+        // Benefits
+        benefit_town_hall: "Taakbeloning: {amount}g",
+        benefit_house: "Bevolking: {amount}",
+        benefit_library: "Max Tax: {tax} / Bank: {interest}",
+        benefit_market_unlock: "Handel Vrijgespeeld",
+        benefit_market_prices: "Betere prijzen",
+        benefit_tavern: "Max {amount} held(en)",
+        benefit_unknown: "Onbekend effect",
+        lbl_stats: "Statistieken",
+        lbl_current_heroes: "Huidige Helden ({count}/{max})",
+        msg_no_heroes: "Geen helden in dienst...",
+        msg_under_construction: "Dit gebouw is nog in constructie.",
+        btn_upgrade_soon: "Upgrade (Binnenkort)",
+        lbl_language: "Taal",
+        // Research Descriptions
+        desc_research_tax: "Verhoogt belastinginkomsten met 1% per niveau.",
+        desc_research_interest: "Ontvang dagelijks 0.1% rente over je goudvoorraad.",
+        msg_town_hall_intro: "Heer, hier kunt u opdrachten geven tot de uitbreiding van onze glorieuze stad.",
+
+        msg_max_heroes: "Maximaal aantal helden (10) bereikt!",
+        msg_tavern_upgrade_required: "Taveerne upgrade vereist! (Huidig limiet: {cap})",
+        msg_not_enough_gold: "Niet genoeg goud! (Vereist: {cost})",
+        msg_no_space: "Geen ruimte meer voor {building}!",
+        msg_building_built: "{building} gebouwd! (-{cost} Goud)",
+        msg_building_max_level: "Dit gebouw is al maximaal niveau!",
+        msg_no_upgrade_cost: "Geen upgrade kosten gevonden voor dit gebouw.",
+        msg_townhall_required: "Stadhuis moet eerst geüpgraded worden!",
+        msg_building_upgraded: "Gebouw geüpgraded naar niveau {level}! (-{cost} Goud)",
+        msg_research_max_level: "Maximaal niveau bereikt!",
+        msg_library_required: "Bibliotheek upgrade (Niveau {level}) vereist voor verder onderzoek!",
+        msg_research_complete: "{research} onderzocht! (Niveau {level})",
+        msg_admin_gold_set: "Goud gezet op {amount}!",
+        msg_admin_reset: "Stad ontruimd! Stadhuis is level 1.",
+        msg_sync_error: "Kon niet synchroniseren met de cloud",
+        msg_daily_income: "Dagelijks inkomen: {total} Goud ({tax} Belasting + {interest} Rente)"
     },
     es: {
         flag: "🇪🇸",
@@ -295,7 +427,73 @@ export const translations = {
         heal_btn: "Curar",
         stat_xp: "XP",
         stat_hp: "PV",
-        stat_power: "Poder"
+        stat_power: "Poder",
+        // Buildings
+        building_town_hall: "Ayuntamiento",
+        building_tavern: "Taberna",
+        building_library: "Biblioteca",
+        building_market: "Mercado",
+        building_house: "Casa",
+        // Research
+        research_tax: "Reforma Fiscal",
+        research_interest: "Banca",
+        // Toasts
+        // UI Labels
+        lbl_level: "Nivel",
+        lbl_name: "Nombre",
+        lbl_effect: "Efecto",
+        lbl_cost: "Costo",
+        lbl_max: "MAX",
+        lbl_locked: "Bloqueado",
+        lbl_completed: "Completado",
+        txt_upgrade_building: "Mejora edificios para hacer crecer tu ciudad.",
+        // Town Hall
+        header_town_hall: "Administración de la Ciudad",
+        desc_town_hall: "Gestiona tu ciudad y construye nuevos edificios.",
+        btn_build: "Construir",
+        msg_built: "Construido",
+        // Library
+        header_library: "Biblioteca Real",
+        desc_library: "Reúne conocimientos para gobernar más eficientemente.",
+        // Tavern
+        header_tavern: "Reclutar un Nuevo Héroe",
+        btn_upgrade_tavern: "Mejorar Taberna",
+
+        // Benefits
+        benefit_town_hall: "Recompensa de Tarea: {amount}g",
+        benefit_house: "Población: {amount}",
+        benefit_library: "Max Impuestos: {tax} / Banco: {interest}",
+        benefit_market_unlock: "Comercio Desbloqueado",
+        benefit_market_prices: "Mejores Precios",
+        benefit_tavern: "Máx {amount} héroes",
+        benefit_unknown: "Efecto Desconocido",
+        lbl_stats: "Estadísticas",
+        lbl_current_heroes: "Héroes Actuales ({count}/{max})",
+        msg_no_heroes: "No hay héroes en servicio...",
+        msg_under_construction: "Este edificio está en construcción.",
+        btn_upgrade_soon: "Mejorar (Próximamente)",
+        lbl_language: "Idioma",
+        // Research Descriptions
+        desc_research_tax: "Aumenta los ingresos fiscales un 1% por nivel.",
+        desc_research_interest: "Recibe un 0.1% de interés diario sobre tus reservas de oro.",
+        msg_town_hall_intro: "Señor, aquí puede ordenar la expansión de nuestra gloriosa ciudad.",
+
+        msg_max_heroes: "¡Número máximo de héroes (10) alcanzado!",
+        msg_tavern_upgrade_required: "¡Mejora de Taberna requerida! (Límite: {cap})",
+        msg_not_enough_gold: "¡No hay suficiente oro! (Requerido: {cost})",
+        msg_no_space: "¡No hay espacio para {building}!",
+        msg_building_built: "¡{building} construido! (-{cost} Oro)",
+        msg_building_max_level: "¡Este edificio ya está al nivel máximo!",
+        msg_no_upgrade_cost: "Costo de mejora no encontrado.",
+        msg_townhall_required: "¡Se requiere mejorar el Ayuntamiento primero!",
+        msg_building_upgraded: "¡Edificio mejorado al nivel {level}! (-{cost} Oro)",
+        msg_research_max_level: "¡Nivel máximo alcanzado!",
+        msg_library_required: "¡Mejora de Biblioteca (Nivel {level}) requerida!",
+        msg_research_complete: "¡{research} investigado! (Nivel {level})",
+        msg_admin_gold_set: "¡Oro establecido en {amount}!",
+        msg_admin_reset: "¡Ciudad reiniciada! El Ayuntamiento es nivel 1.",
+        msg_sync_error: "No se pudo sincronizar con la nube",
+        msg_daily_income: "Ingresos diarios: {total} Oro ({tax} Impuestos + {interest} Interés)"
     },
     de: {
         flag: "🇩🇪",
@@ -394,6 +592,72 @@ export const translations = {
         heal_btn: "Heilen",
         stat_xp: "XP",
         stat_hp: "LP",
-        stat_power: "Kraft"
+        stat_power: "Kraft",
+        // Buildings
+        building_town_hall: "Rathaus",
+        building_tavern: "Taverne",
+        building_library: "Bibliothek",
+        building_market: "Markt",
+        building_house: "Haus",
+        // Research
+        research_tax: "Steuerreform",
+        research_interest: "Bankwesen",
+        // Toasts
+        // UI Labels
+        lbl_level: "Stufe",
+        lbl_name: "Name",
+        lbl_effect: "Effekt",
+        lbl_cost: "Kosten",
+        lbl_max: "MAX",
+        lbl_locked: "Gesperrt",
+        lbl_completed: "Abgeschlossen",
+        txt_upgrade_building: "Baue Gebäude aus, um deine Stadt wachsen zu lassen.",
+        // Town Hall
+        header_town_hall: "Stadtverwaltung",
+        desc_town_hall: "Verwalte deine Stadt und baue neue Gebäude.",
+        btn_build: "Bauen",
+        msg_built: "Gebaut",
+        // Library
+        header_library: "Königliche Bibliothek",
+        desc_library: "Sammle Wissen, um dein Reich effizienter zu regieren.",
+        // Tavern
+        header_tavern: "Rekrutiere einen neuen Held",
+        btn_upgrade_tavern: "Taverne verbessern",
+
+        // Benefits
+        benefit_town_hall: "Aufgabenbelohnung: {amount}g",
+        benefit_house: "Bevölkerung: {amount}",
+        benefit_library: "Max Steuer: {tax} / Bank: {interest}",
+        benefit_market_unlock: "Handel Freigeschaltet",
+        benefit_market_prices: "Bessere Preise",
+        benefit_tavern: "Max {amount} Helden",
+        benefit_unknown: "Unbekannter Effekt",
+        lbl_stats: "Statistiken",
+        lbl_current_heroes: "Aktuelle Helden ({count}/{max})",
+        msg_no_heroes: "Keine Helden im Dienst...",
+        msg_under_construction: "Dieses Gebäude ist noch im Bau.",
+        btn_upgrade_soon: "Upgrade (Demnächst)",
+        lbl_language: "Sprache",
+        // Research Descriptions
+        desc_research_tax: "Erhöht Steuereinnahmen um 1% pro Stufe.",
+        desc_research_interest: "Erhalte täglich 0,1% Zinsen auf deine Goldreserven.",
+        msg_town_hall_intro: "Herr, hier können Sie den Ausbau unserer glorreichen Stadt befehlen.",
+
+        msg_max_heroes: "Maximale Anzahl an Helden (10) erreicht!",
+        msg_tavern_upgrade_required: "Tavernen-Upgrade erforderlich! (Limit: {cap})",
+        msg_not_enough_gold: "Nicht genug Gold! (Benötigt: {cost})",
+        msg_no_space: "Kein Platz mehr für {building}!",
+        msg_building_built: "{building} gebaut! (-{cost} Gold)",
+        msg_building_max_level: "Dieses Gebäude ist bereits auf Maximalstufe!",
+        msg_no_upgrade_cost: "Keine Upgrade-Kosten gefunden.",
+        msg_townhall_required: "Rathaus muss zuerst verbessert werden!",
+        msg_building_upgraded: "Gebäude auf Stufe {level} verbessert! (-{cost} Gold)",
+        msg_research_max_level: "Maximalstufe erreicht!",
+        msg_library_required: "Bibliotheks-Upgrade (Stufe {level}) erforderlich!",
+        msg_research_complete: "{research} erforscht! (Stufe {level})",
+        msg_admin_gold_set: "Gold auf {amount} gesetzt!",
+        msg_admin_reset: "Stadt zurückgesetzt! Rathaus ist Stufe 1.",
+        msg_sync_error: "Konnte nicht mit der Cloud synchronisieren",
+        msg_daily_income: "Tägliches Einkommen: {total} Gold ({tax} Steuern + {interest} Zinsen)"
     }
 };

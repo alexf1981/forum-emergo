@@ -101,7 +101,7 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                     {/* DISPLAY SETTINGS */}
                     <div className="card" style={{ padding: '10px' }}>
                         <div className="settings-row" style={{ marginBottom: '10px', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <span style={{ marginBottom: '5px' }}>Taal / Language</span>
+                            <span style={{ marginBottom: '5px' }}>{t('lbl_language')}</span>
                             <div style={{ display: 'flex', gap: '10px' }}>
                                 {['en', 'nl', 'es', 'de'].map(langKey => (
                                     <button

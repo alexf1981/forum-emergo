@@ -88,10 +88,10 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
         }
         return (
             <div style={{ textAlign: 'center', padding: '20px' }}>
-                <p>Dit gebouw is nog in constructie.</p>
+                <p>{t('msg_under_construction')}</p>
                 <div style={{ margin: '20px 0', opacity: 0.5 }}>🚧 🔨 🏗️</div>
                 <button className="btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-                    Upgrade (Binnenkort)
+                    {t('btn_upgrade_soon')}
                 </button>
             </div>
         );

@@ -401,16 +401,14 @@ export const RESEARCH_TYPES = {
         name: 'Belastinghervorming',
         maxLevel: 30,
         baseCost: 250,
-        costMult: 1.2,
-        desc: "Verhoogt belastinginkomsten met 1% per niveau."
+        costMult: 1.2
     },
     interest: {
         id: 'interest',
         name: 'Bankieren',
         maxLevel: 20,
         baseCost: 1000,
-        costMult: 1.3,
-        desc: "Ontvang dagelijks 0.1% rente over je goudvoorraad."
+        costMult: 1.3
     }
 };
 
@@ -470,31 +468,7 @@ export const calculateTaskGold = (type, townHallLevel) => {
     return base; // Virtue & Mandata give 1x reward
 };
 
-export const getBuildingBenefit = (type, level) => {
-    if (level === 0) return "-";
 
-    switch (type) {
-        case 'town_hall':
-            const mult = TOWN_HALL_MULTIPLIERS[level] || 1;
-            const reward = BASE_TASK_GOLD * mult;
-            return `Taakbeloning: ${reward}g`;
-        case 'house':
-            const pop = POPULATION_PER_LEVEL[level] || 0;
-            return `Bevolking: ${pop}`;
-        case 'library':
-            const caps = RESEARCH_CAPS[level];
-            if (!caps) return "Geen onderzoek";
-            return `Max Tax: ${caps.tax} / Bank: ${caps.interest}`;
-        case 'market':
-            if (level === 1) return "Handel Vrijgespeeld";
-            return "Betere prijzen";
-        case 'tavern':
-            const heroCap = TAVERN_CAPS[level] || 0;
-            return `Max ${heroCap} held(en)`;
-        default:
-            return "Onbekend effect";
-    }
-};
 
 // Tavern Caps
 export const TAVERN_CAPS = {
@@ -510,20 +484,4 @@ export function getTavernCap(level) {
 }
 
 
-export const getBuildingName = (type, level) => {
-    if (type === 'house') {
-        return HOUSE_LEVELS[level]?.name || `Woonhuis ${level}`;
-    }
-    const baseNames = {
-        town_hall: "Stadhuis",
-        library: "Bibliotheek",
-        market: "Markt",
-        tavern: "Taverne",
-        house: "Woonhuis"
-    };
-    const base = baseNames[type] || type;
 
-    // Roman numerals for levels
-    const romans = ["", "I", "II", "III", "IV", "V"];
-    return `${base} ${romans[level] || level}`;
-};

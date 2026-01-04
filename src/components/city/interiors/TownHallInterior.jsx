@@ -1,7 +1,8 @@
-import React from 'react';
+import { useLanguage } from '../../../context/LanguageContext';
 import * as GameLogic from '../../../logic/gameLogic';
 
 const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats }) => {
+    const { t } = useLanguage();
 
     // Helper to check if a specific type can be built (is there an empty slot?)
     const canBuild = (type) => {
@@ -17,7 +18,7 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
     const getHouseStatus = () => {
         const total = buildings.filter(b => b.type === 'house').length;
         const built = buildings.filter(b => b.type === 'house' && b.level > 0).length;
-        return `${built}/${total} gebouwd`;
+        return `${built}/${total} ${t('msg_built')}`;
     };
 
     const handleBuild = (type) => {
@@ -40,10 +41,10 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
         if (type === 'house') {
             const hasSpace = canBuild('house');
             isCompleted = !hasSpace;
-            statusText = isCompleted ? 'Voltooid' : '';
+            statusText = isCompleted ? t('lbl_completed') : '';
         } else {
             isCompleted = built;
-            statusText = isCompleted ? 'Voltooid' : '';
+            statusText = isCompleted ? t('lbl_completed') : '';
         }
 
         return (
@@ -115,7 +116,7 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
                             }}
                         >
                             {isCompleted ? (
-                                <span>Voltooid</span>
+                                <span>{t('lbl_completed')}</span>
                             ) : (
                                 <>
                                     <span>🪙</span>
@@ -139,32 +140,32 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
             }}></div>
 
             <p style={{ marginBottom: '20px', fontStyle: 'italic', fontWeight: 'bold' }}>
-                Heer, hier kunt u opdrachten geven tot de uitbreiding van onze glorieuze stad.
+                {t('msg_town_hall_intro')}
             </p>
 
             <div className="building-options">
                 <BuildingOption
                     type="house"
-                    name="Woonhuis"
-                    cost={`${GameLogic.BUILDING_COSTS.house} Goud`}
+                    name={t('building_house')}
+                    cost={GameLogic.BUILDING_COSTS.house}
                     imagePath="./assets/city/house.png"
                 />
                 <BuildingOption
                     type="tavern"
-                    name="Taverne"
-                    cost={`${GameLogic.BUILDING_COSTS.tavern} Goud`}
+                    name={t('building_tavern')}
+                    cost={GameLogic.BUILDING_COSTS.tavern}
                     imagePath="./assets/city/tavern.png"
                 />
                 <BuildingOption
                     type="library"
-                    name="Bibliotheek"
-                    cost={`${GameLogic.BUILDING_COSTS.library} Goud`}
+                    name={t('building_library')}
+                    cost={GameLogic.BUILDING_COSTS.library}
                     imagePath="./assets/city/library.png"
                 />
                 <BuildingOption
                     type="market"
-                    name="Markt"
-                    cost={`${GameLogic.BUILDING_COSTS.market} Goud`}
+                    name={t('building_market')}
+                    cost={GameLogic.BUILDING_COSTS.market}
                     imagePath="./assets/city/market.png"
                 />
             </div>

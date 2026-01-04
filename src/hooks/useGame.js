@@ -3,6 +3,7 @@ import { useLocalStorage } from './useLocalStorage';
 import * as GameLogic from '../logic/gameLogic';
 import { useAuth } from '../context/AuthContext';
 import { DataService } from '../services/dataService';
+import { useLanguage } from '../context/LanguageContext';
 
 export function useGame() {
     // === STATE ===
@@ -13,6 +14,8 @@ export function useGame() {
     const [buildings, setBuildings] = useLocalStorage('romebuildings', GameLogic.INITIAL_BUILDINGS);
     const [resources, setResources] = useLocalStorage('romeresources', GameLogic.INITIAL_RESOURCES);
     const [research, setResearch] = useLocalStorage('romeresearch', {});
+
+    const { t } = useLanguage();
 
     // Notifications State (Local UI state, not persisted)
     const [notifications, setNotifications] = useState([]);
@@ -144,7 +147,7 @@ export function useGame() {
     const recruitHero = () => {
         // 1. Global Max Check (10)
         if (heroes.length >= 10) {
-            notify("Maximaal aantal helden (10) bereikt!", "error");
+            notify({ key: 'msg_max_heroes' }, "error");
             return;
         }
 
@@ -154,7 +157,7 @@ export function useGame() {
         const currentCap = GameLogic.getTavernCap(tavernLevel);
 
         if (heroes.length >= currentCap) {
-            notify(`Taveerne upgrade vereist! (Huidig limiet: ${currentCap})`, "error");
+            notify({ key: 'msg_tavern_upgrade_required', args: { cap: currentCap } }, "error");
             return;
         }
 
@@ -181,7 +184,7 @@ export function useGame() {
         // 1. Cost Check
         const cost = GameLogic.getDynamicBuildingCost(type, buildings);
         if (stats.gold < cost) {
-            notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
+            notify({ key: 'msg_not_enough_gold', args: { cost } }, "error");
             return;
         }
 
@@ -189,9 +192,9 @@ export function useGame() {
         if (result.success) {
             setBuildings(result.newBuildings);
             setStats(s => ({ ...s, gold: s.gold - cost }));
-            notify(`${type} gebouwd! (-${cost} goud)`, "success");
+            notify({ key: 'msg_building_built', args: { building: t(`building_${type}`), cost } }, "success");
         } else {
-            notify(result.msg, "error");
+            notify({ key: 'msg_no_space', args: { building: t(`building_${type}`) } }, "error");
         }
     };
 
@@ -211,11 +214,11 @@ export function useGame() {
         } else {
             // Fallback or "Max Level" check
             if (nextLevel > 5) {
-                notify("Dit gebouw is al maximaal niveau!", "info");
+                notify({ key: 'msg_building_max_level' }, "info");
                 return;
             }
             // Generic fallback if not defined?
-            notify("Geen upgrade kosten gevonden voor dit gebouw.", "error");
+            notify({ key: 'msg_no_upgrade_cost' }, "error");
             return;
         }
 
@@ -223,19 +226,19 @@ export function useGame() {
         if (type !== 'town_hall') {
             const townHallLevel = GameLogic.getTownHallLevel(buildings);
             if (nextLevel > townHallLevel) {
-                notify("Stadhuis moet eerst geüpgraded worden!", "error");
+                notify({ key: 'msg_townhall_required' }, "error");
                 return;
             }
         }
 
         if (stats.gold < cost) {
-            notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
+            notify({ key: 'msg_not_enough_gold', args: { cost } }, "error");
             return;
         }
 
         setBuildings(prev => GameLogic.upgradeBuilding(prev, id));
         setStats(s => ({ ...s, gold: s.gold - cost }));
-        notify(`Gebouw geüpgraded naar niveau ${nextLevel}! (-${cost} goud)`, "success");
+        notify({ key: 'msg_building_upgraded', args: { level: nextLevel, cost } }, "success");
     };
 
     const moveBuilding = (id, x, y) => {
@@ -250,7 +253,7 @@ export function useGame() {
 
         // Global Max Level Check
         if (currentLevel >= rType.maxLevel) {
-            notify("Maximaal niveau bereikt!", "info");
+            notify({ key: 'msg_research_max_level' }, "info");
             return;
         }
 
@@ -258,24 +261,24 @@ export function useGame() {
         const libLevel = GameLogic.getLibraryLevel(buildings);
         const cap = GameLogic.getResearchCap(typeId, libLevel);
         if (currentLevel >= cap) {
-            notify(`Bibliotheek upgrade (Niveau ${libLevel + 1}) vereist voor verder onderzoek!`, "error");
+            notify({ key: 'msg_library_required', args: { level: libLevel + 1 } }, "error");
             return;
         }
 
         if (stats.gold < cost) {
-            notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
+            notify({ key: 'msg_not_enough_gold', args: { cost } }, "error");
             return;
         }
 
         setStats(s => ({ ...s, gold: s.gold - cost }));
         setResearch(prev => ({ ...prev, [typeId]: currentLevel + 1 }));
-        notify(`${rType.name} onderzocht! (Niveau ${currentLevel + 1})`, "success");
+        notify({ key: 'msg_research_complete', args: { research: t(`research_${typeId}`), level: currentLevel + 1 } }, "success");
     };
 
     // === ADMIN ACTIONS ===
     const adminSetGold = (amount) => {
         setStats(prev => ({ ...prev, gold: parseInt(amount, 10) }));
-        notify(`Goud gezet op ${amount}!`, "success");
+        notify({ key: 'msg_admin_gold_set', args: { amount } }, "success");
     };
 
     const adminResetCity = () => {
@@ -288,7 +291,7 @@ export function useGame() {
         // Providing full reset as per previous context:
         // setStats({ gold: 500, population: 0, happiness: 100 }); 
         // But let's stick to just clearing the "Board" (Buildings + Units) + Research
-        notify("Stad ontruimd! Stadhuis is level 1.", "success");
+        notify({ key: 'msg_admin_reset' }, "success");
     };
 
 
@@ -349,7 +352,7 @@ export function useGame() {
                 } catch (error) {
                     console.error("Sync error:", error);
                     setSaveStatus('error');
-                    notify("Kon niet synchroniseren met de cloud", "error"); // "Could not sync with cloud"
+                    notify({ key: 'msg_sync_error' }, "error"); // "Could not sync with cloud"
                 } finally {
                     // Whether success or fail, we attempted sync.
                     // If fail, we arguably might not want to overwrite cloud with local, but 
@@ -414,8 +417,7 @@ export function useGame() {
 
         if (income.total > 0) {
             setStats(s => ({ ...s, gold: s.gold + income.total }));
-            const msg = `Dagelijks inkomen: ${income.total} Goud (${income.taxIncome} Belasting + ${income.interestIncome} Rente)`;
-            notify(msg, "success");
+            notify({ key: 'msg_daily_income', args: { total: income.total, tax: income.taxIncome, interest: income.interestIncome } }, "success");
         }
 
         setLastWelcomeDate(today); // Updates state -> trigger save

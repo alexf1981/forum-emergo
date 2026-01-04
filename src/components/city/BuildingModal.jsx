@@ -6,6 +6,41 @@ import * as GameLogic from '../../logic/gameLogic';
 const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, formatNumber, playerGold }) => {
     const { t } = useLanguage();
 
+    // Helper: Localized Building Name with Roman Numeral
+    const getLocalizedName = (type, level) => {
+        const base = t(`building_${type}`);
+        const romans = ["", "I", "II", "III", "IV", "V"];
+        const num = (level >= 1 && level < romans.length) ? romans[level] : level;
+        return `${base} ${num}`;
+    };
+
+    // Helper: Localized Benefit Text
+    const getLocalizedBenefit = (type, level) => {
+        if (level === 0) return "-";
+
+        switch (type) {
+            case 'town_hall':
+                const mult = GameLogic.TOWN_HALL_MULTIPLIERS[level] || 1;
+                const reward = GameLogic.BASE_TASK_GOLD * mult;
+                return t('benefit_town_hall', { amount: reward });
+            case 'house':
+                const pop = GameLogic.POPULATION_PER_LEVEL[level] || 0;
+                return t('benefit_house', { amount: pop });
+            case 'library':
+                const caps = GameLogic.RESEARCH_CAPS[level];
+                if (!caps) return "-";
+                return t('benefit_library', { tax: caps.tax, interest: caps.interest });
+            case 'market':
+                if (level === 1) return t('benefit_market_unlock');
+                return t('benefit_market_prices');
+            case 'tavern':
+                const heroCap = GameLogic.TAVERN_CAPS[level] || 0;
+                return t('benefit_tavern', { amount: heroCap });
+            default:
+                return t('benefit_unknown');
+        }
+    };
+
     return (
         <div className="building-modal-overlay" style={{
             position: 'fixed',
@@ -65,7 +100,7 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                             alignItems: 'center'
                         }}>
                             <h2 style={{ margin: 0, fontFamily: 'Trajan Pro, serif', fontSize: '1.2rem', textShadow: '2px 2px 0px #000' }}>
-                                {building.name} <span style={{ fontSize: '0.6em', color: '#ddd' }}>(Lvl {building.level})</span>
+                                {getLocalizedName(building.type || building.id, building.level)} <span style={{ fontSize: '0.6em', color: '#ddd' }}>({t('lbl_level')} {building.level})</span>
                             </h2>
                             {(() => {
                                 // Logic inside IIFE to keep it self-contained within this render block for the header
@@ -88,7 +123,7 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                                             justifyContent: 'center',
                                             alignItems: 'center'
                                         }}>
-                                            MAX
+                                            {t('lbl_max')}
                                         </button>
                                     );
                                 }
@@ -130,7 +165,7 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                                         }}
                                     >
                                         {isRestricted ? (
-                                            <><span>🔒</span><span>Locked</span></>
+                                            <><span>🔒</span><span style={{ fontWeight: 'bold' }}>{t('lbl_locked')}</span></>
                                         ) : (
                                             <>
                                                 <span>⬆️</span>
@@ -166,7 +201,7 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                     /* Standard Header (only if no image) */
                     <div className="modal-header" style={{ borderBottom: '2px solid #8d6e63' }}>
                         <h2 style={{ margin: 0, color: '#5d4037' }}>
-                            {building.name} <span style={{ fontSize: '0.6em', color: '#8d6e63' }}>(Lvl {building.level})</span>
+                            {getLocalizedName(building.type || building.id, building.level)} <span style={{ fontSize: '0.6em', color: '#8d6e63' }}>({t('lbl_level')} {building.level})</span>
                         </h2>
                         <button className="btn-icon" onClick={onClose} style={{ color: '#5d4037' }}><Icons.X /></button>
                     </div>
@@ -182,7 +217,7 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                     {/* UPGRADE TABLE - HouseInterior Style */}
                     <div style={{ marginTop: '20px', color: '#2c3e50' }}>
                         <h3 style={{ borderBottom: '2px solid #7f8c8d', paddingBottom: '5px', marginBottom: '10px', fontSize: '1.1rem' }}>
-                            {building.name ? building.name.split(' ')[0] : 'Gebouw'} Statistieken
+                            {t(`building_${building.type}`)} {t('lbl_stats')}
                         </h3>
 
                         {/* Removed specific scrolling implementation here to let the modal body scroll */}
@@ -190,18 +225,18 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                             <table className="upgrade-table">
                                 <thead>
                                     <tr style={{ background: '#ecf0f1', borderBottom: '2px solid #bdc3c7' }}>
-                                        <th className="upgrade-cell">Lvl</th>
-                                        <th className="upgrade-cell">Naam</th>
-                                        <th className="upgrade-cell">Effect</th>
-                                        <th className="upgrade-cell">Kosten</th>
+                                        <th className="upgrade-cell">{t('lbl_level')}</th>
+                                        <th className="upgrade-cell">{t('lbl_name')}</th>
+                                        <th className="upgrade-cell">{t('lbl_effect')}</th>
+                                        <th className="upgrade-cell">{t('lbl_cost')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {[1, 2, 3, 4, 5].map(lvl => {
                                         const type = building.type || building.id;
                                         const cost = GameLogic.UPGRADE_COSTS[type]?.[lvl] || (lvl === 1 ? GameLogic.BUILDING_COSTS[type] : 0);
-                                        const benefit = GameLogic.getBuildingBenefit(type, lvl);
-                                        const name = GameLogic.getBuildingName ? GameLogic.getBuildingName(type, lvl) : `${type} ${lvl}`;
+                                        const benefit = getLocalizedBenefit(type, lvl);
+                                        const name = getLocalizedName(type, lvl);
                                         const isCurrent = building.level === lvl;
 
                                         return (
@@ -228,7 +263,7 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                             </table>
                         </div>
                         <div style={{ marginTop: '10px', fontStyle: 'italic', fontSize: '0.8rem', color: '#7f8c8d' }}>
-                            * Upgrade gebouwen om je stad te laten groeien.
+                            * {t('txt_upgrade_building')}
                         </div>
                     </div>
                 </div>

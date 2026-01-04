@@ -21,7 +21,7 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber, buildings }) =
                 borderRadius: '8px'
             }}>
                 <div style={{ textAlign: 'center' }}>
-                    <strong style={{ color: '#3e2723' }}>Rekruteer een Nieuwe Held</strong>
+                    <strong style={{ color: '#3e2723' }}>{t('header_tavern')}</strong>
                 </div>
 
                 {(() => {
@@ -49,12 +49,11 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber, buildings }) =
                         btnColor = '#95a5a6'; // Grey
                         btnDisabled = true;
                         cursorStyle = 'not-allowed';
-                        btnContent = <span>MAX</span>;
+                        btnContent = <span>{t('lbl_max')}</span>;
                     } else if (isLevelCapped) {
                         btnColor = '#7f8c8d'; // Grey
                         btnDisabled = false; // Clickable for toast
                         // cursorStyle = 'pointer'; // Keep pointer to encourage click for info
-                        btnContent = <span>🔒 Upgrade Taverne</span>;
                         // Or just Lock icon? User asked: "staat er een slotje op grijze knop"
                         btnContent = <span style={{ fontSize: '1.2rem' }}>🔒</span>;
                     } else if (!canAfford) {
@@ -107,10 +106,10 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber, buildings }) =
             </div>
 
             <div style={{ marginTop: '20px', fontSize: '0.9rem' }}>
-                <h4 style={{ borderBottom: '1px solid #8d6e63', paddingBottom: '5px', color: '#3e2723' }}>Huidige Helden ({heroes.length}/10)</h4>
+                <h4 style={{ borderBottom: '1px solid #8d6e63', paddingBottom: '5px', color: '#3e2723' }}>{t('lbl_current_heroes', { count: heroes.length, max: 10 })}</h4>
                 <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {heroes.length === 0 ? (
-                        <div style={{ color: '#5d4037', fontStyle: 'italic', textAlign: 'center' }}>Geen helden in dienst...</div>
+                        <div style={{ color: '#5d4037', fontStyle: 'italic', textAlign: 'center' }}>{t('msg_no_heroes')}</div>
                     ) : (
                         heroes.map(hero => (
                             <div key={hero.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 10px', background: 'rgba(93, 64, 55, 0.15)', borderRadius: '4px', border: '1px solid rgba(141, 110, 99, 0.3)' }}>
