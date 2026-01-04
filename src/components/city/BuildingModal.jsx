@@ -187,13 +187,13 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
 
                         {/* Removed specific scrolling implementation here to let the modal body scroll */}
                         <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', minWidth: '300px', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                            <table className="upgrade-table">
                                 <thead>
                                     <tr style={{ background: '#ecf0f1', borderBottom: '2px solid #bdc3c7' }}>
-                                        <th style={{ padding: '10px', textAlign: 'left' }}>Lvl</th>
-                                        <th style={{ padding: '10px', textAlign: 'left' }}>Naam</th>
-                                        <th style={{ padding: '10px', textAlign: 'left' }}>Effect</th>
-                                        <th style={{ padding: '10px', textAlign: 'left' }}>Kosten</th>
+                                        <th className="upgrade-cell">Lvl</th>
+                                        <th className="upgrade-cell">Naam</th>
+                                        <th className="upgrade-cell">Effect</th>
+                                        <th className="upgrade-cell">Kosten</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -211,10 +211,10 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                                                 color: isCurrent ? '#2980b9' : '#2c3e50',
                                                 borderBottom: '1px solid #bdc3c7'
                                             }}>
-                                                <td style={{ padding: '10px' }}>{lvl}</td>
-                                                <td style={{ padding: '10px' }}>{name}</td>
-                                                <td style={{ padding: '10px' }}>{benefit}</td>
-                                                <td style={{ padding: '10px' }}>
+                                                <td className="upgrade-cell">{lvl}</td>
+                                                <td className="upgrade-cell">{name}</td>
+                                                <td className="upgrade-cell">{benefit}</td>
+                                                <td className="upgrade-cell">
                                                     {lvl === 1 && cost === 0 ? '-' : (
                                                         <>
                                                             {formatNumber ? formatNumber(cost) : cost} <span style={{ fontSize: '0.8em' }}>🪙</span>
@@ -237,6 +237,27 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                
+                .upgrade-table {
+                    width: 100%;
+                    min-width: 300px;
+                    border-collapse: collapse;
+                    font-size: 0.9rem;
+                }
+                .upgrade-cell {
+                    padding: 10px;
+                    text-align: left;
+                }
+                
+                @media (max-width: 400px) {
+                    .upgrade-table {
+                        font-size: 0.8rem;
+                        min-width: 100%; /* Allow shrinking below 300px */
+                    }
+                    .upgrade-cell {
+                        padding: 6px 4px; /* Tighter padding */
+                    }
+                }
             `}</style>
         </div>
     );
