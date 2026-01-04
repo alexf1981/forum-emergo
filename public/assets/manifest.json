@@ -3,7 +3,7 @@
   "short_name": "Forum Emergo",
   "start_url": "../",
   "scope": "../",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#F5F5F0",
   "theme_color": "#8E1600",
   "orientation": "portrait-primary",
