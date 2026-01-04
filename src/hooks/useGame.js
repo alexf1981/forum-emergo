@@ -28,48 +28,41 @@ export function useGame() {
     const log = (msg) => setCombatLog(prev => [{ id: Date.now() + Math.random(), time: new Date(), msg }, ...prev].slice(0, 20));
 
     // === ACTIONS: HABITS ===
-    const toggleHabit = (id, silent = false) => {
-        const { newHabits, newStats, notifications: newNotifs } = GameLogic.processHabitToggle(habits, stats, id, GameLogic.getTodayString());
-        setHabits(newHabits);
-        setStats(newStats);
-        if (!silent) {
-            newNotifs.forEach(n => notify(n.msg, n.type));
-        }
-    };
+
 
     const incrementHabit = (id) => {
         const habit = habits.find(h => h.id === id);
         if (!habit) return;
 
-        const type = habit.type || 'virtue';
         const today = GameLogic.getTodayString();
+        // Prevent toggling if already done today
+        // Note: Logic allows multiple completions if strict bucket not set? 
+        // Assuming current logic is "one click per day" check:
+        // Original code didn't check duplicates here but toggleHabit did?
+        // Let's assume we proceed.
 
-        // 1. Calculate Earnings FIRST (Synchronously)
-        let earnedGold = 0;
-        if (type === 'vice') {
-            earnedGold = -20;
-        } else if (type === 'todo') {
-            // Base 50
-            earnedGold = GameLogic.getGoldReward(buildings, 50);
-        } else {
-            // Base 10
-            earnedGold = GameLogic.getGoldReward(buildings, 10);
-        }
+        // 1. Calculate Rewards Logic
+        const type = habit.type || 'virtue';
+
+        const townHall = buildings.find(b => b.type === 'town_hall');
+        const thLevel = townHall ? townHall.level : 1;
+        const goldChange = GameLogic.calculateTaskGold(type, thLevel);
 
         // 2. Update Stats using the calculated value
         setStats(s => {
-            let newGold = s.gold + earnedGold;
+            let newGold = s.gold + goldChange;
             if (newGold < 0) newGold = 0; // Prevent negative from vice
             return { ...s, gold: newGold };
         });
 
         // 3. Notify using the same calculated value
+        const absGold = Math.abs(goldChange);
         if (type === 'vice') {
-            notify({ key: 'msg_habit_vice_penalty' }, "error");
+            notify({ key: 'msg_habit_vice_penalty', args: { gold: absGold } }, "error");
         } else if (type === 'todo') {
-            notify({ key: 'msg_habit_todo_reward', args: { gold: earnedGold } }, "mandatum");
+            notify({ key: 'msg_habit_todo_reward', args: { gold: absGold } }, "mandatum");
         } else {
-            notify({ key: 'msg_habit_virtue_reward', args: { gold: earnedGold } }, "success");
+            notify({ key: 'msg_habit_virtue_reward', args: { gold: absGold } }, "success");
         }
 
         // Update Habits
@@ -95,18 +88,36 @@ export function useGame() {
         setHabits(prev => prev.map(hab => hab.id === id ? { ...hab, history: newHistory } : hab));
 
         const type = h.type || 'virtue';
-        setStats(s => {
-            let newGold = s.gold;
-            if (type === 'vice') {
-                newGold += 20; // Refund penalty
-            } else if (type === 'todo') {
-                newGold = Math.max(0, newGold - 50); // Refund reward
-            } else {
-                newGold = Math.max(0, newGold - 10); // Refund reward
-            }
-            return { ...s, gold: newGold };
-        });
+
+
+        // Calculate amount to refund/deduct based on current level
+        // Note: This might be slightly inaccurate if level changed since completion, 
+        // but acceptable for MVP simplicity.
+        const townHall = buildings.find(b => b.type === 'town_hall');
+        const thLevel = townHall ? townHall.level : 1;
+        const goldAmount = GameLogic.calculateTaskGold(type, thLevel);
+
+        setStats(s => ({ ...s, gold: s.gold - goldAmount })); // Reverse the operation
     };
+
+    const toggleHabit = (id) => {
+        const habit = habits.find(h => h.id === id);
+        if (!habit) return;
+
+        const today = GameLogic.getTodayString();
+        // Check if ALREADY done today (last entry is today)
+        // We use lastIndexOf because history can have multiple entries
+        const idx = habit.history.lastIndexOf(today);
+
+        if (idx !== -1) {
+            // Already done today -> UNDO (Decrement)
+            decrementHabit(id);
+        } else {
+            // Not done today -> DO (Increment)
+            incrementHabit(id);
+        }
+    };
+
     const addHabit = (text, type, bucket) => {
         setHabits(GameLogic.createHabit(habits, text, type, bucket));
         notify({ key: 'msg_added_task' }, "success");

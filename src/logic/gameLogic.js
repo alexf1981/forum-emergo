@@ -459,6 +459,16 @@ export function getLibraryLevel(buildings) {
     return lib ? lib.level : 0;
 }
 
+
+
+export const calculateTaskGold = (type, townHallLevel) => {
+    const mult = TOWN_HALL_MULTIPLIERS[townHallLevel] || 1;
+    const base = BASE_TASK_GOLD * mult;
+
+    if (type === 'vice') return -(base * 2); // Vice costs double the reward
+    return base; // Virtue & Mandata give 1x reward
+};
+
 export const getBuildingBenefit = (type, level) => {
     if (level === 0) return "-";
 
