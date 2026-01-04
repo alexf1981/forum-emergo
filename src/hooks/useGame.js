@@ -235,6 +235,7 @@ export function useGame() {
 
     const adminResetCity = () => {
         setBuildings(GameLogic.INITIAL_BUILDINGS);
+        setResearch({});
         notify("Stad ontruimd! Stadhuis is level 1.", "success");
     };
 
