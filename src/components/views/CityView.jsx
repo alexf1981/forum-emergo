@@ -7,10 +7,13 @@ import HabitItem from '../HabitItem';
 
 import CityVisual from '../CityVisual';
 
-const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit, onDecrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, onMoveHabit, onNotify, formatNumber }) => {
+const CityView = ({ habits, stats, buildings, rank, score, onToggleHabit, onIncrementHabit, onDecrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, onMoveHabit, onNotify, formatNumber }) => {
     const { t } = useLanguage();
     const { playerName } = useAuth();
     const [editingHabitId, setEditingHabitId] = useState(null);
+
+    // Calculate Population for Image
+    const population = buildings ? GameLogic.getCityPopulation(buildings) : 0;
 
     const handleSaveEdit = (id, newText, newBucket) => {
         onUpdateHabit(id, newText, newBucket);
@@ -78,7 +81,7 @@ const CityView = ({ habits, stats, rank, score, onToggleHabit, onIncrementHabit,
         <div className="city-dashboard">
             <div className="main-grid">
                 <div className="city-visual-section card">
-                    <CityVisual rank={rank} score={score} formatNumber={formatNumber} playerName={playerName} />
+                    <CityVisual rank={rank} score={score} population={population} formatNumber={formatNumber} playerName={playerName} />
                 </div>
 
                 <main className="city-dashboard-content">

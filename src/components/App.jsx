@@ -250,6 +250,7 @@ function App() {
                     <CityView
                         habits={habits}
                         stats={stats}
+                        buildings={buildings} // Passed for population calculation
                         rank="rank_1" // TODO: derive from stats
                         score={0}     // TODO: derive
                         onToggleHabit={actions.toggleHabit}
