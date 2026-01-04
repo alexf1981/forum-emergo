@@ -13,7 +13,7 @@ export const translations = {
         confirm: "Confirm",
         confirm: "Confirm",
         logged_in_as: "Logged in as",
-        subtitle: "Build your empire, conquer the world",
+        subtitle: "Strengthen your habits. Shape your empire.",
         // Welcome
         welcome_text: "Ave Emperor! Enter Forum Emergo. Strengthen your habits. Shape your empire.",
         welcome_has_account: "Have an account?",
@@ -186,7 +186,7 @@ export const translations = {
         confirm: "Bevestigen",
         confirm: "Bevestigen",
         logged_in_as: "Ingelogd als",
-        subtitle: "Bouw je imperium, verover de wereld",
+        subtitle: "Versterk je gewoontes. Vorm je rijk.",
         // Welcome
         welcome_text: "Ave Keizer! Betreed Forum Emergo. Versterk je gewoontes. Vorm je rijk.",
         welcome_has_account: "Heb je al een account?",
@@ -359,7 +359,7 @@ export const translations = {
         confirm: "Confirmar",
         confirm: "Confirmar",
         logged_in_as: "Conectado como",
-        subtitle: "Construye tu imperio, conquista el mundo",
+        subtitle: "Refuerza tus hábitos. Forma tu imperio.",
         // Welcome
         welcome_text: "¡Ave Emperador! Entra en el Foro Emergo. Refuerza tus hábitos. Forma tu imperio.",
         welcome_has_account: "¿Tienes cuenta?",
@@ -532,7 +532,7 @@ export const translations = {
         confirm: "Bestätigen",
         confirm: "Bestätigen",
         logged_in_as: "Angemeldet als",
-        subtitle: "Baue dein Imperium, erobere die Welt",
+        subtitle: "Stärke deine Gewohnheiten. Forme dein Reich.",
         // Welcome
         welcome_text: "Ave Imperator! Betritt Forum Emergo. Stärke deine Gewohnheiten. Forme dein Reich.",
         welcome_has_account: "Bereits ein Konto?",
