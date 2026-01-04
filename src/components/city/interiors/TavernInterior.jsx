@@ -26,33 +26,39 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber }) => {
                 <button
                     className="btn"
                     onClick={onRecruit}
-                    // disabled={false} // Always clickable for toast feedback
+                    disabled={heroes.length >= 10} // Disable if full
                     style={{
                         padding: '8px 16px',
                         fontSize: '1rem',
                         fontWeight: 'bold',
-                        backgroundColor: stats.gold >= recruitCost ? '#27ae60' : '#7f8c8d', // Grey if poor
+                        backgroundColor: heroes.length >= 10 ? '#95a5a6' : (stats.gold >= recruitCost ? '#27ae60' : '#7f8c8d'),
                         color: 'white',
                         border: '1px solid #fff',
                         borderRadius: '4px',
-                        cursor: 'pointer',
-                        opacity: stats.gold >= recruitCost ? 1 : 0.6,
+                        cursor: heroes.length >= 10 ? 'not-allowed' : 'pointer',
+                        opacity: (heroes.length >= 10 || stats.gold < recruitCost) ? 0.6 : 1,
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
                         gap: '8px',
                         minWidth: '120px',
-                        boxShadow: stats.gold >= recruitCost ? '0 2px 5px rgba(0,0,0,0.5)' : 'none'
+                        boxShadow: (heroes.length < 10 && stats.gold >= recruitCost) ? '0 2px 5px rgba(0,0,0,0.5)' : 'none'
                     }}
                 >
-                    <span>🍺</span>
-                    <span>{formatNumber(recruitCost)}</span>
+                    {heroes.length >= 10 ? (
+                        <span>Vol (10/10)</span>
+                    ) : (
+                        <>
+                            <span>🍺</span>
+                            <span>{formatNumber(recruitCost)}</span>
+                        </>
+                    )}
                 </button>
             </div>
 
             <div style={{ marginTop: '20px', fontSize: '0.9rem' }}>
-                <h4 style={{ borderBottom: '1px solid #8d6e63', paddingBottom: '5px', color: '#3e2723' }}>Huidige Helden ({heroes.length})</h4>
-                <div style={{ maxHeight: '150px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '10px' }}>
+                <h4 style={{ borderBottom: '1px solid #8d6e63', paddingBottom: '5px', color: '#3e2723' }}>Huidige Helden ({heroes.length}/10)</h4>
+                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {heroes.length === 0 ? (
                         <div style={{ color: '#5d4037', fontStyle: 'italic', textAlign: 'center' }}>Geen helden in dienst...</div>
                     ) : (

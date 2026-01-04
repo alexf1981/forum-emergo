@@ -131,6 +131,7 @@ export function useGame() {
 
     // === ACTIONS: HEROES ===
     const recruitHero = () => {
+        if (heroes.length >= 10) { notify("Maximaal aantal helden (10) bereikt!", "error"); return; }
         if (stats.gold < 100) { notify({ key: 'msg_recruit_fail_gold' }, "error"); return; }
         const name = GameLogic.HERO_NAMES[Math.floor(Math.random() * GameLogic.HERO_NAMES.length)];
         const newHero = { id: Date.now(), name, lvl: 1, xp: 0, hp: 20, maxHp: 20, str: Math.floor(Math.random() * 3) + 3, items: [] };

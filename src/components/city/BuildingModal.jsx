@@ -27,9 +27,9 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
             {/* Modal Content - Floating Page */}
             <div className="modal-content" style={{
                 position: 'relative',
-                width: '100%',
+                width: '95%', // Responsive width
                 maxWidth: '600px',
-                maxHeight: '100%', // Use flex parent limits (padding handles the max height implicitly)
+                maxHeight: '85vh', // Ensure it fits in viewport height
                 display: 'flex',
                 flexDirection: 'column',
                 padding: '0',
@@ -186,8 +186,8 @@ const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, form
                         </h3>
 
                         {/* Removed specific scrolling implementation here to let the modal body scroll */}
-                        <div style={{}}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', minWidth: '300px', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                                 <thead>
                                     <tr style={{ background: '#ecf0f1', borderBottom: '2px solid #bdc3c7' }}>
                                         <th style={{ padding: '10px', textAlign: 'left' }}>Lvl</th>

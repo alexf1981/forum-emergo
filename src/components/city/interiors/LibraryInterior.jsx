@@ -22,6 +22,7 @@ const LibraryInterior = ({ research, doResearch, stats, buildings }) => {
                 borderRadius: '8px',
                 border: '1px solid #dcdde1',
                 display: 'flex',
+                flexWrap: 'wrap', // Responsive wrapping
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 gap: '15px'
@@ -30,7 +31,7 @@ const LibraryInterior = ({ research, doResearch, stats, buildings }) => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#2c3e50' }}>{def.name}</h3>
                         <span style={{ background: '#34495e', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem' }}>
-                            Lvl {level} / {cap} (Global Max: {def.maxLevel})
+                            Lvl {level} / {cap}
                         </span>
                     </div>
                     <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#7f8c8d' }}>
