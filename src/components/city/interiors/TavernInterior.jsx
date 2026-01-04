@@ -1,7 +1,8 @@
 import React from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
+import * as GameLogic from '../../../logic/gameLogic';
 
-const TavernInterior = ({ heroes, stats, onRecruit, formatNumber }) => {
+const TavernInterior = ({ heroes, stats, onRecruit, formatNumber, buildings }) => {
     const { t } = useLanguage();
     const recruitCost = 100; // Hardcoded for now, could be passed or derived
 
@@ -23,37 +24,86 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber }) => {
                     <strong style={{ color: '#3e2723' }}>Rekruteer een Nieuwe Held</strong>
                 </div>
 
-                <button
-                    className="btn"
-                    onClick={onRecruit}
-                    disabled={heroes.length >= 10} // Disable if full
-                    style={{
-                        padding: '8px 16px',
-                        fontSize: '1rem',
-                        fontWeight: 'bold',
-                        backgroundColor: heroes.length >= 10 ? '#95a5a6' : (stats.gold >= recruitCost ? '#27ae60' : '#7f8c8d'),
-                        color: 'white',
-                        border: '1px solid #fff',
-                        borderRadius: '4px',
-                        cursor: heroes.length >= 10 ? 'not-allowed' : 'pointer',
-                        opacity: (heroes.length >= 10 || stats.gold < recruitCost) ? 0.6 : 1,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '8px',
-                        minWidth: '120px',
-                        boxShadow: (heroes.length < 10 && stats.gold >= recruitCost) ? '0 2px 5px rgba(0,0,0,0.5)' : 'none'
-                    }}
-                >
-                    {heroes.length >= 10 ? (
-                        <span>Vol (10/10)</span>
-                    ) : (
-                        <>
-                            <span>🍺</span>
-                            <span>{formatNumber(recruitCost)}</span>
-                        </>
-                    )}
-                </button>
+                {(() => {
+                    const tavern = buildings ? buildings.find(b => b.type === 'tavern') : null;
+                    const tavernLevel = tavern ? tavern.level : 0;
+                    const tavernCap = GameLogic.TAVERN_CAPS[tavernLevel] || 0;
+
+                    const isGlobalMax = heroes.length >= 10;
+                    const isLevelCapped = !isGlobalMax && heroes.length >= tavernCap;
+                    const canAfford = stats.gold >= recruitCost;
+                    const isLocked = isLevelCapped;
+
+                    // Button Logic:
+                    // 1. Global Max -> Grey "MAX"
+                    // 2. Level Capped -> Grey "Lock"
+                    // 3. Poor -> Grey "Gold Icon + Cost"
+                    // 4. Affordable -> Green "Gold Icon + Cost"
+
+                    let btnColor = '#27ae60'; // Green
+                    let btnDisabled = false;
+                    let btnContent = null;
+                    let cursorStyle = 'pointer';
+
+                    if (isGlobalMax) {
+                        btnColor = '#95a5a6'; // Grey
+                        btnDisabled = true;
+                        cursorStyle = 'not-allowed';
+                        btnContent = <span>MAX</span>;
+                    } else if (isLevelCapped) {
+                        btnColor = '#7f8c8d'; // Grey
+                        btnDisabled = false; // Clickable for toast
+                        // cursorStyle = 'pointer'; // Keep pointer to encourage click for info
+                        btnContent = <span>🔒 Upgrade Taverne</span>;
+                        // Or just Lock icon? User asked: "staat er een slotje op grijze knop"
+                        btnContent = <span style={{ fontSize: '1.2rem' }}>🔒</span>;
+                    } else if (!canAfford) {
+                        btnColor = '#7f8c8d'; // Grey
+                        btnDisabled = false; // Clickable for toast
+                        btnContent = (
+                            <>
+                                <span>🪙</span>
+                                <span>{formatNumber(recruitCost)}</span>
+                            </>
+                        );
+                    } else {
+                        // Affordable & Available
+                        btnColor = '#27ae60';
+                        btnContent = (
+                            <>
+                                <span>🪙</span>
+                                <span>{formatNumber(recruitCost)}</span>
+                            </>
+                        );
+                    }
+
+                    return (
+                        <button
+                            className="btn"
+                            onClick={onRecruit}
+                            disabled={btnDisabled}
+                            style={{
+                                padding: '8px 16px',
+                                fontSize: '1rem',
+                                fontWeight: 'bold',
+                                backgroundColor: btnColor,
+                                color: 'white',
+                                border: '1px solid #fff',
+                                borderRadius: '4px',
+                                cursor: cursorStyle,
+                                opacity: btnDisabled ? 0.6 : 1, // Only fade if truly disabled (MAX)
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                gap: '8px',
+                                minWidth: '120px',
+                                boxShadow: (!btnDisabled && canAfford) ? '0 2px 5px rgba(0,0,0,0.5)' : 'none'
+                            }}
+                        >
+                            {btnContent}
+                        </button>
+                    );
+                })()}
             </div>
 
             <div style={{ marginTop: '20px', fontSize: '0.9rem' }}>

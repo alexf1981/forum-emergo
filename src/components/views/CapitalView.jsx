@@ -63,6 +63,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                     stats={stats}
                     onRecruit={actions.recruitHero}
                     formatNumber={formatNumber}
+                    buildings={buildings}
                 />
             );
         }

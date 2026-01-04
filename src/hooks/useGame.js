@@ -131,7 +131,22 @@ export function useGame() {
 
     // === ACTIONS: HEROES ===
     const recruitHero = () => {
-        if (heroes.length >= 10) { notify("Maximaal aantal helden (10) bereikt!", "error"); return; }
+        // 1. Global Max Check (10)
+        if (heroes.length >= 10) {
+            notify("Maximaal aantal helden (10) bereikt!", "error");
+            return;
+        }
+
+        // 2. Tavern Level Cap Check
+        const tavern = buildings.find(b => b.type === 'tavern');
+        const tavernLevel = tavern ? tavern.level : 0;
+        const currentCap = GameLogic.getTavernCap(tavernLevel);
+
+        if (heroes.length >= currentCap) {
+            notify(`Taveerne upgrade vereist! (Huidig limiet: ${currentCap})`, "error");
+            return;
+        }
+
         if (stats.gold < 100) { notify({ key: 'msg_recruit_fail_gold' }, "error"); return; }
         const name = GameLogic.HERO_NAMES[Math.floor(Math.random() * GameLogic.HERO_NAMES.length)];
         const newHero = { id: Date.now(), name, lvl: 1, xp: 0, hp: 20, maxHp: 20, str: Math.floor(Math.random() * 3) + 3, items: [] };
@@ -255,6 +270,13 @@ export function useGame() {
     const adminResetCity = () => {
         setBuildings(GameLogic.INITIAL_BUILDINGS);
         setResearch({});
+        setHeroes([]); // Clear heroes
+        setLocalBuildings(GameLogic.INITIAL_BUILDINGS);
+        // Stats reset usually optional or kept? User said "Stad ontruimen", implying buildings/units gone.
+        // Assuming we keep Gold/Pop/Happiness or should reset? 
+        // Providing full reset as per previous context:
+        // setStats({ gold: 500, population: 0, happiness: 100 }); 
+        // But let's stick to just clearing the "Board" (Buildings + Units) + Research
         notify("Stad ontruimd! Stadhuis is level 1.", "success");
     };
 

@@ -478,12 +478,26 @@ export const getBuildingBenefit = (type, level) => {
             if (level === 1) return "Handel Vrijgespeeld";
             return "Betere prijzen";
         case 'tavern':
-            if (level === 1) return "Helden Vrijgespeeld";
-            return "Betere helden";
+            const heroCap = TAVERN_CAPS[level] || 0;
+            return `Max ${heroCap} held(en)`;
         default:
-            return "-";
+            return "Onbekend effect";
     }
 };
+
+// Tavern Caps
+export const TAVERN_CAPS = {
+    1: 1,
+    2: 2,
+    3: 4,
+    4: 7,
+    5: 10
+};
+
+export function getTavernCap(level) {
+    return TAVERN_CAPS[level] || 0;
+}
+
 
 export const getBuildingName = (type, level) => {
     if (type === 'house') {
