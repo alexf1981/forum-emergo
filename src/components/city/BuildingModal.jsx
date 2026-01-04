@@ -3,7 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import Icons from '../Icons';
 import * as GameLogic from '../../logic/gameLogic';
 
-const BuildingModal = ({ building, onClose, onUpgrade, children, formatNumber, playerGold }) => {
+const BuildingModal = ({ building, buildings, onClose, onUpgrade, children, formatNumber, playerGold }) => {
     const { t } = useLanguage();
 
     return (
@@ -72,11 +72,23 @@ const BuildingModal = ({ building, onClose, onUpgrade, children, formatNumber, p
                                 if (building.level >= 5) {
                                     return (
                                         <button disabled style={{
-                                            background: '#7f8c8d', border: '1px solid #fff', color: 'white', borderRadius: '4px',
-                                            padding: '4px 8px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'default',
-                                            marginLeft: 'auto', marginRight: '30px', opacity: 0.7
+                                            background: '#95a5a6', // Grey for Max
+                                            border: '1px solid #fff',
+                                            color: 'white',
+                                            borderRadius: '4px',
+                                            padding: '8px 16px',
+                                            fontSize: '0.9rem',
+                                            fontWeight: 'bold',
+                                            cursor: 'not-allowed',
+                                            marginLeft: 'auto',
+                                            marginRight: '30px',
+                                            minWidth: '120px',
+                                            opacity: 0.7,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
                                         }}>
-                                            Max Level
+                                            MAX
                                         </button>
                                     );
                                 }
@@ -86,26 +98,45 @@ const BuildingModal = ({ building, onClose, onUpgrade, children, formatNumber, p
                                 const cost = GameLogic.UPGRADE_COSTS[type]?.[nextLvl] || 0;
                                 const canAfford = playerGold >= cost;
 
+                                let isRestricted = false;
+                                if (type !== 'town_hall' && buildings) {
+                                    const townHallLevel = GameLogic.getTownHallLevel(buildings);
+                                    if (nextLvl > townHallLevel) {
+                                        isRestricted = true;
+                                    }
+                                }
+
                                 return (
                                     <button
                                         onClick={() => onUpgrade(building.id)}
-                                        disabled={!canAfford}
                                         style={{
-                                            background: canAfford ? '#27ae60' : '#e74c3c',
+                                            background: (isRestricted || !canAfford) ? '#7f8c8d' : '#27ae60',
                                             border: '1px solid #fff',
                                             color: 'white',
                                             borderRadius: '4px',
-                                            padding: '4px 8px',
-                                            fontSize: '0.8rem',
+                                            padding: '8px 16px',
+                                            fontSize: '0.9rem',
                                             fontWeight: 'bold',
-                                            cursor: canAfford ? 'pointer' : 'not-allowed',
-                                            boxShadow: canAfford ? '0 2px 5px rgba(0,0,0,0.5)' : 'none',
+                                            cursor: 'pointer',
+                                            boxShadow: (isRestricted || !canAfford) ? 'none' : '0 2px 5px rgba(0,0,0,0.5)',
                                             marginLeft: 'auto',
                                             marginRight: '30px',
-                                            opacity: canAfford ? 1 : 0.7
+                                            minWidth: '120px',
+                                            opacity: (isRestricted || !canAfford) ? 0.6 : 1,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            gap: '8px'
                                         }}
                                     >
-                                        ⬆️ Upgrade ({formatNumber ? formatNumber(cost) : cost} 🪙)
+                                        {isRestricted ? (
+                                            <><span>🔒</span><span>Locked</span></>
+                                        ) : (
+                                            <>
+                                                <span>⬆️</span>
+                                                <span>{formatNumber ? formatNumber(cost) : cost}</span>
+                                            </>
+                                        )}
                                     </button>
                                 );
                             })()}

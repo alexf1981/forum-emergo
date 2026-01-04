@@ -427,3 +427,23 @@ export function getDailyPassiveIncome(stats, population, researchState) {
 
     return { taxIncome, interestIncome, total: taxIncome + interestIncome };
 }
+
+// Research Caps based on Library Level
+export const RESEARCH_CAPS = {
+    1: { tax: 6, interest: 4 },
+    2: { tax: 12, interest: 8 },
+    3: { tax: 18, interest: 12 },
+    4: { tax: 24, interest: 16 },
+    5: { tax: 30, interest: 20 }
+};
+
+export function getResearchCap(typeId, libraryLevel) {
+    const caps = RESEARCH_CAPS[libraryLevel];
+    if (!caps) return 0; // Should not happen if level >= 1
+    return caps[typeId] || 999;
+}
+
+export function getLibraryLevel(buildings) {
+    const lib = buildings.find(b => b.type === 'library');
+    return lib ? lib.level : 0;
+}

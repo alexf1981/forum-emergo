@@ -78,25 +78,53 @@ const TownHallInterior = ({ onClose, buildings, buildBuilding, resources, stats 
                         </div>
                     </div>
                 </div>
-                <button
-                    className="btn primary-btn-bounce"
-                    onClick={() => handleBuild(type)}
-                    disabled={isCompleted || !available}
-                    style={{
-                        padding: '8px 16px',
-                        background: '#27ae60', // Always green
-                        opacity: (isCompleted || !available) ? 0.5 : 1, // Grayed out if completed or not available
-                        cursor: (isCompleted || !available) ? 'not-allowed' : 'pointer',
-                        border: 'none',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        boxShadow: (isCompleted || !available) ? 'none' : '0 4px 0 #219150',
-                        flex: '0 0 auto', // Don't shrink
-                        marginLeft: 'auto' // Push to right if space permits
-                    }}
-                >
-                    {isCompleted ? 'Voltooid' : 'Bouwen'}
-                </button>
+                {(() => {
+                    const numericCost = GameLogic.BUILDING_COSTS[type];
+                    const canAfford = stats.gold >= numericCost;
+                    const isLocked = !available; // No space or max level global logic
+
+                    // If completed (Max houses built or unique built) -> Grey and "Voltooid" (actually isCompleted logic handles this)
+                    // If available space -> Check Afford
+
+                    // We use simplified logic:
+                    // Color: Green if (available AND canAfford), Grey otherwise
+                    const isGreen = available && canAfford && !isCompleted;
+
+                    return (
+                        <button
+                            className="btn primary-btn-bounce"
+                            onClick={() => handleBuild(type)}
+                            disabled={isCompleted}
+                            style={{
+                                padding: '8px 16px',
+                                background: isGreen ? '#27ae60' : '#7f8c8d',
+                                opacity: (isCompleted || !available) ? 0.6 : (canAfford ? 1 : 0.6),
+                                cursor: isCompleted ? 'not-allowed' : 'pointer', // Clickable if poor for toast
+                                border: '1px solid #fff',
+                                borderRadius: '4px',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                boxShadow: isGreen ? '0 2px 5px rgba(0,0,0,0.5)' : 'none',
+                                flex: '0 0 auto',
+                                marginLeft: 'auto',
+                                minWidth: '120px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                        >
+                            {isCompleted ? (
+                                <span>Voltooid</span>
+                            ) : (
+                                <>
+                                    <span>🔨</span>
+                                    <span>{numericCost}</span>
+                                </>
+                            )}
+                        </button>
+                    );
+                })()}
             </div>
         );
     };

@@ -192,6 +192,15 @@ export function useGame() {
             return;
         }
 
+        // TOWN HALL LEVEL CAP CHECK
+        if (type !== 'town_hall') {
+            const townHallLevel = GameLogic.getTownHallLevel(buildings);
+            if (nextLevel > townHallLevel) {
+                notify("Stadhuis moet eerst geüpgraded worden!", "error");
+                return;
+            }
+        }
+
         if (stats.gold < cost) {
             notify(`Niet genoeg goud! Vereist: ${cost}`, "error");
             return;
@@ -212,8 +221,17 @@ export function useGame() {
         const cost = GameLogic.getResearchCost(typeId, currentLevel);
         const rType = GameLogic.RESEARCH_TYPES[typeId];
 
+        // Global Max Level Check
         if (currentLevel >= rType.maxLevel) {
             notify("Maximaal niveau bereikt!", "info");
+            return;
+        }
+
+        // Library Cap Check
+        const libLevel = GameLogic.getLibraryLevel(buildings);
+        const cap = GameLogic.getResearchCap(typeId, libLevel);
+        if (currentLevel >= cap) {
+            notify(`Bibliotheek upgrade (Niveau ${libLevel + 1}) vereist voor verder onderzoek!`, "error");
             return;
         }
 

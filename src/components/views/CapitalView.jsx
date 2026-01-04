@@ -72,6 +72,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                     research={research}
                     doResearch={actions.doResearch}
                     stats={stats}
+                    buildings={buildings}
                 />
             );
         }
@@ -206,6 +207,7 @@ const CapitalView = ({ stats, heroes, actions, formatNumber, buildings, resource
                     onUpgrade={actions.upgradeBuilding}
                     formatNumber={formatNumber}
                     playerGold={stats.gold}
+                    buildings={buildings}
                 >
                     {renderBuildingContent()}
                 </BuildingModal>

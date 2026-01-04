@@ -26,23 +26,27 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber }) => {
                 <button
                     className="btn"
                     onClick={onRecruit}
-                    disabled={stats.gold < recruitCost}
+                    // disabled={false} // Always clickable for toast feedback
                     style={{
-                        padding: '10px 20px',
-                        fontSize: '1.1rem',
-                        backgroundColor: stats.gold >= recruitCost ? '#27ae60' : '#8d6e63',
+                        padding: '8px 16px',
+                        fontSize: '1rem',
+                        fontWeight: 'bold',
+                        backgroundColor: stats.gold >= recruitCost ? '#27ae60' : '#7f8c8d', // Grey if poor
                         color: 'white',
-                        border: '2px solid #2ecc71',
-                        borderRadius: '5px',
-                        cursor: stats.gold >= recruitCost ? 'pointer' : 'not-allowed',
+                        border: '1px solid #fff',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
                         opacity: stats.gold >= recruitCost ? 1 : 0.6,
                         display: 'flex',
+                        justifyContent: 'center',
                         alignItems: 'center',
-                        gap: '10px'
+                        gap: '8px',
+                        minWidth: '120px',
+                        boxShadow: stats.gold >= recruitCost ? '0 2px 5px rgba(0,0,0,0.5)' : 'none'
                     }}
                 >
                     <span>🍺</span>
-                    <span>Rekruteer ({formatNumber(recruitCost)}g)</span>
+                    <span>{formatNumber(recruitCost)}</span>
                 </button>
             </div>
 
