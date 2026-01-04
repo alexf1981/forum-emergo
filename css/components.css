@@ -145,18 +145,18 @@
     background: var(--color-red);
     color: white;
     padding: 2% 4%;
-    /* Relative padding */
     font-family: var(--font-heading);
     border: 2px solid #3d0a00;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     text-transform: uppercase;
-    font-size: clamp(0.7rem, 6cqi, 1.4rem);
-    /* Scale with container width */
+    font-size: clamp(0.6rem, 4.5cqi, 1.2rem);
+    /* Scaled down for long names */
     white-space: nowrap;
     text-align: center;
     font-weight: bold;
     width: auto;
-    max-width: 90%;
+    max-width: 95%;
+    /* More space */
     z-index: 5;
 }
 
@@ -169,18 +169,18 @@
     background: var(--color-red);
     color: white;
     padding: 2% 4%;
-    /* Relative padding */
     font-family: var(--font-heading);
     border: 2px solid #3d0a00;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     text-transform: uppercase;
-    font-size: clamp(0.7rem, 6cqi, 1.4rem);
-    /* Scale with container width */
+    font-size: clamp(0.55rem, 4cqi, 1.2rem);
+    /* Aggressive scaling for long ranks */
     white-space: nowrap;
     text-align: center;
     font-weight: bold;
     width: auto;
-    max-width: 90%;
+    max-width: 95%;
+    /* More space */
     z-index: 5;
 }
 
