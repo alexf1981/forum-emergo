@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://alexf1981.github.io/forum-emergo/sitemap.xml
