@@ -8,6 +8,10 @@ import AdminDashboard from './AdminDashboard';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../locales/translations';
 
+// IMPORTS needed for Reset Logic
+import { DataService } from '../services/dataService';
+import * as GameLogic from '../logic/gameLogic';
+
 const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin, onLocalLogout, actions }) => {
     const { user, playerName, updatePlayerName } = useAuth();
     const [localPlayerName, setLocalPlayerName] = useState(playerName || '');
@@ -64,6 +68,67 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
         window.location.reload();
     };
 
+    const handleResetAccount = async () => {
+        if (!window.confirm(t('msg_confirm_reset'))) return;
+
+        // 1. Construct Default State
+        // Habits: We must generate them here manually since we can't easily import "App's internal logic"
+        // Using same keys as App.jsx seeding
+        const now = Date.now();
+        const defaultHabits = [
+            { id: now + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
+            { id: now + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
+            { id: now + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
+            { id: now + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
+            { id: now + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
+        ];
+
+        const resetData = {
+            romestats: { gold: 200, know: 0, pop: 100 },
+            romeheroes: [],
+            romehabits: defaultHabits,
+            romebuildings: GameLogic.INITIAL_BUILDINGS,
+            romeresources: {},
+            romeresearch: {},
+            romeloginhistory: [],
+            romelastwelcome: ''
+        };
+
+        if (user) {
+            // Logged In: Overwrite Cloud Data
+            try {
+                await DataService.saveGameData(user.id, resetData);
+                // Also overwrite local storage to ensure immediate consistency before reload
+                window.localStorage.setItem('romestats', JSON.stringify(resetData.romestats));
+                window.localStorage.setItem('romeheroes', JSON.stringify(resetData.romeheroes));
+                window.localStorage.setItem('romehabits', JSON.stringify(resetData.romehabits));
+                window.localStorage.setItem('romebuildings', JSON.stringify(resetData.romebuildings));
+                window.localStorage.setItem('romeresources', JSON.stringify(resetData.romeresources));
+                window.localStorage.setItem('romeresearch', JSON.stringify(resetData.romeresearch));
+                window.localStorage.setItem('romeloginhistory', JSON.stringify(resetData.romeloginhistory));
+
+                // Reload to refresh game state completely
+                window.location.reload();
+            } catch (error) {
+                console.error("Reset Failed:", error);
+                alert("Reset failed: " + error.message);
+            }
+        } else {
+            // Local: Clear and Reload (triggering Welcome)
+            window.localStorage.clear();
+            // We specifically want to trigger Welcome Modal, so ensure has_visited is GONE.
+            // But wait! If we clear(), it IS gone.
+            // AND we want default habits? 
+            // If we clear and reload, App.jsx `onPlayLocal` logic (via WelcomeModal) handles the seeding.
+            // So for local user, just clearing and reloading is enough to "Start Over".
+            // Prompt says: "standaardtaken worden weer toegevoegd".
+            // App.jsx logic: if habits.length === 0, seed defaults.
+            // So simply clearing storage works.
+
+            window.location.reload();
+        }
+    };
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -71,86 +136,84 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                     <h2>{t('settings_title')}</h2>
                     <button className="btn-icon" onClick={onClose}><Icons.X /></button>
                 </div>
-                <div className="modal-body" style={{ gap: '10px' }}>
+                <div className="modal-body" style={{ gap: '8px', padding: '0 5px' }}>
 
-
-                    {/* PROFILE SECTION */}
-                    <div className="card">
-                        <div className="modal-form-group">
-                            <label>{t('player_name')}</label>
+                    {/* PLAYER & LOGIN STATUS COMBINED */}
+                    <div className="card" style={{ padding: '10px' }}>
+                        <div className="modal-form-group" style={{ marginBottom: '10px' }}>
+                            <label style={{ fontSize: '0.85em', color: '#666' }}>{t('player_name')}</label>
                             <input
                                 type="text"
                                 value={localPlayerName}
                                 onChange={(e) => setLocalPlayerName(e.target.value)}
                                 onBlur={() => updatePlayerName(localPlayerName)}
                                 placeholder={t('player_name')}
+                                style={{ padding: '6px' }}
                             />
                         </div>
-                    </div>
 
-                    {/* CLOUD SECTION (Preferred) */}
-                    <div className="card">
-                        {/* Header Removed as per user request */}
                         {user ? (
-                            <div className="mt-sm">
-                                <p style={{ fontSize: '0.9em' }}>{t('cloud_desc_user')} <br /><strong>{user.email}</strong></p>
-                                {isAdmin && (
-                                    <button className="btn full-width mt-sm" onClick={() => setShowAdmin(true)} style={{ backgroundColor: '#8e44ad', borderColor: '#6c3483' }}>
-                                        <Icons.Crown /> Admin
-                                    </button>
-                                )}
-                                <button className="btn full-width mt-sm" onClick={handleLogout} style={{ backgroundColor: '#c0392b', borderColor: '#962d22' }}>{t('logout')}</button>
+                            <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
+                                <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>{t('cloud_desc_user')} <strong>{user.email}</strong></p>
+                                <div style={{ display: 'flex', gap: '5px' }}>
+                                    {isAdmin && (
+                                        <button className="btn" onClick={() => setShowAdmin(true)} style={{ flex: 1, backgroundColor: '#8e44ad', borderColor: '#6c3483', padding: '6px', fontSize: '0.9em' }}>
+                                            <Icons.Crown /> Admin
+                                        </button>
+                                    )}
+                                    <button className="btn" onClick={handleLogout} style={{ flex: 1, backgroundColor: '#c0392b', borderColor: '#962d22', padding: '6px', fontSize: '0.9em' }}>{t('logout')}</button>
+                                </div>
                             </div>
                         ) : (
-                            <div className="mt-sm">
-                                <p style={{ fontSize: '0.9em', marginBottom: '8px' }}>
+                            <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
+                                <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>
                                     {t('logged_in_as')}: <strong>{t('local_login_status')}</strong>
                                 </p>
                                 <div style={{
                                     backgroundColor: '#fff3cd',
                                     border: '1px solid #ffeeba',
                                     color: '#856404',
-                                    padding: '8px',
+                                    padding: '6px',
                                     borderRadius: '4px',
-                                    fontSize: '0.85em',
-                                    marginBottom: '10px'
+                                    fontSize: '0.75em',
+                                    margin: '5px 0',
+                                    lineHeight: '1.3'
                                 }}>
-                                    <Icons.CloudOffline style={{ marginRight: '5px', verticalAlign: 'middle' }} />
+                                    <Icons.CloudOffline style={{ marginRight: '4px', width: '12px', height: '12px', verticalAlign: 'middle' }} />
                                     {t('welcome_local_desc')}
                                 </div>
                                 <div style={{ display: 'flex', gap: '5px' }}>
-                                    <button className="btn full-width mt-sm" onClick={onLogin}>{t('login_btn')} / {t('register_btn')}</button>
+                                    <button className="btn" onClick={onLogin} style={{ flex: 2, padding: '6px', fontSize: '0.9em' }}>{t('login_btn')} / {t('register_btn')}</button>
+                                    <button
+                                        className="btn"
+                                        onClick={onLocalLogout}
+                                        style={{ flex: 1, backgroundColor: '#7f8c8d', borderColor: '#666', padding: '6px', fontSize: '0.9em' }}
+                                    >
+                                        {t('logout')}
+                                    </button>
                                 </div>
-                                <button
-                                    className="btn full-width mt-sm"
-                                    onClick={onLocalLogout}
-                                    style={{ backgroundColor: '#7f8c8d', borderColor: '#666', marginTop: '10px' }}
-                                >
-                                    {t('logout')}
-                                </button>
                             </div>
                         )}
                     </div>
 
                     {/* DISPLAY SETTINGS */}
                     <div className="card" style={{ padding: '10px' }}>
-                        <div className="settings-row" style={{ marginBottom: '10px', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <span style={{ marginBottom: '5px' }}>{t('lbl_language')}</span>
-                            <div style={{ display: 'flex', gap: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '0.9em' }}>{t('lbl_language')}</span>
+                            <div style={{ display: 'flex', gap: '5px' }}>
                                 {['en', 'nl', 'es', 'de'].map(langKey => (
                                     <button
                                         key={langKey}
                                         onClick={() => changeLanguage(langKey)}
                                         style={{
-                                            fontSize: '1.5rem',
                                             padding: '0',
-                                            width: '40px',
-                                            height: '40px',
+                                            width: '28px',
+                                            height: '28px',
                                             border: language === langKey ? '2px solid #8E1600' : '1px solid #ccc',
                                             borderRadius: '50%',
                                             backgroundColor: language === langKey ? '#fff0e0' : 'white',
                                             cursor: 'pointer',
-                                            opacity: language === langKey ? 1 : 0.7,
+                                            opacity: language === langKey ? 1 : 0.6,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -164,15 +227,37 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                             </div>
                         </div>
 
-                        <div className="settings-row">
-                            <span>{t('roman_nums')}</span>
+                        <div className="settings-row" style={{ marginTop: '5px', padding: '5px 0', borderTop: '1px solid #f0f0f0' }}>
+                            <span style={{ fontSize: '0.9em' }}>{t('roman_nums')}</span>
                             <input
                                 type="checkbox"
                                 checked={useRomanNumerals}
                                 onChange={toggleRomanNumerals}
                                 className="settings-checkbox"
+                                style={{ transform: 'scale(0.9)' }}
                             />
                         </div>
+                    </div>
+
+                    {/* RESET ACCOUNT SECTION - Minimal */}
+                    <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
+                        <button
+                            onClick={handleResetAccount}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#c0392b',
+                                fontSize: '0.8em',
+                                cursor: 'pointer',
+                                opacity: 0.7,
+                                textDecoration: 'underline',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Icons.Trash style={{ width: '12px', height: '12px', marginRight: '4px' }} />
+                            {t('reset_account_btn')}
+                        </button>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,11 @@ import { supabase } from '../services/supabaseClient'
 
 const AuthContext = createContext()
 
-const getRandomName = () => "Incognitus Romanus";
+const getRandomName = () => {
+    const names = ["Romanus", "Imperator", "Legionarius", "Centurion", "Senator", "Plebeius"];
+    const suffix = Math.floor(Math.random() * 10000);
+    return `${names[Math.floor(Math.random() * names.length)]} ${suffix}`;
+};
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)

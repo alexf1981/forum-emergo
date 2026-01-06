@@ -58,6 +58,8 @@ export const translations = {
         login_link: "Login here",
         login_success: "Logged in as",
         logout_success: "Logged out as",
+        reset_account_btn: "Reset Account",
+        msg_confirm_reset: "Are you sure? ALL game data will be lost! This cannot be undone.",
         // Settings
         settings_title: "Settings",
         cloud_storage: "Cloud Storage",
@@ -241,6 +243,8 @@ export const translations = {
         login_link: "Log hier in",
         login_success: "Ingelogd als",
         logout_success: "Uitgelogd als",
+        reset_account_btn: "Account Resetten",
+        msg_confirm_reset: "Weet je het zeker? ALLE speldata gaat verloren! Dit kan niet ongedaan worden.",
         // Settings
         settings_title: "Instellingen",
         cloud_storage: "Cloud Opslag",
@@ -424,6 +428,8 @@ export const translations = {
         login_link: "Entra aquí",
         login_success: "Conectado como",
         logout_success: "Desconectado como",
+        reset_account_btn: "Reiniciar Cuenta",
+        msg_confirm_reset: "¿Estás seguro? ¡Se perderán TODOS los datos! Esto no se puede deshacer.",
         // Settings
         settings_title: "Ajustes",
         cloud_storage: "Nube",
@@ -607,6 +613,8 @@ export const translations = {
         login_link: "Hier einloggen",
         login_success: "Angemeldet als",
         logout_success: "Abgemeldet als",
+        reset_account_btn: "Konto zurücksetzen",
+        msg_confirm_reset: "Bist du sicher? ALLE Spieldaten gehen verloren! Dies kann nicht rückgängig gemacht werden.",
         // Settings
         settings_title: "Einstellungen",
         cloud_storage: "Cloud-Speicher",
