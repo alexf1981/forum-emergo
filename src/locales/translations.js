@@ -14,6 +14,7 @@ export const translations = {
         confirm: "Confirm",
         logged_in_as: "Logged in as",
         subtitle: "Strengthen your habits. Shape your empire.",
+        days_short: "Mo,Tu,We,Th,Fr,Sa,Su",
         // Welcome
         welcome_text: "Ave Emperor! Enter Forum Emergo. Strengthen your habits. Shape your empire.",
         welcome_has_account: "Have an account?",
@@ -193,6 +194,7 @@ export const translations = {
         confirm: "Bevestigen",
         logged_in_as: "Ingelogd als",
         subtitle: "Versterk je gewoontes. Vorm je rijk.",
+        days_short: "Ma,Di,Wo,Do,Vr,Za,Zo",
         // Welcome
         welcome_text: "Ave Keizer! Betreed Forum Emergo. Versterk je gewoontes. Vorm je rijk.",
         welcome_has_account: "Heb je al een account?",
@@ -372,6 +374,7 @@ export const translations = {
         confirm: "Confirmar",
         logged_in_as: "Conectado como",
         subtitle: "Refuerza tus hábitos. Forma tu imperio.",
+        days_short: "Lu,Ma,Mi,Ju,Vi,Sa,Do",
         // Welcome
         welcome_text: "¡Ave Emperador! Entra en el Foro Emergo. Refuerza tus hábitos. Forma tu imperio.",
         welcome_has_account: "¿Tienes cuenta?",
@@ -551,6 +554,7 @@ export const translations = {
         confirm: "Bestätigen",
         logged_in_as: "Angemeldet als",
         subtitle: "Stärke deine Gewohnheiten. Forme dein Reich.",
+        days_short: "Mo,Di,Mi,Do,Fr,Sa,So",
         // Welcome
         welcome_text: "Ave Imperator! Betritt Forum Emergo. Stärke deine Gewohnheiten. Forme dein Reich.",
         welcome_has_account: "Bereits ein Konto?",

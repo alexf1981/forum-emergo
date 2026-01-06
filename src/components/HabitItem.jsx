@@ -244,6 +244,109 @@ const HabitItem = ({
                             <Icons.Trash />
                             <span>{t('delete')}</span>
                         </button>
+
+                        {(colType === 'virtue' || colType === 'vice') && (
+                            <div style={{
+                                marginTop: '4px',
+                                borderTop: '1px solid #eee',
+                                paddingTop: '8px',
+                                paddingLeft: '4px',
+                                paddingRight: '4px',
+                                minWidth: '250px' // Force wider menu for bigger boxes
+                            }}>
+                                {/* Headers */}
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(7, 1fr)',
+                                    gap: '2px',
+                                    marginBottom: '4px',
+                                    width: '100%'
+                                }}>
+                                    {(t('days_short') || "Ma,Di,Wo,Do,Vr,Za,Zo").split(',').map((day, i) => (
+                                        <div key={i} style={{
+                                            fontSize: '12px', // Larger text (closer to menu items)
+                                            textAlign: 'center',
+                                            color: '#555',
+                                            fontWeight: 'bold',
+                                            textTransform: 'capitalize'
+                                        }}>
+                                            {day}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Days Grid */}
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(7, 1fr)',
+                                    gap: '2px',
+                                    width: '100%'
+                                }}>
+                                    {(() => {
+                                        const cells = [];
+                                        const now = new Date();
+                                        const todayStr = (() => {
+                                            const y = now.getFullYear();
+                                            const m = String(now.getMonth() + 1).padStart(2, '0');
+                                            const d = String(now.getDate()).padStart(2, '0');
+                                            return `${y}-${m}-${d}`;
+                                        })();
+
+                                        // Calculate Start Date: Monday of 3 weeks ago
+                                        // 1. Get current Monday
+                                        // Day 1(Mon)..6(Sat), 0(Sun)
+                                        // We want 0(Mon)..6(Sun)
+                                        let dayIndex = now.getDay(); // 0=Sun, 1=Mon
+                                        let orderedIndex = dayIndex === 0 ? 6 : dayIndex - 1; // Mon=0, Sun=6
+
+                                        const startDate = new Date(now);
+                                        startDate.setDate(now.getDate() - orderedIndex - 21); // Go back to Monday of 3 weeks ago
+
+                                        for (let i = 0; i < 28; i++) {
+                                            const d = new Date(startDate);
+                                            d.setDate(startDate.getDate() + i);
+
+                                            const y = d.getFullYear();
+                                            const m = String(d.getMonth() + 1).padStart(2, '0');
+                                            const da = String(d.getDate()).padStart(2, '0');
+                                            const dateString = `${y}-${m}-${da}`;
+
+                                            const isFuture = d > now; // Strict object comparison works for dates if now is fresh `new Date()`? 
+                                            // actually d includes time from startDate derived from now.
+                                            // Let's strip time for robust "Future" check.
+                                            const dNoTime = new Date(y, d.getMonth(), d.getDate());
+                                            const nowNoTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                            const isStrictFuture = dNoTime > nowNoTime;
+                                            const isToday = dateString === todayStr;
+
+                                            const isCompleted = !isStrictFuture && habit.history && habit.history.includes(dateString);
+
+                                            cells.push(
+                                                <div key={i} style={{
+                                                    aspectRatio: '1',
+                                                    backgroundColor: isToday ? '#bfdbfe' : '#f5f5f5', // Light blue for today
+                                                    borderRadius: '2px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '10px',
+                                                    opacity: isStrictFuture ? 0.3 : 1
+                                                }}>
+                                                    {isCompleted ? (
+                                                        colType === 'virtue' ? (
+                                                            <Icons.Check style={{ width: '100%', height: '100%', color: colColor }} />
+                                                        ) : (
+                                                            <Icons.X style={{ width: '100%', height: '100%', color: colColor }} />
+                                                        )
+                                                    ) : null}
+                                                </div>
+                                            );
+                                        }
+                                        return cells;
+                                    })()}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
