@@ -32,6 +32,16 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess, initialMode = 'login', clo
         try {
             let result
             if (isLogin) {
+                // BACKUP LOCAL DATA BEFORE LOGIN
+                // This allows us to restore the local state exactly as it was if the user logs out later.
+                const currentHabits = localStorage.getItem('romehabits');
+                if (currentHabits) {
+                    localStorage.setItem('romehabits_backup', currentHabits);
+                } else {
+                    // Mark explicitly that there was no data
+                    localStorage.setItem('romehabits_backup', 'null');
+                }
+
                 result = await signIn(email, password)
             } else {
                 result = await signUp(email, password)

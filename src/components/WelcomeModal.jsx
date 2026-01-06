@@ -11,7 +11,7 @@ const VIDEO_FILES = [
     './assets/city/Introduction_III.mp4'
 ];
 
-const WelcomeModal = ({ onLogin, onRegister, onPlayLocal }) => {
+const WelcomeModal = ({ onLogin, onRegister, onPlayLocal, hasLocalData }) => {
     // Import everything we need from LanguageContext
     const { t, changeLanguage, language } = useLanguage();
 
@@ -88,7 +88,9 @@ const WelcomeModal = ({ onLogin, onRegister, onPlayLocal }) => {
 
                         <div style={{ padding: '10px', borderRadius: '8px' }}>
                             <p style={{ marginBottom: '5px', fontWeight: 'bold', fontSize: '0.9em' }}>{t('welcome_play_local')}</p>
-                            <button className="btn full-width" onClick={onPlayLocal}>{t('welcome_play_local')}</button>
+                            <button className="btn full-width" onClick={onPlayLocal}>
+                                {hasLocalData ? t('welcome_play_local_continue') : t('welcome_play_local_new')}
+                            </button>
                             <p style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
                                 {t('welcome_local_desc')}
                             </p>

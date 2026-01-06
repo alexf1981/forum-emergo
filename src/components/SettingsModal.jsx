@@ -8,7 +8,7 @@ import AdminDashboard from './AdminDashboard';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../locales/translations';
 
-const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin, actions }) => {
+const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin, onLocalLogout, actions }) => {
     const { user, playerName, updatePlayerName } = useAuth();
     const [localPlayerName, setLocalPlayerName] = useState(playerName || '');
 
@@ -40,10 +40,22 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
             console.error("Logout error (or timeout):", error);
         }
 
-        // 2. Nuke everything from storage to be sure (Auth tokens + Game Data)
+        // 2. Capture Backup & Nuke Storage
+        const backup = window.localStorage.getItem('romehabits_backup');
         window.localStorage.clear();
 
-        // 3. Set a flag for the "just logged out" message (must be done AFTER clear)
+        // 3. Restore Backup (if exists)
+        // If backup is 'null', we do nothing (storage stays empty, cleaner than restoring 'null')
+        if (backup && backup !== 'null') {
+            window.localStorage.setItem('romehabits', backup);
+        }
+
+        // CRITICAL CHANGE: Always force Welcome Screen after logout
+        // Do NOT set 'has_visited' to true.
+        // We ensure it is removed so the WelcomeModal appears.
+        window.localStorage.removeItem('has_visited');
+
+        // 4. Set a flag for the "just logged out" message (must be done AFTER clear)
         if (email) {
             window.localStorage.setItem('logout_message', `Uitgelogd als ${email}`);
         }
@@ -92,7 +104,16 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                         ) : (
                             <div className="mt-sm">
                                 <p style={{ fontSize: '0.9em' }}>{t('cloud_desc_guest')}</p>
-                                <button className="btn full-width mt-sm" onClick={onLogin}>{t('login_btn')} / {t('register_btn')}</button>
+                                <div style={{ display: 'flex', gap: '5px' }}>
+                                    <button className="btn full-width mt-sm" onClick={onLogin}>{t('login_btn')} / {t('register_btn')}</button>
+                                </div>
+                                <button
+                                    className="btn full-width mt-sm"
+                                    onClick={onLocalLogout}
+                                    style={{ backgroundColor: '#7f8c8d', borderColor: '#666', marginTop: '10px' }}
+                                >
+                                    {t('logout')}
+                                </button>
                             </div>
                         )}
                     </div>

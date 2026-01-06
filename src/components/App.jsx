@@ -141,12 +141,22 @@ function App() {
         }
     };
 
+    const handleLocalLogout = () => {
+        setShowSettings(false);
+        // Clear flag so Welcome appears
+        localStorage.removeItem('has_visited');
+        setShowFirstVisitModal(true);
+        // Clean up other state if needed (like Daily Welcome)
+        actions.dismissWelcome();
+    };
+
     return (
         <div className="wrapper">
             {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
             {/* First Visit Modal - Highest Priority */}
             {showFirstVisitModal && (
                 <WelcomeModal
+                    hasLocalData={habits.length > 0}
                     onLogin={() => {
                         // Don't mark visited yet
                         setShowFirstVisitModal(false);
@@ -171,16 +181,18 @@ function App() {
                         actions.dismissWelcome();
                         actions.notify(t('msg_enjoy_rome'), "success");
 
-                        // Seed Default Habits (Force for new local start)
-                        const newHabits = [
-                            { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
-                            { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
-                            { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
-                            { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
-                            { id: Date.now() + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
-                        ];
-                        actions.replaceHabits(newHabits, true);
-                        setShowOnboarding(true);
+                        // Only seed defaults if no local data exists
+                        if (habits.length === 0) {
+                            const newHabits = [
+                                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
+                                { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
+                                { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
+                                { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
+                                { id: Date.now() + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
+                            ];
+                            actions.replaceHabits(newHabits, true);
+                            setShowOnboarding(true);
+                        }
                         // We already notified "Enjoy Rome" above
                     }}
                 />
@@ -206,6 +218,7 @@ function App() {
                     setAuthFromStart(false); // Normal login from settings
                     setShowAuthModal(true);
                 }}
+                onLocalLogout={handleLocalLogout}
                 actions={actions}
             />}
 
