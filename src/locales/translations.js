@@ -171,7 +171,11 @@ export const translations = {
         msg_admin_gold_set: "Gold set to {amount}!",
         msg_admin_reset: "City reset! Town Hall is level 1.",
         msg_sync_error: "Could not sync with cloud",
-        msg_daily_income: "Daily Income: {total} Gold ({tax} Tax + {interest} Interest)"
+        msg_daily_income: "Daily Income: {total} Gold ({tax} Tax + {interest} Interest)",
+        // Onboarding
+        onboarding_title: "Welcome, Emperor",
+        onboarding_text: "Welcome to Forum Emergo. To help you get started, the Senate has already created some sample tasks for you. An extensive onboarding tutorial will arrive here soon.",
+        btn_start_reign: "Begin Reign"
     },
     nl: {
         flag: "🇳🇱",
@@ -344,7 +348,11 @@ export const translations = {
         msg_admin_gold_set: "Goud gezet op {amount}!",
         msg_admin_reset: "Stad ontruimd! Stadhuis is level 1.",
         msg_sync_error: "Kon niet synchroniseren met de cloud",
-        msg_daily_income: "Dagelijks inkomen: {total} Goud ({tax} Belasting + {interest} Rente)"
+        msg_daily_income: "Dagelijks inkomen: {total} Goud ({tax} Belasting + {interest} Rente)",
+        // Onboarding
+        onboarding_title: "Welkom, Keizer",
+        onboarding_text: "Welkom bij Forum Emergo. Om u alvast op weg te helpen heeft de senaat al een aantal voorbeeld taken voor u aangemaakt. Binnenkort komt hier een uitgebreide onboarding tutorial.",
+        btn_start_reign: "Start Regering"
     },
     es: {
         flag: "🇪🇸",
@@ -517,7 +525,11 @@ export const translations = {
         msg_admin_gold_set: "¡Oro establecido en {amount}!",
         msg_admin_reset: "¡Ciudad reiniciada! El Ayuntamiento es nivel 1.",
         msg_sync_error: "No se pudo sincronizar con la nube",
-        msg_daily_income: "Ingresos diarios: {total} Oro ({tax} Impuestos + {interest} Interés)"
+        msg_daily_income: "Ingresos diarios: {total} Oro ({tax} Impuestos + {interest} Interés)",
+        // Onboarding
+        onboarding_title: "Bienvenido, Emperador",
+        onboarding_text: "Bienvenido al Foro Emergo. Para ayudarle a empezar, el Senado ya ha creado algunas tareas de ejemplo para usted. Pronto habrá un tutorial más detallado.",
+        btn_start_reign: "Comenzar Reinado"
     },
     de: {
         flag: "🇩🇪",
@@ -690,6 +702,10 @@ export const translations = {
         msg_admin_gold_set: "Gold auf {amount} gesetzt!",
         msg_admin_reset: "Stadt zurückgesetzt! Rathaus ist Stufe 1.",
         msg_sync_error: "Konnte nicht mit der Cloud synchronisieren",
-        msg_daily_income: "Tägliches Einkommen: {total} Gold ({tax} Steuern + {interest} Zinsen)"
+        msg_daily_income: "Tägliches Einkommen: {total} Gold ({tax} Steuern + {interest} Zinsen)",
+        // Onboarding
+        onboarding_title: "Willkommen, Imperator",
+        onboarding_text: "Willkommen im Forum Emergo. Um Ihnen den Einstieg zu erleichtern, hat der Senat bereits einige Beispielaufgaben für Sie erstellt. Ein ausführliches Tutorial folgt in Kürze.",
+        btn_start_reign: "Beginne Herrschaft"
     }
 };

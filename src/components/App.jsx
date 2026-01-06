@@ -11,6 +11,7 @@ import SettingsModal from './SettingsModal';
 import AuthModal from './AuthModal';
 import DailyWelcome from './DailyWelcome';
 import WelcomeModal from './WelcomeModal';
+import OnboardingModal from './OnboardingModal';
 import { useGame } from '../hooks/useGame';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -28,6 +29,7 @@ function App() {
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [selectedQuest, setSelectedQuest] = useState(null);
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
+    const [showOnboarding, setShowOnboarding] = useState(false);
 
     // === HOOK ===
     const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research } = useGame();
@@ -76,6 +78,7 @@ function App() {
             ];
             actions.replaceHabits(newHabits, true);
             actions.notify(t('msg_enjoy_rome'), "success");
+            setShowOnboarding(true);
         }
     }, [isNewUser, isCloudSynchronized, habits, actions, t]);
 
@@ -165,6 +168,7 @@ function App() {
 
     return (
         <div className="wrapper">
+            {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
             {/* First Visit Modal - Highest Priority */}
             {showFirstVisitModal && (
                 <WelcomeModal
@@ -192,17 +196,16 @@ function App() {
                         actions.dismissWelcome();
                         actions.notify(t('msg_enjoy_rome'), "success");
 
-                        // Seed Default Habits if empty
-                        if (habits.length === 0) {
-                            const newHabits = [
-                                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
-                                { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
-                                { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
-                                { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
-                                { id: Date.now() + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
-                            ];
-                            actions.replaceHabits(newHabits, true);
-                        }
+                        // Seed Default Habits (Force for new local start)
+                        const newHabits = [
+                            { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
+                            { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
+                            { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
+                            { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
+                            { id: Date.now() + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
+                        ];
+                        actions.replaceHabits(newHabits, true);
+                        setShowOnboarding(true);
                         // We already notified "Enjoy Rome" above
                     }}
                 />

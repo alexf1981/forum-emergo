@@ -349,16 +349,16 @@ export function useGame() {
                         setIsNewUser(true);
                     }
                     setSaveStatus('saved');
+                    // Sync success!
+                    setIsCloudSynchronized(true);
                 } catch (error) {
                     console.error("Sync error:", error);
                     setSaveStatus('error');
-                    notify({ key: 'msg_sync_error' }, "error"); // "Could not sync with cloud"
+                    // Sync failed! Do NOT assume synchronized.
+                    setIsCloudSynchronized(false);
+                    notify({ key: 'msg_sync_error' }, "error");
                 } finally {
-                    // Whether success or fail, we attempted sync.
-                    // If fail, we arguably might not want to overwrite cloud with local, but 
-                    // usually we let user continue. For safety, let's say we are synchronized 
-                    // so valid local changes can eventually be saved.
-                    setIsCloudSynchronized(true);
+                    // Finally block no longer sets isCloudSynchronized blindly.
                 }
             } else {
                 // No user? No sync needed, but we are "synchronized" with local (noop)
@@ -392,6 +392,7 @@ export function useGame() {
                 setSaveStatus(success ? 'saved' : 'error');
             }, 200);
 
+            return () => clearTimeout(timeoutId);
         }
     }, [stats, habits, heroes, lastWelcomeDate, buildings, resources, research, user, isCloudSynchronized]);
 
