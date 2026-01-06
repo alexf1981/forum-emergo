@@ -15,7 +15,8 @@ const HabitItem = ({
     onNotify,
     formatNumber,
     t,
-    onPending
+    onPending,
+    loginHistory = [] // New Prop
 }) => {
     const isTodo = colType === 'todo';
     // Determine recurrence based on explicit property first, fallback to legacy 'bucket' logic
@@ -345,27 +346,69 @@ const HabitItem = ({
                                             const m = String(d.getMonth() + 1).padStart(2, '0');
                                             const da = String(d.getDate()).padStart(2, '0');
                                             const dateString = `${y}-${m}-${da}`;
+
+                                            // Future check for opacity
+                                            const dNoTime = new Date(y, d.getMonth(), d.getDate());
+                                            const nowNoTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                            const isStrictFuture = dNoTime > nowNoTime;
                                             const isToday = dateString === todayStr;
 
+                                            // Determine Status
+                                            const isExample = isStrictFuture;
+                                            const hasLoggedIn = loginHistory && loginHistory.includes(dateString);
                                             const isCompleted = habit.history && habit.history.includes(dateString);
+                                            const completionCount = habit.history ? habit.history.filter(d => d === dateString).length : 0;
+
+                                            // BG Color Logic
+                                            let bgColor = '#f5f5f5'; // Default Grey (Not logged in)
+
+                                            if (isToday) {
+                                                bgColor = '#bfdbfe'; // Today is simple Blue
+                                            } else if (hasLoggedIn) {
+                                                // Logged In Logic
+                                                if (colType === 'virtue') {
+                                                    // Virtue: Done = Green, Missed = Red
+                                                    bgColor = isCompleted ? '#dcfce7' : '#fee2e2';
+                                                } else if (colType === 'vice') {
+                                                    // Vice: Done = Red (Bad!), Missed = Green (Good!)
+                                                    bgColor = isCompleted ? '#fee2e2' : '#dcfce7';
+                                                } else {
+                                                    // Todo / Other
+                                                    bgColor = isCompleted ? '#dcfce7' : '#f5f5f5';
+                                                }
+                                            } else {
+                                                // Not logged in -> Grey (already set)
+                                            }
 
                                             cells.push(
                                                 <div key={i} style={{
                                                     aspectRatio: '1',
-                                                    backgroundColor: isToday ? '#bfdbfe' : '#f5f5f5',
+                                                    backgroundColor: bgColor,
                                                     borderRadius: '2px',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    fontSize: '10px'
+                                                    fontSize: '10px',
+                                                    color: '#333',
+                                                    opacity: isStrictFuture ? 0.3 : 1
                                                 }}>
-                                                    {isCompleted ? (
-                                                        colType === 'virtue' ? (
-                                                            <Icons.Check style={{ width: '100%', height: '100%', color: colColor }} />
-                                                        ) : (
-                                                            <Icons.X style={{ width: '100%', height: '100%', color: colColor }} />
-                                                        )
-                                                    ) : null}
+                                                    {hasLoggedIn && !isCompleted && colType === 'vice' && isRecurring ? (
+                                                        <span style={{ fontWeight: 'bold' }}>0</span>
+                                                    ) : (
+                                                        isCompleted ? (
+                                                            colType === 'virtue' ? (
+                                                                // Virtue: Checkmark or Number
+                                                                isRecurring && completionCount > 1 ?
+                                                                    <span style={{ fontWeight: 'bold' }}>{completionCount}</span> :
+                                                                    <Icons.Check style={{ width: '100%', height: '100%', color: colColor }} />
+                                                            ) : (
+                                                                // Vice: X or Number
+                                                                isRecurring ?
+                                                                    <span style={{ fontWeight: 'bold' }}>{completionCount}</span> :
+                                                                    <Icons.X style={{ width: '100%', height: '100%', color: colColor }} />
+                                                            )
+                                                        ) : null
+                                                    )}
                                                 </div>
                                             );
                                         }

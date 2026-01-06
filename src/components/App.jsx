@@ -32,7 +32,7 @@ function App() {
     const [showOnboarding, setShowOnboarding] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research } = useGame();
+    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research, loginHistory } = useGame();
 
     // Scroll listener & First Visit Check
     useEffect(() => {
@@ -261,6 +261,7 @@ function App() {
                         onMoveHabit={actions.moveHabit} // NEW
                         onNotify={actions.notify} // NEW
                         formatNumber={formatNumber}
+                        loginHistory={loginHistory} // NEW: For calendar visualization
                     />
                 )}
 

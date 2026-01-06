@@ -14,6 +14,7 @@ export function useGame() {
     const [buildings, setBuildings] = useLocalStorage('romebuildings', GameLogic.INITIAL_BUILDINGS);
     const [resources, setResources] = useLocalStorage('romeresources', GameLogic.INITIAL_RESOURCES);
     const [research, setResearch] = useLocalStorage('romeresearch', {});
+    const [loginHistory, setLoginHistory] = useLocalStorage('romeloginhistory', []); // New: Track days logged in
 
     const { t } = useLanguage();
 
@@ -304,6 +305,7 @@ export function useGame() {
             setHeroes(data.romeheroes);
             if (data.romebuildings) setBuildings(data.romebuildings);
             if (data.romeresources) setResources(data.romeresources);
+            if (data.romeloginhistory) setLoginHistory(data.romeloginhistory);
             notify({ key: 'msg_restored' }, "success");
         }
     };
@@ -313,7 +315,8 @@ export function useGame() {
         romehabits: habits,
         romeheroes: heroes,
         romebuildings: buildings,
-        romeresources: resources
+        romeresources: resources,
+        romeloginhistory: loginHistory
     });
 
 
@@ -343,6 +346,7 @@ export function useGame() {
                         if (cloudData.romebuildings) setBuildings(cloudData.romebuildings);
                         if (cloudData.romeresources) setResources(cloudData.romeresources);
                         if (cloudData.romeresearch) setResearch(cloudData.romeresearch);
+                        if (cloudData.romeloginhistory) setLoginHistory(cloudData.romeloginhistory);
                         setIsNewUser(false);
                     } else {
                         // Valid load but no data found -> New User (or wiped)
@@ -382,7 +386,8 @@ export function useGame() {
                 romelastwelcome: lastWelcomeDate,
                 romebuildings: buildings,
                 romeresources: resources,
-                romeresearch: research
+                romeresearch: research,
+                romeloginhistory: loginHistory
             };
 
             // Reduced timeout to 200ms to persist faster and feel snappier
@@ -394,7 +399,7 @@ export function useGame() {
 
             return () => clearTimeout(timeoutId);
         }
-    }, [stats, habits, heroes, lastWelcomeDate, buildings, resources, research, user, isCloudSynchronized]);
+    }, [stats, habits, heroes, lastWelcomeDate, buildings, resources, research, loginHistory, user, isCloudSynchronized]);
 
     // === DAILY WELCOME ===
     const [showWelcome, setShowWelcome] = useState(false);
@@ -407,7 +412,13 @@ export function useGame() {
         } else {
             setShowWelcome(false);
         }
-    }, [lastWelcomeDate]);
+
+        // --- NEW: UPDATE LOGIN HISTORY ---
+        // Always ensure 'today' is in login history if we are running
+        if (!loginHistory.includes(today)) {
+            setLoginHistory(prev => [...prev, today]);
+        }
+    }, [lastWelcomeDate, loginHistory]);
 
     const dismissWelcome = () => {
         const today = GameLogic.getTodayString();
@@ -434,6 +445,7 @@ export function useGame() {
         buildings, // NEW
         resources, // NEW
         research, // NEW
+        loginHistory, // NEW
         notifications,
         combatLog,
         saveStatus, // Export status
