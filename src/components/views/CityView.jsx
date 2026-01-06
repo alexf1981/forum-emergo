@@ -214,11 +214,11 @@ const CityView = ({ habits, stats, buildings, rank, score, onToggleHabit, onIncr
                                                 <>
                                                     {renderList(activeHabits, true)}
                                                     {completedBucketHabits.length > 0 && (
-                                                        <details style={{ marginTop: '10px', borderTop: '1px dashed #ccc', paddingTop: '5px' }}>
+                                                        <details style={{ marginTop: '10px', borderTop: '1px dashed #ccc', paddingTop: '5px', position: 'relative', zIndex: 5 }}>
                                                             <summary style={{ cursor: 'pointer', color: '#777', fontStyle: 'italic', marginBottom: '5px', userSelect: 'none' }}>
                                                                 {t('completed_tasks')} ({completedBucketHabits.length})
                                                             </summary>
-                                                            <div style={{ opacity: 0.7 }}>
+                                                            <div style={{ /* Removed opacity as requested */ }}>
                                                                 {renderList(completedBucketHabits, false)}
                                                             </div>
                                                         </details>

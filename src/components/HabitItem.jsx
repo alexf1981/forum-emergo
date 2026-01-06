@@ -124,7 +124,26 @@ const HabitItem = ({
 
     // Menu State
     const [showMenu, setShowMenu] = useState(false);
+    const [menuPlacement, setMenuPlacement] = useState('down'); // 'down' or 'up'
     const menuRef = useRef(null);
+
+    // Toggle logic with boundary check
+    const toggleMenu = (e) => {
+        if (!showMenu) {
+            // Check space below
+            const rect = e.currentTarget.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            // Calendar ~200px + padding. 300px is safe.
+            if (spaceBelow < 320) {
+                setMenuPlacement('up');
+            } else {
+                setMenuPlacement('down');
+            }
+            setShowMenu(true);
+        } else {
+            setShowMenu(false);
+        }
+    };
 
     // Click outside listener
     useEffect(() => {
@@ -143,7 +162,8 @@ const HabitItem = ({
     }, [showMenu]);
 
     // Derived Visuals
-    const opacity = isPendingDelete ? 0.7 : (isDoneOneTime ? 0.5 : 1);
+    // User requested completed items to NOT be transparent anymore.
+    const opacity = isPendingDelete ? 0.7 : 1;
 
     // If pending delete, overriding styles
     const containerStyle = {
@@ -151,7 +171,7 @@ const HabitItem = ({
         opacity: opacity,
         backgroundColor: isPendingDelete ? '#f9f9f9' : 'rgba(255, 255, 255, 0.8)',
         transition: 'all 0.5s',
-        zIndex: showMenu ? 50 : 1,
+        zIndex: showMenu ? 50 : 1, // Ensure menu is on top
         position: 'relative'
     };
 
@@ -228,14 +248,22 @@ const HabitItem = ({
             <div className="habit-controls habit-menu-container" ref={menuRef}>
                 <button
                     className="btn-icon small menu-toggle"
-                    onClick={() => setShowMenu(!showMenu)}
+                    onClick={toggleMenu}
                     title="Menu"
                 >
                     <Icons.Menu />
                 </button>
 
                 {showMenu && (
-                    <div className="habit-menu-dropdown">
+                    <div
+                        className="habit-menu-dropdown"
+                        style={{
+                            top: menuPlacement === 'down' ? '100%' : 'auto',
+                            bottom: menuPlacement === 'up' ? '100%' : 'auto',
+                            marginTop: menuPlacement === 'down' ? '4px' : 0,
+                            marginBottom: menuPlacement === 'up' ? '4px' : 0,
+                        }}
+                    >
                         <button className="menu-item" onClick={() => { onEdit(habit.id); setShowMenu(false); }}>
                             <Icons.Edit />
                             <span>{t('edit')}</span>
@@ -292,17 +320,24 @@ const HabitItem = ({
                                             return `${y}-${m}-${d}`;
                                         })();
 
-                                        // Calculate Start Date: Monday of 3 weeks ago
-                                        // 1. Get current Monday
-                                        // Day 1(Mon)..6(Sat), 0(Sun)
-                                        // We want 0(Mon)..6(Sun)
-                                        let dayIndex = now.getDay(); // 0=Sun, 1=Mon
-                                        let orderedIndex = dayIndex === 0 ? 6 : dayIndex - 1; // Mon=0, Sun=6
-
+                                        // Strict 28 days history
+                                        const HISTORY_DAYS = 28;
                                         const startDate = new Date(now);
-                                        startDate.setDate(now.getDate() - orderedIndex - 21); // Go back to Monday of 3 weeks ago
+                                        startDate.setDate(now.getDate() - (HISTORY_DAYS - 1));
 
-                                        for (let i = 0; i < 28; i++) {
+                                        // Calculate Padding for Start (Monday based)
+                                        // JS getDay(): Sun=0, Mon=1...
+                                        // We want Mon=0, ..., Sun=6
+                                        const startDay = startDate.getDay();
+                                        const padCount = startDay === 0 ? 6 : startDay - 1;
+
+                                        // Add Padding Cells
+                                        for (let i = 0; i < padCount; i++) {
+                                            cells.push(<div key={`pad-${i}`} />);
+                                        }
+
+                                        // Add Day Cells
+                                        for (let i = 0; i < HISTORY_DAYS; i++) {
                                             const d = new Date(startDate);
                                             d.setDate(startDate.getDate() + i);
 
@@ -310,27 +345,19 @@ const HabitItem = ({
                                             const m = String(d.getMonth() + 1).padStart(2, '0');
                                             const da = String(d.getDate()).padStart(2, '0');
                                             const dateString = `${y}-${m}-${da}`;
-
-                                            const isFuture = d > now; // Strict object comparison works for dates if now is fresh `new Date()`? 
-                                            // actually d includes time from startDate derived from now.
-                                            // Let's strip time for robust "Future" check.
-                                            const dNoTime = new Date(y, d.getMonth(), d.getDate());
-                                            const nowNoTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                                            const isStrictFuture = dNoTime > nowNoTime;
                                             const isToday = dateString === todayStr;
 
-                                            const isCompleted = !isStrictFuture && habit.history && habit.history.includes(dateString);
+                                            const isCompleted = habit.history && habit.history.includes(dateString);
 
                                             cells.push(
                                                 <div key={i} style={{
                                                     aspectRatio: '1',
-                                                    backgroundColor: isToday ? '#bfdbfe' : '#f5f5f5', // Light blue for today
+                                                    backgroundColor: isToday ? '#bfdbfe' : '#f5f5f5',
                                                     borderRadius: '2px',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    fontSize: '10px',
-                                                    opacity: isStrictFuture ? 0.3 : 1
+                                                    fontSize: '10px'
                                                 }}>
                                                     {isCompleted ? (
                                                         colType === 'virtue' ? (
