@@ -110,32 +110,7 @@ function App() {
     };
 
     // Import/Export Handlers
-    const handleExport = () => {
-        const gameData = actions.getExportData();
-        const data = { ...gameData, player_name: playerName };
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `forum-emergo-backup-${GameLogic.getTodayString()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    };
 
-    const handleImport = (file) => {
-        if (!confirm(t('confirm') + "?")) return; // "Confirm?"
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (data.player_name) {
-                    updatePlayerName(data.player_name);
-                }
-                actions.importData(data);
-            } catch (err) { console.error(err); alert("Error!"); }
-        };
-        reader.readAsText(file);
-    };
 
     const [authFromStart, setAuthFromStart] = useState(false);
 
@@ -224,8 +199,6 @@ function App() {
             )}
             {showSettings && <SettingsModal
                 onClose={() => setShowSettings(false)}
-                onExport={handleExport}
-                onImport={handleImport}
                 useRomanNumerals={useRomanNumerals}
                 toggleRomanNumerals={() => setUseRomanNumerals(prev => !prev)}
                 onLogin={() => {

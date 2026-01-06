@@ -92,6 +92,7 @@ const WelcomeModal = ({ onLogin, onRegister, onPlayLocal }) => {
                             <p style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
                                 {t('welcome_local_desc')}
                             </p>
+
                         </div>
                     </div>
 

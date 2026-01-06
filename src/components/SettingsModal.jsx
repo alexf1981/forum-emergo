@@ -8,7 +8,7 @@ import AdminDashboard from './AdminDashboard';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../locales/translations';
 
-const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRomanNumerals, onLogin, actions }) => {
+const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin, actions }) => {
     const { user, playerName, updatePlayerName } = useAuth();
     const [localPlayerName, setLocalPlayerName] = useState(playerName || '');
 
@@ -19,7 +19,6 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
 
     const { language, changeLanguage, t } = useLanguage();
     const [showAdmin, setShowAdmin] = useState(false);
-    const [showLocal, setShowLocal] = useState(false); // Collapsed by default to save space
 
     // Simple admin check
     const ADMINS = ['alexfitie1981@gmail.com', 'olivierfitie2015@gmail.com'];
@@ -139,43 +138,7 @@ const SettingsModal = ({ onClose, onExport, onImport, useRomanNumerals, toggleRo
                                 className="settings-checkbox"
                             />
                         </div>
-
-
-
                     </div>
-
-                    {/* LOCAL SECTION (Collapsible) */}
-                    <div className="card" style={{ padding: '10px' }}>
-                        <div
-                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                            onClick={() => setShowLocal(!showLocal)}
-                        >
-                            <h3 style={{ margin: 0, fontSize: '1rem' }}><Icons.Scroll /> {t('local_manage')}</h3>
-                            <span>{showLocal ? '▲' : '▼'}</span>
-                        </div>
-
-                        {showLocal && (
-                            <div className="mt-md">
-                                <p style={{ fontSize: '0.85em', color: '#666', marginBottom: '10px' }}>
-                                    {t('local_desc')}
-                                </p>
-                                <button className="btn full-width" onClick={onExport} style={{ fontSize: '0.9em', padding: '8px' }}>
-                                    <Icons.Save /> {t('download_backup')}
-                                </button>
-                                <div className="mt-sm">
-                                    <label style={{ fontSize: '0.9em', display: 'block', marginBottom: '4px' }}>{t('restore_backup')}:</label>
-                                    <input
-                                        className="file-input full-width"
-                                        type="file"
-                                        accept=".json"
-                                        onChange={(e) => { if (e.target.files[0]) onImport(e.target.files[0]); }}
-                                        style={{ fontSize: '0.8em' }}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
                 </div>
             </div>
         </div>
