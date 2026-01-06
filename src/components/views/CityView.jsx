@@ -7,7 +7,7 @@ import HabitItem from '../HabitItem';
 
 import CityVisual from '../CityVisual';
 
-const CityView = ({ habits, stats, buildings, rank, score, onToggleHabit, onIncrementHabit, onDecrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, onMoveHabit, onNotify, formatNumber, loginHistory }) => {
+const CityView = ({ habits, stats, buildings, rank, score, onToggleHabit, onIncrementHabit, onDecrementHabit, onAddHabit, onDeleteHabit, onUpdateHabit, onMoveHabit, onNotify, formatNumber, loginHistory, onSetHabitCompletion }) => {
     const { t } = useLanguage();
     const { playerName } = useAuth();
     const [editingHabitId, setEditingHabitId] = useState(null);
@@ -157,6 +157,7 @@ const CityView = ({ habits, stats, buildings, rank, score, onToggleHabit, onIncr
                                                             onPending={handlePending}
                                                             isPending={pendingIds.has(h.id)}
                                                             loginHistory={loginHistory}
+                                                            onSetCompletion={onSetHabitCompletion}
                                                         />
                                                     );
 

@@ -262,6 +262,7 @@ function App() {
                         onNotify={actions.notify} // NEW
                         formatNumber={formatNumber}
                         loginHistory={loginHistory} // NEW: For calendar visualization
+                        onSetHabitCompletion={actions.setHabitCompletion} // NEW
                     />
                 )}
 

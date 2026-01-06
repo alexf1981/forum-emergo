@@ -99,6 +99,7 @@ export const translations = {
         msg_added_task: "New task added!",
         msg_restored: "Chronicles restored!",
         msg_check_email: "Check email for confirmation!",
+        msg_history_updated: "History updated!",
         // Items (Generic)
         item_weapon: "Weapon",
         item_armor: "Armor",
@@ -279,6 +280,7 @@ export const translations = {
         msg_added_task: "Nieuwe taak toegevoegd!",
         msg_restored: "Kronieken hersteld!",
         msg_check_email: "Controleer je e-mail voor bevestiging!",
+        msg_history_updated: "Historie bijgewerkt!",
         // Items
         item_weapon: "Wapen",
         item_armor: "Pantser",
@@ -459,6 +461,7 @@ export const translations = {
         msg_added_task: "¡Nueva tarea añadida!",
         msg_restored: "¡Crónicas restauradas!",
         msg_check_email: "¡Verifica tu correo para confirmar!",
+        msg_history_updated: "¡Historial actualizado!",
         // Items
         item_weapon: "Arma",
         item_armor: "Armadura",
@@ -639,6 +642,7 @@ export const translations = {
         msg_added_task: "Neue Aufgabe hinzugefügt!",
         msg_restored: "Chroniken wiederhergestellt!",
         msg_check_email: "Prüfe deine E-Mails zur Bestätigung!",
+        msg_history_updated: "Verlauf aktualisiert!",
         // Items
         item_weapon: "Waffe",
         item_armor: "Rüstung",

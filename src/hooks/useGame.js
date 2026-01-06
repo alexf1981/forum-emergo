@@ -144,6 +144,44 @@ export function useGame() {
         if (!silent) notify({ key: 'msg_restored' }, "success");
     };
 
+    const setHabitCompletion = (id, date, count) => {
+        const habit = habits.find(h => h.id === id);
+        if (!habit) return;
+
+        // 1. Sanitize count
+        const validCount = Math.max(0, parseInt(count) || 0);
+
+        // 1. Remove ANY existing entries for this date ('2023...', '!2023...', '-2023...')
+        const otherDates = habit.history.filter(d => d !== date && d !== `!${date}` && d !== `-${date}`);
+        let newHistory = [...otherDates];
+
+        // 2. Add New State
+        if (count === null) {
+            // Reset to Default: Do nothing (just removed)
+        } else if (count === -1) {
+            // Explicit Grey (Exempt): Add marker
+            newHistory.push(`-${date}`);
+        } else if (count === 0) {
+            // Explicit Red: Add marker
+            newHistory.push(`!${date}`);
+        } else {
+            // Explicit Green: Add completions
+            const validCount = Math.max(1, parseInt(count)); // Ensure at least 1 if positive
+            const newEntries = Array(validCount).fill(date);
+            newHistory = [...newHistory, ...newEntries];
+        }
+
+        // 4. Update Habit
+        setHabits(prev => prev.map(h =>
+            h.id === id ? { ...h, history: newHistory } : h
+        ));
+
+        // Note: We deliberately do NOT update loginHistory here anymore.
+        // This ensures other habits remain Grey (Unknown) for that day.
+
+        notify({ key: 'msg_history_updated' }, "success");
+    };
+
     // === ACTIONS: HEROES ===
     const recruitHero = () => {
         // 1. Global Max Check (10)
@@ -468,6 +506,7 @@ export function useGame() {
             notify,
             dismissWelcome, // NEW
             replaceHabits,
+            setHabitCompletion, // NEW
 
             // City
             buildBuilding,

@@ -16,7 +16,8 @@ const HabitItem = ({
     formatNumber,
     t,
     onPending,
-    loginHistory = [] // New Prop
+    loginHistory = [], // New Prop
+    onSetCompletion = () => { } // New Prop
 }) => {
     const isTodo = colType === 'todo';
     // Determine recurrence based on explicit property first, fallback to legacy 'bucket' logic
@@ -356,56 +357,128 @@ const HabitItem = ({
                                             // Determine Status
                                             const isExample = isStrictFuture;
                                             const hasLoggedIn = loginHistory && loginHistory.includes(dateString);
+
+                                            // isCompleted: Normal completion
                                             const isCompleted = habit.history && habit.history.includes(dateString);
+
+                                            // isSkipped: Explicit failure marker (!date)
+                                            const isSkipped = habit.history && habit.history.includes(`!${dateString}`);
+
+                                            // isExempt: Explicit grey marker (-date)
+                                            const isExempt = habit.history && habit.history.includes(`-${dateString}`);
+
                                             const completionCount = habit.history ? habit.history.filter(d => d === dateString).length : 0;
 
                                             // BG Color Logic
-                                            let bgColor = '#f5f5f5'; // Default Grey (Not logged in)
+                                            let bgColor = '#f5f5f5'; // Default Grey (Not logged in / Unknown)
 
                                             if (isToday) {
                                                 bgColor = '#bfdbfe'; // Today is simple Blue
-                                            } else if (hasLoggedIn) {
-                                                // Logged In Logic
-                                                if (colType === 'virtue') {
-                                                    // Virtue: Done = Green, Missed = Red
-                                                    bgColor = isCompleted ? '#dcfce7' : '#fee2e2';
-                                                } else if (colType === 'vice') {
-                                                    // Vice: Done = Red (Bad!), Missed = Green (Good!)
-                                                    bgColor = isCompleted ? '#fee2e2' : '#dcfce7';
-                                                } else {
-                                                    // Todo / Other
-                                                    bgColor = isCompleted ? '#dcfce7' : '#f5f5f5';
-                                                }
                                             } else {
-                                                // Not logged in -> Grey (already set)
+                                                // Priority: Explicit State > Login State > Default
+                                                if (isCompleted) {
+                                                    // Green (or Red for Vice)
+                                                    bgColor = colType === 'vice' ? '#fee2e2' : '#dcfce7';
+                                                } else if (isSkipped) {
+                                                    // Red (or Green for Vice)
+                                                    bgColor = colType === 'vice' ? '#dcfce7' : '#fee2e2';
+                                                } else if (isExempt) {
+                                                    // Explicit Grey
+                                                    bgColor = '#f5f5f5';
+                                                } else if (hasLoggedIn) {
+                                                    // Implied miss due to login
+                                                    bgColor = colType === 'vice' ? '#dcfce7' : '#fee2e2';
+                                                }
                                             }
 
+                                            // HANDLER
+                                            const handleCellClick = () => {
+                                                if (isStrictFuture || isToday) return;
+
+                                                // Calculate current count for THIS date specifically
+                                                const count = completionCount;
+
+                                                if (isRecurring) {
+                                                    // Recurring: Prompt for exact number
+                                                    const input = window.prompt("Aantal keer voltooid op " + dateString + ":", count);
+                                                    if (input === null) {
+                                                        // Cancel -> Do nothing
+                                                    } else if (input.trim() === '') {
+                                                        // Empty -> Explicitly Set to Exempt (Grey)
+                                                        // This forces "No Data" state even if logged in
+                                                        onSetCompletion(habit.id, dateString, -1);
+                                                    } else {
+                                                        const newVal = parseInt(input);
+                                                        if (!isNaN(newVal) && newVal >= 0) {
+                                                            onSetCompletion(habit.id, dateString, newVal);
+                                                        }
+                                                    }
+                                                } else {
+                                                    // One-Time: 3-State Cycle
+                                                    // State 1: Grey (Unknown) -> (!isCompleted && !isSkipped && !hasLoggedIn)
+                                                    // State 2: Green (Done) -> isCompleted
+                                                    // State 3: Red (Missed) -> isSkipped || (hasLoggedIn && !isCompleted)
+
+                                                    if (isCompleted) {
+                                                        // Green -> Red (0 / Skipped)
+                                                        onSetCompletion(habit.id, dateString, 0);
+                                                    } else if (isSkipped || (hasLoggedIn && !isExempt)) {
+                                                        // Red -> Grey (Exempt)
+                                                        // Note: We use -1 to force Exempt state
+                                                        onSetCompletion(habit.id, dateString, -1);
+                                                    } else {
+                                                        // Grey -> Green (Done)
+                                                        // (Includes isExempt or Default Grey)
+                                                        onSetCompletion(habit.id, dateString, 1);
+                                                    }
+                                                }
+                                            };
+
                                             cells.push(
-                                                <div key={i} style={{
-                                                    aspectRatio: '1',
-                                                    backgroundColor: bgColor,
-                                                    borderRadius: '2px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: '10px',
-                                                    color: '#333',
-                                                    opacity: isStrictFuture ? 0.3 : 1
-                                                }}>
-                                                    {hasLoggedIn && !isCompleted && colType === 'vice' && isRecurring ? (
-                                                        <span style={{ fontWeight: 'bold' }}>0</span>
+                                                <div key={i}
+                                                    className="calendar-cell"
+                                                    title={dateString}
+                                                    onClick={handleCellClick}
+                                                    style={{
+                                                        aspectRatio: '1',
+                                                        backgroundColor: bgColor,
+                                                        borderRadius: '2px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '10px',
+                                                        color: '#333',
+                                                        opacity: isStrictFuture ? 0.3 : 1,
+                                                        cursor: (isStrictFuture || isToday) ? 'default' : 'pointer' // non-interactive for future & today
+                                                    }}>
+                                                    {/* CONTENT LOGIC */}
+                                                    {isCompleted ? (
+                                                        // COMPLETED STATE
+                                                        colType === 'virtue' ? (
+                                                            // Virtue (Green): Checkmark or Number
+                                                            isRecurring && completionCount > 1 ?
+                                                                <span style={{ fontWeight: 'bold' }}>{completionCount}</span> :
+                                                                <Icons.Check style={{ width: '100%', height: '100%', color: colColor }} />
+                                                        ) : (
+                                                            // Vice (Red): X or Number
+                                                            isRecurring ?
+                                                                <span style={{ fontWeight: 'bold' }}>{completionCount}</span> :
+                                                                <Icons.X style={{ width: '100%', height: '100%', color: colColor }} />
+                                                        )
                                                     ) : (
-                                                        isCompleted ? (
+                                                        // NOT COMPLETED STATE
+                                                        // Check if we should show "Failure" (Virtue -> X) or "Success" (Vice -> Check)
+                                                        (isSkipped || (hasLoggedIn && !isExempt)) ? (
                                                             colType === 'virtue' ? (
-                                                                // Virtue: Checkmark or Number
-                                                                isRecurring && completionCount > 1 ?
-                                                                    <span style={{ fontWeight: 'bold' }}>{completionCount}</span> :
-                                                                    <Icons.Check style={{ width: '100%', height: '100%', color: colColor }} />
-                                                            ) : (
-                                                                // Vice: X or Number
+                                                                // Virtue Missed (Red): Show X or 0 (if recurring)
                                                                 isRecurring ?
-                                                                    <span style={{ fontWeight: 'bold' }}>{completionCount}</span> :
-                                                                    <Icons.X style={{ width: '100%', height: '100%', color: colColor }} />
+                                                                    <span style={{ fontWeight: 'bold' }}>0</span> :
+                                                                    <Icons.X style={{ width: '100%', height: '100%', color: colColor, opacity: 0.5 }} />
+                                                            ) : (
+                                                                // Vice Avoided (Green): Show Check or 0
+                                                                isRecurring ?
+                                                                    <span style={{ fontWeight: 'bold' }}>0</span> :
+                                                                    <Icons.Check style={{ width: '100%', height: '100%', color: colColor, opacity: 0.5 }} />
                                                             )
                                                         ) : null
                                                     )}

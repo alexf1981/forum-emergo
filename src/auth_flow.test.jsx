@@ -72,6 +72,12 @@ describe('Authentication & Data Flow', () => {
         vi.clearAllMocks();
         localStorage.clear();
 
+        // Fix JSDOM "Not implemented: navigation" error
+        Object.defineProperty(window, 'location', {
+            configurable: true,
+            value: { reload: vi.fn() },
+        });
+
         // Default Supabase Mocks (No Auth)
         supabase.auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
         supabase.auth.onAuthStateChange.mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } });
