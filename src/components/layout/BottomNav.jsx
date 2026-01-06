@@ -40,6 +40,7 @@ const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber
                         return (
                             <button
                                 key={item.id}
+                                id={`nav-btn-${item.id}`}
                                 className={`nav-item ${activeTab === item.id ? 'active' : ''} role-${role}`}
                                 onClick={() => onTabChange(item.id)}
                                 title={item.label}

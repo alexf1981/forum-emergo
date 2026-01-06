@@ -178,12 +178,19 @@ const HabitItem = ({
     };
 
     return (
-        <div className={`habit-item compact ${isDoneOneTime ? 'completed' : ''}`} style={containerStyle}>
+        <div
+            id={`habit-item-${habit.id}`}
+            data-type={colType}
+            data-recurring={isRecurring}
+            data-bucket={!!habit.bucket}
+            className={`habit-item compact ${isDoneOneTime ? 'completed' : ''}`}
+            style={containerStyle}
+        >
             <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
 
                 {isRecurring ? (
                     // Plus/Minus Controls
-                    <div style={{ display: 'flex', alignItems: 'center', marginRight: '8px', gap: '4px' }}>
+                    <div className="recurring-controls" style={{ display: 'flex', alignItems: 'center', marginRight: '8px', gap: '4px' }}>
                         <button
                             className="btn-icon small"
                             onClick={handleMinus}
@@ -193,7 +200,7 @@ const HabitItem = ({
                                 border: `1px solid ${colColor}`,
                                 color: colColor,
                                 opacity: dailyCount <= 0 ? 0.3 : 1,
-                                fontSize: '14px', lineHeight: 1
+                                fontSize: '12px', lineHeight: 1
                             }}
                         >
                             -
@@ -208,7 +215,7 @@ const HabitItem = ({
                                 backgroundColor: cooldown ? '#eee' : 'transparent',
                                 color: cooldown ? '#aaa' : colColor,
                                 cursor: cooldown ? 'default' : 'pointer',
-                                fontSize: '14px', lineHeight: 1
+                                fontSize: '12px', lineHeight: 1
                             }}
                         >
                             +
@@ -249,7 +256,7 @@ const HabitItem = ({
 
             <div className="habit-controls habit-menu-container" ref={menuRef}>
                 <button
-                    className="btn-icon small menu-toggle"
+                    className="btn-icon small menu-toggle onboarding-target-menu"
                     onClick={toggleMenu}
                     title="Menu"
                 >

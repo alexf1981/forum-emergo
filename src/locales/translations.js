@@ -60,6 +60,25 @@ export const translations = {
         logout_success: "Logged out as",
         reset_account_btn: "Reset Account",
         msg_confirm_reset: "Are you sure? ALL game data will be lost! This cannot be undone.",
+
+        // Onboarding
+        onboarding_welcome_title: "Ave Caesar!",
+        onboarding_welcome_text: "Welcome to Forum Emergo. I will give you a short tour of your city if you wish.",
+        onboarding_step2_text: "This is the Tasks page. Here you find all your daily habits, good and bad. And other tasks you must complete.",
+        onboarding_step3_text: "These are your Virtues (Good Habits). Work on yourself daily. It is expected you perform these daily.",
+        onboarding_step4_text: "These are your Vices (Bad Habits). Avoid these as much as possible. They will cost you. But every day is a new day to resist temptation.",
+        onboarding_step5_text: "These are your Mandata (One-time tasks). Once checked off, they do not return.",
+        onboarding_step6_text: "Some habits you only need to do once a day.",
+        onboarding_step7_text: "Other habits you can check off multiple times a day.",
+        onboarding_step8_text: "Press the three dots to get more information about your habits.",
+        onboarding_step9_text: "This is the City page. Here you build your empire from a small settlement into a bustling city.",
+        onboarding_step10_text: "We start with a simple Town Hall, but under your leadership, this will grow quickly.",
+        onboarding_name_title: "One last question...",
+        onboarding_name_text: "Let's begin, oh Caesar. But one last question: How may I call you?",
+        btn_skip_tour: "Skip Tour",
+        btn_next: "Click to continue",
+        btn_finish: "Start Reign",
+
         // Settings
         settings_title: "Settings",
         cloud_storage: "Cloud Storage",
@@ -245,6 +264,25 @@ export const translations = {
         logout_success: "Uitgelogd als",
         reset_account_btn: "Account Resetten",
         msg_confirm_reset: "Weet je het zeker? ALLE speldata gaat verloren! Dit kan niet ongedaan worden.",
+
+        // Onboarding
+        onboarding_welcome_title: "Ave Keizer!",
+        onboarding_welcome_text: "Welkom bij Forum Emergo. Ik zal u een korte rondleiding geven door uw stad als u wenst.",
+        onboarding_step2_text: "Dit is de takenpagina. Hier vindt u al uw dagelijkse gewoontes, goed en slecht. En andere taken die u moet afronden.",
+        onboarding_step3_text: "Dit zijn uw Virtues (Goede Gewoontes). Zorg ervoor dat u dagelijks aan uzelf werkt. Er wordt verwacht dat u deze taken dagelijks uitvoert.",
+        onboarding_step4_text: "Dit zijn uw Barbaria (Slechte Gewoontes). Voorkom deze zoveel mogelijk. Dit komt u nog duur te staan. Maar elke dag is een nieuwe dag om de verleiding te weerstaan.",
+        onboarding_step5_text: "Dit zijn uw Mandata (Eenmalige taken). Nadat deze zijn afgevinkt komen ze niet meer terug.",
+        onboarding_step6_text: "Sommige gewoontes hoeft u maar 1 keer per dag te doen.",
+        onboarding_step7_text: "Andere gewoontes kunt u meerdere malen per dag afvinken.",
+        onboarding_step8_text: "Druk op de drie puntjes om meer informatie te krijgen over uw gewoontes.",
+        onboarding_step9_text: "Dit is de Stadpagina. Hier bouwt u uw rijk van een kleine nederzetting om tot een bruisende stad.",
+        onboarding_step10_text: "We beginnen met een simpel Stadhuis, maar onder uw leiding zal dit snel uitgroeien.",
+        onboarding_name_title: "Nog één vraag...",
+        onboarding_name_text: "Laten we beginnen, o Keizer. Maar nog 1 laatste vraag: Hoe kan ik u noemen?",
+        btn_skip_tour: "Sla rondleiding over",
+        btn_next: "Klik om verder te gaan",
+        btn_finish: "Start Uw Rijk",
+
         // Settings
         settings_title: "Instellingen",
         cloud_storage: "Cloud Opslag",
@@ -430,6 +468,25 @@ export const translations = {
         logout_success: "Desconectado como",
         reset_account_btn: "Reiniciar Cuenta",
         msg_confirm_reset: "¿Estás seguro? ¡Se perderán TODOS los datos! Esto no se puede deshacer.",
+
+        // Onboarding (Placeholder Spanish - English Copy for simplicity or rough translation)
+        onboarding_welcome_title: "¡Ave César!",
+        onboarding_welcome_text: "Bienvenido a Forum Emergo. Le daré un breve recorrido por su ciudad si lo desea.",
+        onboarding_step2_text: "Esta es la página de tareas. Aquí encontrarás todos tus hábitos diarios, buenos y malos.",
+        onboarding_step3_text: "Estas son tus Virtudes. Trabaja en ti mismo diariamente.",
+        onboarding_step4_text: "Estos son tus Vicios. Evítalos tanto como sea posible.",
+        onboarding_step5_text: "Estos son tus Mandata (Tareas únicas). Una vez marcadas, no vuelven.",
+        onboarding_step6_text: "Algunos hábitos solo necesitas hacerlos una vez al día.",
+        onboarding_step7_text: "Otros hábitos puedes marcarlos varias veces al día.",
+        onboarding_step8_text: "Presiona los tres puntos para obtener más información.",
+        onboarding_step9_text: "Esta es la página de la Ciudad. Aquí construyes tu imperio.",
+        onboarding_step10_text: "Comenzamos con un Ayuntamiento simple, pero crecerá rápidamente.",
+        onboarding_name_title: "Una última pregunta...",
+        onboarding_name_text: "¿Cómo puedo llamarte?",
+        btn_skip_tour: "Saltar tour",
+        btn_next: "Clic para continuar",
+        btn_finish: "Comenzar Reino",
+
         // Settings
         settings_title: "Ajustes",
         cloud_storage: "Nube",
@@ -615,6 +672,25 @@ export const translations = {
         logout_success: "Abgemeldet als",
         reset_account_btn: "Konto zurücksetzen",
         msg_confirm_reset: "Bist du sicher? ALLE Spieldaten gehen verloren! Dies kann nicht rückgängig gemacht werden.",
+
+        // Onboarding (German)
+        onboarding_welcome_title: "Ave Caesar!",
+        onboarding_welcome_text: "Willkommen im Forum Emergo. Ich gebe Ihnen eine kurze Führung.",
+        onboarding_step2_text: "Dies ist die Aufgabenseite. Hier finden Sie Ihre täglichen Gewohnheiten.",
+        onboarding_step3_text: "Dies sind Ihre Tugenden. Arbeiten Sie täglich an sich selbst.",
+        onboarding_step4_text: "Dies sind Ihre Laster. Vermeiden Sie diese so weit wie möglich.",
+        onboarding_step5_text: "Dies sind Ihre Mandata (Einmalige Aufgaben).",
+        onboarding_step6_text: "Einige Gewohnheiten müssen Sie nur einmal am Tag tun.",
+        onboarding_step7_text: "Andere Gewohnheiten können Sie mehrmals am Tag abhaken.",
+        onboarding_step8_text: "Drücken Sie auf die drei Punkte für mehr Informationen.",
+        onboarding_step9_text: "Dies ist die Stadtseite. Hier bauen Sie Ihr Reich.",
+        onboarding_step10_text: "Wir beginnen mit einem einfachen Rathaus.",
+        onboarding_name_title: "Eine letzte Frage...",
+        onboarding_name_text: "Wie darf ich Sie nennen?",
+        btn_skip_tour: "Tour überspringen",
+        btn_next: "Klicken zum Fortfahren",
+        btn_finish: "Reich starten",
+
         // Settings
         settings_title: "Einstellungen",
         cloud_storage: "Cloud-Speicher",

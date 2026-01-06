@@ -231,6 +231,7 @@ const CityBuilding = ({ building, onClick, onMove, globalScale = 1 }) => {
 
     return (
         <div
+            id={`building-${building.type || building.id}`}
             className="city-building"
             style={style}
             onMouseDown={onMouseDown}

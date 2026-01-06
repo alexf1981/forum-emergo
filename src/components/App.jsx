@@ -69,8 +69,36 @@ function App() {
     useEffect(() => {
         // If we are a new user (cloud confirmed no data) and local habits are empty, seed defaults
         if (isNewUser && isCloudSynchronized && habits.length === 0) {
+            // Helper to generate 4 weeks of random history (strings)
+            // MUST match HabitItem.jsx formatting (Local Time YYYY-MM-DD)
+            const generateRandomHistory = () => {
+                const history = [];
+                const today = new Date();
+                // Start from yesterday (i=1) to avoid overriding today's state
+                for (let i = 1; i < 28; i++) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+
+                    // Force Local Time Formatting to match HabitItem.jsx
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const dateStr = `${y}-${m}-${day}`;
+
+                    // 33% Done, 33% Fail (!), 33% No Data (Skip)
+                    const rand = Math.random();
+                    if (rand > 0.66) {
+                        history.push(dateStr); // Green
+                    } else if (rand > 0.33) {
+                        history.push(`!${dateStr}`); // Red
+                    }
+                    // else skip -> "No Data" (Grey)
+                }
+                return history;
+            };
+
             const newHabits = [
-                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
+                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: generateRandomHistory(), recurring: false },
                 { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
                 { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
                 { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
@@ -152,7 +180,7 @@ function App() {
 
     return (
         <div className="wrapper">
-            {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
+            {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} setActiveTab={setActiveTab} />}
             {/* First Visit Modal - Highest Priority */}
             {showFirstVisitModal && (
                 <WelcomeModal
@@ -183,8 +211,35 @@ function App() {
 
                         // Only seed defaults if no local data exists
                         if (habits.length === 0) {
+                            // Helper to generate 4 weeks of random history (strings)
+                            const generateRandomHistory = () => {
+                                const history = [];
+                                const today = new Date();
+                                // Start from yesterday (i=1) to avoid overriding today's state
+                                for (let i = 1; i < 28; i++) {
+                                    const d = new Date(today);
+                                    d.setDate(d.getDate() - i);
+
+                                    // Force Local Time Formatting to match HabitItem.jsx
+                                    const y = d.getFullYear();
+                                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                                    const day = String(d.getDate()).padStart(2, '0');
+                                    const dateStr = `${y}-${m}-${day}`;
+
+                                    // 33% Done, 33% Fail (!), 33% No Data (Skip)
+                                    const rand = Math.random();
+                                    if (rand > 0.66) {
+                                        history.push(dateStr); // Green
+                                    } else if (rand > 0.33) {
+                                        history.push(`!${dateStr}`); // Red
+                                    }
+                                    // else skip -> "No Data" (Grey)
+                                }
+                                return history;
+                            };
+
                             const newHabits = [
-                                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: [], recurring: false },
+                                { id: Date.now() + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: generateRandomHistory(), recurring: false },
                                 { id: Date.now() + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
                                 { id: Date.now() + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
                                 { id: Date.now() + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },

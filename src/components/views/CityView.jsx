@@ -91,7 +91,7 @@ const CityView = ({ habits, stats, buildings, rank, score, onToggleHabit, onIncr
                             const colColor = colType === 'virtue' ? '#4caf50' : colType === 'vice' ? '#ff4444' : '#2196f3';
 
                             return (
-                                <div className="city-col" key={colType}>
+                                <div className="city-col" key={colType} id={`city-col-${colType}`}>
                                     <div className="city-col-header" style={{ color: colColor, borderColor: colColor }}>{colTitle}</div>
                                     <div className="city-col-content">
                                         {(() => {
