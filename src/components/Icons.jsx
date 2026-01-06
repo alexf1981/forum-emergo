@@ -19,7 +19,8 @@ const Icons = {
     FlagUK: () => <svg width="24" height="24" viewBox="0 0 32 24" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="24" fill="#012169" /><path d="M0,0 L32,24 M32,0 L0,24" stroke="#FFF" strokeWidth="4" /><path d="M0,0 L32,24 M32,0 L0,24" stroke="#C8102E" strokeWidth="2" /><path d="M16,0 V24 M0,12 H32" stroke="#FFF" strokeWidth="6" /><path d="M16,0 V24 M0,12 H32" stroke="#C8102E" strokeWidth="4" /></svg>,
     FlagNL: () => <svg width="24" height="24" viewBox="0 0 32 24" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="8" fill="#AE1C28" /><rect y="8" width="32" height="8" fill="#FFF" /><rect y="16" width="32" height="8" fill="#21468B" /></svg>,
     FlagES: () => <svg width="24" height="24" viewBox="0 0 32 24" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="24" fill="#AA151B" /><rect y="6" width="32" height="12" fill="#F1BF00" /></svg>,
-    FlagDE: () => <svg width="24" height="24" viewBox="0 0 32 24" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="8" fill="#000" /><rect y="8" width="32" height="8" fill="#DD0000" /><rect y="16" width="32" height="8" fill="#FFCE00" /></svg>
+    FlagDE: () => <svg width="24" height="24" viewBox="0 0 32 24" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="8" fill="#000" /><rect y="8" width="32" height="8" fill="#DD0000" /><rect y="16" width="32" height="8" fill="#FFCE00" /></svg>,
+    CloudOffline: (props) => <svg {...props} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0 4 15h9a5 5 0 0 0 1.7-.3"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
 };
 
 export default Icons;

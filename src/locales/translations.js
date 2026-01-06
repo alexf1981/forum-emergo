@@ -63,6 +63,7 @@ export const translations = {
         cloud_storage: "Cloud Storage",
         cloud_desc_guest: "Create an account to save progress securely in the cloud and play anywhere.",
         cloud_desc_user: "Logged in as:",
+        local_login_status: "Local Login",
         local_manage: "Local Management",
         local_desc: "No account needed. Data is saved on this device.",
         download_backup: "Download Backup",
@@ -100,6 +101,7 @@ export const translations = {
         msg_restored: "Chronicles restored!",
         msg_check_email: "Check email for confirmation!",
         msg_history_updated: "History updated!",
+        success_rate_4w: "Success (4 weeks)",
         // Items (Generic)
         item_weapon: "Weapon",
         item_armor: "Armor",
@@ -244,6 +246,7 @@ export const translations = {
         cloud_storage: "Cloud Opslag",
         cloud_desc_guest: "Maak een account aan om je voortgang veilig in de cloud te bewaren en overal te spelen.",
         cloud_desc_user: "Ingelogd als:",
+        local_login_status: "Lokaal Ingelogd",
         local_manage: "Lokaal Beheer",
         local_desc: "Geen account nodig. Gegevens worden op dit apparaat opgeslagen.",
         download_backup: "Download Backup",
@@ -281,6 +284,7 @@ export const translations = {
         msg_restored: "Kronieken hersteld!",
         msg_check_email: "Controleer je e-mail voor bevestiging!",
         msg_history_updated: "Historie bijgewerkt!",
+        success_rate_4w: "Succes (4 weken)",
         // Items
         item_weapon: "Wapen",
         item_armor: "Pantser",
@@ -425,6 +429,7 @@ export const translations = {
         cloud_storage: "Nube",
         cloud_desc_guest: "Crea una cuenta para guardar tu progreso en la nube.",
         cloud_desc_user: "Conectado como:",
+        local_login_status: "Inicio de sesión local",
         local_manage: "Gestión Local",
         local_desc: "Datos guardados en este dispositivo.",
         download_backup: "Descargar Copia",
@@ -462,6 +467,7 @@ export const translations = {
         msg_restored: "¡Crónicas restauradas!",
         msg_check_email: "¡Verifica tu correo para confirmar!",
         msg_history_updated: "¡Historial actualizado!",
+        success_rate_4w: "Éxito (4 semanas)",
         // Items
         item_weapon: "Arma",
         item_armor: "Armadura",
@@ -606,6 +612,7 @@ export const translations = {
         cloud_storage: "Cloud-Speicher",
         cloud_desc_guest: "Erstelle ein Konto, um deinen Fortschritt sicher zu speichern.",
         cloud_desc_user: "Angemeldet als:",
+        local_login_status: "Lokale Anmeldung",
         local_manage: "Lokale Verwaltung",
         local_desc: "Daten werden auf diesem Gerät gespeichert.",
         download_backup: "Backup herunterladen",
@@ -643,6 +650,7 @@ export const translations = {
         msg_restored: "Chroniken wiederhergestellt!",
         msg_check_email: "Prüfe deine E-Mails zur Bestätigung!",
         msg_history_updated: "Verlauf aktualisiert!",
+        success_rate_4w: "Erfolg (4 Wochen)",
         // Items
         item_weapon: "Waffe",
         item_armor: "Rüstung",

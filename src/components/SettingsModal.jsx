@@ -90,7 +90,7 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
 
                     {/* CLOUD SECTION (Preferred) */}
                     <div className="card">
-                        <h3><Icons.Wreath /> {t('cloud_storage')}</h3>
+                        {/* Header Removed as per user request */}
                         {user ? (
                             <div className="mt-sm">
                                 <p style={{ fontSize: '0.9em' }}>{t('cloud_desc_user')} <br /><strong>{user.email}</strong></p>
@@ -103,7 +103,21 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                             </div>
                         ) : (
                             <div className="mt-sm">
-                                <p style={{ fontSize: '0.9em' }}>{t('cloud_desc_guest')}</p>
+                                <p style={{ fontSize: '0.9em', marginBottom: '8px' }}>
+                                    {t('logged_in_as')}: <strong>{t('local_login_status')}</strong>
+                                </p>
+                                <div style={{
+                                    backgroundColor: '#fff3cd',
+                                    border: '1px solid #ffeeba',
+                                    color: '#856404',
+                                    padding: '8px',
+                                    borderRadius: '4px',
+                                    fontSize: '0.85em',
+                                    marginBottom: '10px'
+                                }}>
+                                    <Icons.CloudOffline style={{ marginRight: '5px', verticalAlign: 'middle' }} />
+                                    {t('welcome_local_desc')}
+                                </div>
                                 <div style={{ display: 'flex', gap: '5px' }}>
                                     <button className="btn full-width mt-sm" onClick={onLogin}>{t('login_btn')} / {t('register_btn')}</button>
                                 </div>

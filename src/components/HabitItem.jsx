@@ -275,6 +275,7 @@ const HabitItem = ({
                             <span>{t('delete')}</span>
                         </button>
 
+
                         {(colType === 'virtue' || colType === 'vice') && (
                             <div style={{
                                 marginTop: '4px',
@@ -284,6 +285,64 @@ const HabitItem = ({
                                 paddingRight: '4px',
                                 minWidth: '250px' // Force wider menu for bigger boxes
                             }}>
+                                {/* Success Rate Display */}
+                                {(() => {
+                                    const calculateSuccessRate = () => {
+                                        let valid = 0;
+                                        let success = 0;
+                                        const now = new Date();
+                                        const history = habit.history || [];
+
+                                        // Loop strictly last 28 days (Visible Calendar)
+                                        for (let i = 0; i < 28; i++) {
+                                            const d = new Date(now);
+                                            d.setDate(now.getDate() - i); // i=0 is Today, i=27 is 4 weeks ago
+
+                                            const y = d.getFullYear();
+                                            const m = String(d.getMonth() + 1).padStart(2, '0');
+                                            const da = String(d.getDate()).padStart(2, '0');
+                                            const dateString = `${y}-${m}-${da}`;
+
+                                            // 1. Exclude Exempt
+                                            if (history.includes(`-${dateString}`)) continue;
+
+                                            // 2. Logic Status
+                                            const isCompleted = history.includes(dateString);
+                                            const isSkipped = history.includes(`!${dateString}`);
+                                            const hasLoggedIn = loginHistory && loginHistory.includes(dateString);
+
+                                            // 3. Exclude Grey (No Data)
+                                            // Grey = Not Login AND Not Explicit
+                                            if (!isCompleted && !isSkipped && !hasLoggedIn) continue;
+
+                                            // It is Valid
+                                            valid++;
+
+                                            if (colType === 'vice') {
+                                                // Vice Success = NOT DONE (Avoided)
+                                                if (!isCompleted) success++;
+                                            } else {
+                                                // Virtue Success = DONE
+                                                if (isCompleted) success++;
+                                            }
+                                        }
+
+                                        if (valid === 0) return null;
+                                        const rate = Math.round((success / valid) * 100);
+                                        return (
+                                            <div style={{
+                                                textAlign: 'center',
+                                                marginBottom: '8px',
+                                                fontSize: '12px',
+                                                color: '#666',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                {t('success_rate_4w')}: <span style={{ color: rate >= 80 ? 'var(--color-virtue)' : (rate < 50 ? 'var(--color-vice)' : '#666') }}>{rate}%</span>
+                                            </div>
+                                        );
+                                    };
+                                    return calculateSuccessRate();
+                                })()}
                                 {/* Headers */}
                                 <div style={{
                                     display: 'grid',

@@ -147,4 +147,27 @@ describe('HabitItem History Interaction', () => {
         fireEvent.click(todayCell);
         expect(mockSetCompletion).not.toHaveBeenCalled();
     });
+
+    it('calculates success rate correctly (ignoring Grey days)', () => {
+        // Setup dates:
+        // 1. pastDate (5 days ago)
+        // 2. anotherDate (6 days ago)
+        const anotherDate = new Date(today);
+        anotherDate.setDate(today.getDate() - 6);
+        const anotherDateStr = anotherDate.toISOString().split('T')[0];
+
+        // Scenario:
+        // - pastDate: Green (Done)
+        // - anotherDate: Red (Logged In but not Done)
+        // - All other days (26): Grey (No login, no history, so ignored)
+        // - Total Valid: 2. Success: 1 (pastDate). Rate: 50%.
+
+        renderHabit([pastDateStr], [anotherDateStr, pastDateStr]);
+        openMenu();
+
+        // Check for text "success_rate_4w: 50%" (as t returns key)
+        // getByText throws if not found, so simply calling it is sufficient assertion for existence
+        screen.getByText(/success_rate_4w/);
+        screen.getByText('50%');
+    });
 });
