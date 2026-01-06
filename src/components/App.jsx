@@ -62,6 +62,13 @@ function App() {
             setShowFirstVisitModal(true);
         }
 
+        // Check for Manual Reset Trigger
+        const triggerOnboarding = localStorage.getItem('trigger_onboarding');
+        if (triggerOnboarding) {
+            setShowOnboarding(true);
+            localStorage.removeItem('trigger_onboarding');
+        }
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 

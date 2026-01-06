@@ -107,9 +107,13 @@ const CityView = ({ habits, stats, buildings, rank, score, onToggleHabit, onIncr
                                                 const dailyCount = h.history.filter(d => d === today).length;
                                                 const isDone = dailyCount > 0;
 
-                                                // If it's done AND bucket AND not pending, move to completed.
+                                                // Determine recurrence (matches HabitItem logic)
+                                                const isRecurring = h.recurring !== undefined ? h.recurring : !h.bucket;
+                                                const isOneTime = !isRecurring;
+
+                                                // If it's done AND (bucket OR one-time) AND not pending, move to completed.
                                                 // If it's pending, it stays in active even if done.
-                                                if (h.bucket && isDone && !pendingIds.has(h.id)) {
+                                                if ((h.bucket || isOneTime) && isDone && !pendingIds.has(h.id)) {
                                                     completedBucketHabits.push(h);
                                                 } else {
                                                     activeHabits.push(h);

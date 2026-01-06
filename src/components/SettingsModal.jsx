@@ -135,6 +135,9 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                 window.localStorage.setItem('romeresearch', JSON.stringify(resetData.romeresearch));
                 window.localStorage.setItem('romeloginhistory', JSON.stringify(resetData.romeloginhistory));
 
+                // Set flag to trigger onboarding after reload
+                window.localStorage.setItem('trigger_onboarding', 'true');
+
                 // Reload to refresh game state completely
                 window.location.reload();
             } catch (error) {
@@ -152,6 +155,11 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
             // Prompt says: "standaardtaken worden weer toegevoegd".
             // App.jsx logic: if habits.length === 0, seed defaults.
             // So simply clearing storage works.
+
+            // Set flag to trigger onboarding after reload
+            // REMOVED: For local user, we want the "Welcome Modal" to take precedence. 
+            // The Welcome Modal -> "Play Local" flow will naturally trigger onboarding.
+            // window.localStorage.setItem('trigger_onboarding', 'true');
 
             window.location.reload();
         }
