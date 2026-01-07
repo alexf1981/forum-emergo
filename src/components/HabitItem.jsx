@@ -522,7 +522,7 @@ const HabitItem = ({
                                                         // COMPLETED STATE
                                                         colType === 'virtue' ? (
                                                             // Virtue (Green): Checkmark or Number
-                                                            isRecurring && completionCount > 1 ?
+                                                            isRecurring ?
                                                                 <span style={{ fontWeight: 'bold' }}>{completionCount}</span> :
                                                                 <Icons.Check style={{ width: '100%', height: '100%', color: colColor }} />
                                                         ) : (
