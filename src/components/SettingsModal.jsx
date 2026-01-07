@@ -119,7 +119,7 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
             romeresources: {},
             romeresearch: {},
             romeloginhistory: [],
-            romelastwelcome: ''
+            romelastwelcome: GameLogic.getTodayString()
         };
 
         if (user) {

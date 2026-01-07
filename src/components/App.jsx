@@ -113,6 +113,7 @@ function App() {
             ];
             actions.replaceHabits(newHabits, true);
             actions.notify(t('msg_enjoy_rome'), "success");
+            actions.dismissWelcome(); // Suppress Daily Welcome for new users
             setShowOnboarding(true);
         }
     }, [isNewUser, isCloudSynchronized, habits, actions, t]);

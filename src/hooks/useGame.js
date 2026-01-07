@@ -380,7 +380,18 @@ export function useGame() {
                         setStats(cloudData.romestats);
                         setHabits(cloudData.romehabits);
                         setHeroes(cloudData.romeheroes);
-                        if (cloudData.romelastwelcome) setLastWelcomeDate(cloudData.romelastwelcome);
+                        if (cloudData.romelastwelcome) {
+                            // Smart Sync: Don't overwrite if local is already "Today" (just dismissed) and cloud is old
+                            const today = GameLogic.getTodayString();
+                            let localVal = '';
+                            try {
+                                localVal = JSON.parse(window.localStorage.getItem('rome_last_welcome'));
+                            } catch (e) { }
+
+                            if (localVal !== today || cloudData.romelastwelcome === today) {
+                                setLastWelcomeDate(cloudData.romelastwelcome);
+                            }
+                        }
                         if (cloudData.romebuildings) setBuildings(cloudData.romebuildings);
                         if (cloudData.romeresources) setResources(cloudData.romeresources);
                         if (cloudData.romeresearch) setResearch(cloudData.romeresearch);
