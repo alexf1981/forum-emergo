@@ -45,8 +45,16 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
         }
 
         // 2. Capture Backup & Nuke Storage
+        // 2. Capture Backup & Nuke Storage
+        // 2. Capture Backup & Nuke Storage
         const backup = window.localStorage.getItem('romehabits_backup');
+        const debugLogs = window.localStorage.getItem('emergo_debug_log');
         window.localStorage.clear();
+
+        // Restore Logs
+        if (debugLogs) {
+            window.localStorage.setItem('emergo_debug_log', debugLogs);
+        }
 
         // 3. Restore Backup (if exists)
         // If backup is 'null', we do nothing (storage stays empty, cleaner than restoring 'null')
@@ -109,6 +117,22 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                 window.localStorage.setItem('romeresearch', JSON.stringify(resetData.romeresearch));
                 window.localStorage.setItem('romeloginhistory', JSON.stringify(resetData.romeloginhistory));
 
+                // Preserve Debug Logs
+                const debugLogs = window.localStorage.getItem('emergo_debug_log');
+                if (debugLogs) {
+                    // We didn't clear storage here, we just overwrote data keys.
+                    // But if we wanted to be safe... actually we don't clear storage for logged in user above.
+                    // We overwrite keys.
+                    // So logs should be SAFE.
+                    // Wait, checking code above...
+                    // line 128: await DataService.saveGameData(user.id, resetData);
+                    // line 130-136: window.localStorage.setItem(...)
+
+                    // We do NOT call localStorage.clear() for logged in user!
+                    // So logs are already safe.
+                    // I will NOT modify this block then.
+                }
+
                 // Set flag to trigger onboarding after reload
                 window.localStorage.setItem('trigger_onboarding', 'true');
 
@@ -120,7 +144,15 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
             }
         } else {
             // Local: Clear and Reload (triggering Welcome)
+            // Local: Clear and Reload (triggering Welcome)
+            // Local: Clear and Reload (triggering Welcome)
+            // Preserve logs
+            const debugLogs = window.localStorage.getItem('emergo_debug_log');
             window.localStorage.clear();
+            if (debugLogs) {
+                window.localStorage.setItem('emergo_debug_log', debugLogs);
+            }
+
             // We specifically want to trigger Welcome Modal, so ensure has_visited is GONE.
             // But wait! If we clear(), it IS gone.
             // AND we want default habits? 
