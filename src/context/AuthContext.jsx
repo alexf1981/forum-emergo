@@ -64,6 +64,13 @@ export const AuthProvider = ({ children }) => {
 
     const handleSession = async (session) => {
         const currentUser = session?.user ?? null;
+
+        // Optimization: If user ID hasn't changed, don't trigger state update
+        // This prevents 'SIGNED_IN' and 'INITIAL_SESSION' from causing double-mounts
+        if (currentUser?.id === user?.id && currentUser !== null && user !== null) {
+            return;
+        }
+
         setUser(currentUser);
 
         if (currentUser) {

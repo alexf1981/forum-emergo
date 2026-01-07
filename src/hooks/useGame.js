@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DebugLogger } from '../utils/DebugLogger';
 import { useLocalStorage } from './useLocalStorage';
 import * as GameLogic from '../logic/gameLogic';
@@ -367,9 +367,18 @@ export function useGame() {
 
 
     // 1. Initial Load from Cloud when user logs in
+    const syncInProgress = useRef(null);
+
     useEffect(() => {
         const syncFromCloud = async () => {
+            // Prevent concurrent syncs for the same user (e.g. StrictMode double-fire)
+            if (user && syncInProgress.current === user.id) {
+                DebugLogger.log('SYNC', `Skipping Duplicate Sync for: ${user.email}`);
+                return;
+            }
+
             if (user) {
+                syncInProgress.current = user.id;
                 DebugLogger.log('SYNC', `Starting Sync for User: ${user.email}`);
                 // Reset sync status because we are loading new user data
                 // We do NOT want to auto-save local stale data over this new user's cloud data
@@ -420,6 +429,10 @@ export function useGame() {
                     DebugLogger.log('SYNC', `Sync Failed: ${error.message}`);
                     notify({ key: 'msg_sync_error' }, "error");
                 } finally {
+                    // Release lock
+                    if (user && syncInProgress.current === user.id) {
+                        syncInProgress.current = null;
+                    }
                     // Finally block no longer sets isCloudSynchronized blindly.
                 }
             } else {
