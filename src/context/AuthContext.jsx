@@ -12,6 +12,12 @@ const getRandomName = () => {
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
+    const userRef = React.useRef(null); // Fix Stale Closure in useEffect
+
+    useEffect(() => {
+        userRef.current = user;
+    }, [user]);
+
     // Initialize with stored name OR generate one immediately so it's never empty
     const [playerName, setPlayerName] = useState(() => {
         const stored = localStorage.getItem('player_name');
@@ -51,8 +57,10 @@ export const AuthProvider = ({ children }) => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             if (mounted) {
                 // We don't touch loading state here, as initAuth handles the initial load
-                await handleSession(session);
-                DebugLogger.log('AUTH', `Auth State Changed: ${_event}. User: ${session?.user ? session.user.email : 'None'}`);
+                const updated = await handleSession(session);
+                if (updated) {
+                    DebugLogger.log('AUTH', `Auth State Changed: ${_event}. User: ${session?.user ? session.user.email : 'None'}`);
+                }
             }
         });
 
@@ -67,8 +75,10 @@ export const AuthProvider = ({ children }) => {
 
         // Optimization: If user ID hasn't changed, don't trigger state update
         // This prevents 'SIGNED_IN' and 'INITIAL_SESSION' from causing double-mounts
-        if (currentUser?.id === user?.id && currentUser !== null && user !== null) {
-            return;
+        // Use userRef.current to avoid stale closure in useEffect
+        const previousUser = userRef.current;
+        if (currentUser?.id === previousUser?.id && currentUser !== null && previousUser !== null) {
+            return false;
         }
 
         setUser(currentUser);
@@ -96,6 +106,7 @@ export const AuthProvider = ({ children }) => {
         } else {
             loadLocalName();
         }
+        return true;
     }
 
     // Track currently fetching user to prevent parallel requests for same ID

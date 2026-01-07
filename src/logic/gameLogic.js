@@ -37,6 +37,32 @@ export const getTodayString = () => {
     return `${year}-${month}-${day}`;
 };
 
+export const generateRandomHistory = () => {
+    const history = [];
+    const today = new Date();
+    // Start from yesterday (i=1) to avoid overriding today's state
+    for (let i = 1; i < 28; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+
+        // Force Local Time Formatting to match HabitItem.jsx
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const dateStr = `${y}-${m}-${day}`;
+
+        // 33% Done, 33% Fail (!), 33% No Data (Skip)
+        const rand = Math.random();
+        if (rand > 0.66) {
+            history.push(dateStr); // Green
+        } else if (rand > 0.33) {
+            history.push(`!${dateStr}`); // Red
+        }
+        // else skip -> "No Data" (Grey)
+    }
+    return history;
+};
+
 // --- PURE LOGIC ---
 
 export function getScore(stats) {
