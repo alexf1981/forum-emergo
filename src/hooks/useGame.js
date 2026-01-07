@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { DebugLogger } from '../utils/DebugLogger';
 import { useLocalStorage } from './useLocalStorage';
 import * as GameLogic from '../logic/gameLogic';
 import { useAuth } from '../context/AuthContext';
@@ -364,10 +365,12 @@ export function useGame() {
     const [isCloudSynchronized, setIsCloudSynchronized] = useState(false);
     const [isNewUser, setIsNewUser] = useState(false);
 
+
     // 1. Initial Load from Cloud when user logs in
     useEffect(() => {
         const syncFromCloud = async () => {
             if (user) {
+                DebugLogger.log('SYNC', `Starting Sync for User: ${user.email}`);
                 // Reset sync status because we are loading new user data
                 // We do NOT want to auto-save local stale data over this new user's cloud data
                 setIsCloudSynchronized(false);
@@ -377,6 +380,7 @@ export function useGame() {
                 try {
                     const cloudData = await DataService.loadGameData(user.id);
                     if (cloudData && cloudData.romestats) {
+                        DebugLogger.log('SYNC', 'Cloud Data Found & Loaded');
                         setStats(cloudData.romestats);
                         setHabits(cloudData.romehabits);
                         setHeroes(cloudData.romeheroes);
@@ -390,6 +394,8 @@ export function useGame() {
 
                             if (localVal !== today || cloudData.romelastwelcome === today) {
                                 setLastWelcomeDate(cloudData.romelastwelcome);
+                            } else {
+                                DebugLogger.log('SYNC', 'Skipped Stale Welcome Date (Local is Today)');
                             }
                         }
                         if (cloudData.romebuildings) setBuildings(cloudData.romebuildings);
@@ -399,22 +405,26 @@ export function useGame() {
                         setIsNewUser(false);
                     } else {
                         // Valid load but no data found -> New User (or wiped)
+                        DebugLogger.log('SYNC', 'No Cloud Data Found (New User)');
                         setIsNewUser(true);
                     }
                     setSaveStatus('saved');
                     // Sync success!
                     setIsCloudSynchronized(true);
+                    DebugLogger.log('SYNC', 'Sync Complete. isCloudSynchronized = true');
                 } catch (error) {
                     console.error("Sync error:", error);
                     setSaveStatus('error');
                     // Sync failed! Do NOT assume synchronized.
                     setIsCloudSynchronized(false);
+                    DebugLogger.log('SYNC', `Sync Failed: ${error.message}`);
                     notify({ key: 'msg_sync_error' }, "error");
                 } finally {
                     // Finally block no longer sets isCloudSynchronized blindly.
                 }
             } else {
                 // No user? No sync needed, but we are "synchronized" with local (noop)
+                DebugLogger.log('SYNC', 'No User. Running in Local Mode.');
                 setIsCloudSynchronized(false);
                 setIsNewUser(false);
             }

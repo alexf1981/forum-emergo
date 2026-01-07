@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import { supabase } from '../services/supabaseClient'
+import { DebugLogger } from '../utils/DebugLogger'
 
 const AuthContext = createContext()
 
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }) => {
 
                 if (mounted) {
                     await handleSession(session);
+                    DebugLogger.log('AUTH', `Initial Session Check: ${session?.user ? session.user.email : 'No User'}`);
                 }
             } catch (error) {
                 console.error("Auth init error:", error);
@@ -50,6 +52,7 @@ export const AuthProvider = ({ children }) => {
             if (mounted) {
                 // We don't touch loading state here, as initAuth handles the initial load
                 await handleSession(session);
+                DebugLogger.log('AUTH', `Auth State Changed: ${_event}. User: ${session?.user ? session.user.email : 'None'}`);
             }
         });
 

@@ -1,9 +1,34 @@
+import { useState, useRef } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 
-const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber, saveStatus, isLoggedIn }) => {
+const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber, saveStatus, isLoggedIn, onDebug }) => {
     const { t } = useLanguage();
     const { playerName } = useAuth();
+
+    // Secret Debug Trigger Logic
+    const [clickCount, setClickCount] = useState(0);
+    const clickTimer = useRef(null);
+
+    const handleGoldClick = () => {
+        setClickCount(prev => {
+            const newVal = prev + 1;
+
+            // Clear existing timer to reset window
+            if (clickTimer.current) clearTimeout(clickTimer.current);
+
+            // Set new timer: must click next within 500ms
+            clickTimer.current = setTimeout(() => {
+                setClickCount(0);
+            }, 500);
+
+            if (newVal >= 5) {
+                onDebug && onDebug();
+                return 0;
+            }
+            return newVal;
+        });
+    };
 
     // We construct navItems inside render or memo so 't' is fresh
     const navItems = [
@@ -19,7 +44,7 @@ const BottomNav = ({ activeTab, onTabChange, onProfileClick, stats, formatNumber
     return (
         <div className="bottom-nav">
             <div className="bottom-nav-content">
-                <div className="nav-item stat-item edge-item">
+                <div className="nav-item stat-item edge-item" onClick={handleGoldClick} style={{ cursor: 'pointer' }}>
                     <div className="nav-icon gold-icon">
                         <img src="./assets/nav_gold.jpg" alt="Goud" />
                     </div>

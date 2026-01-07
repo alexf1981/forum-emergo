@@ -15,6 +15,8 @@ import OnboardingModal from './OnboardingModal';
 import { useGame } from '../hooks/useGame';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { DebugLogger } from '../utils/DebugLogger';
+import DebugLogModal from './DebugLogModal';
 
 function App() {
     const { t } = useLanguage();
@@ -30,12 +32,14 @@ function App() {
     const [selectedQuest, setSelectedQuest] = useState(null);
     const [useRomanNumerals, setUseRomanNumerals] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
+    const [showDebugModal, setShowDebugModal] = useState(false);
 
     // === HOOK ===
     const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research, loginHistory } = useGame();
 
     // Scroll listener & First Visit Check
     useEffect(() => {
+        DebugLogger.log('APP', 'App Mounted');
         const handleScroll = () => {
             // ...
             const scrollPos = window.scrollY || document.documentElement.scrollTop;
@@ -65,6 +69,7 @@ function App() {
         // Check for Manual Reset Trigger
         const triggerOnboarding = localStorage.getItem('trigger_onboarding');
         if (triggerOnboarding) {
+            DebugLogger.log('APP', 'Found "trigger_onboarding" flag. Showing Onboarding.');
             setShowOnboarding(true);
             localStorage.removeItem('trigger_onboarding');
         }
@@ -188,6 +193,7 @@ function App() {
 
     return (
         <div className="wrapper">
+            {showDebugModal && <DebugLogModal onClose={() => setShowDebugModal(false)} />}
             {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} setActiveTab={setActiveTab} />}
             {/* First Visit Modal - Highest Priority */}
             {showFirstVisitModal && (
@@ -261,7 +267,8 @@ function App() {
                 />
             )}
 
-            {showWelcome && !showFirstVisitModal && !showAuthModal && (
+            {/* Daily Welcome: Only show if NO user (local) OR if user matches AND is synchronized (prevent premature show on slow internet) */}
+            {showWelcome && !showFirstVisitModal && !showAuthModal && (!user || (user && isCloudSynchronized)) && (
                 <DailyWelcome
                     onDismiss={actions.dismissWelcome}
                     habits={habits}
@@ -366,6 +373,7 @@ function App() {
                 formatNumber={formatNumber}
                 saveStatus={saveStatus}
                 isLoggedIn={isLoggedIn}
+                onDebug={() => setShowDebugModal(true)}
             />
         </div>
     );
