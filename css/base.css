@@ -31,8 +31,8 @@
 }
 
 html {
-    overflow-y: scroll;
-    /* Force scrollbar to prevent layout jumps */
+    overflow-y: auto;
+    /* Allow scrollbar to appear only when needed */
     height: 100%;
 }
 
