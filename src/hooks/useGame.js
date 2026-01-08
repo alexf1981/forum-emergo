@@ -249,9 +249,13 @@ export function useGame() {
             setQuests(result.newQuests);
             setHeroes(result.newHeroes);
             setStats(result.newStats);
-            notify({ msg: result.msg }, "success");
+            // Translate quest name if present
+            if (result.msg && result.msg.key === 'msg_quest_started') {
+                result.msg.args.quest = t(result.msg.args.quest);
+            }
+            notify(result.msg, "success");
         } else {
-            notify({ msg: result.msg }, "error");
+            notify(result.msg, "error");
         }
     };
 
@@ -261,9 +265,9 @@ export function useGame() {
             setQuests(result.newQuests);
             setHeroes(result.newHeroes);
             setStats(result.newStats);
-            notify({ msg: result.msg }, "success");
+            notify(result.msg, "success");
         } else {
-            notify({ msg: result.msg }, "error");
+            notify(result.msg, "error");
         }
     };
 

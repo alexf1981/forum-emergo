@@ -739,7 +739,7 @@ export function startQuest(quests, heroes, stats, questId, selectedHeroIds) {
         newQuests: [...quests, newQuest],
         newHeroes,
         newStats: stats, // No cost for now
-        msg: `Missie "${template.name}" gestart!`
+        msg: { key: 'msg_quest_started', args: { quest: template.name } }
     };
 }
 
@@ -784,7 +784,7 @@ export function completeQuest(quests, heroes, stats, questInstanceId) {
         newQuests,
         newHeroes,
         newStats,
-        msg: `Missie Voltooid! +${rewardGold} Goud`
+        msg: { key: 'msg_quest_completed', args: { gold: rewardGold } }
     };
 }
 

@@ -278,7 +278,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                                                     <span>{template.requirements?.heroCount || 0}</span> <Icons.Arm width="16" height="16" />
                                                 </div>
                                                 <div title="Duur" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <span>{template.type === 'instant' ? 'Geen' : `${template.durationDays}d`}</span> <Icons.Hourglass width="16" height="16" />
+                                                    <span>{template.type === 'instant' ? t('duration_none') : `${template.durationDays}d`}</span> <Icons.Hourglass width="16" height="16" />
                                                 </div>
                                             </div>
 
@@ -426,7 +426,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                                                     <span>{template.level > 0 ? `${template.level}+` : heroReq}</span> <Icons.Arm width="16" height="16" />
                                                 </div>
                                                 <div title="Duur" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <span>{template.type === 'instant' ? 'Geen' : `${template.durationDays}d`}</span> <Icons.Hourglass width="16" height="16" />
+                                                    <span>{template.type === 'instant' ? t('duration_none') : `${template.durationDays}d`}</span> <Icons.Hourglass width="16" height="16" />
                                                 </div>
                                             </div>
 
