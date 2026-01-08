@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import * as GameLogic from '../logic/gameLogic';
 import BottomNav from './layout/BottomNav';
 import HeroBanner from './layout/HeroBanner';
@@ -306,17 +307,21 @@ function App() {
                     />
                 )}
 
-                <div className="toast-container">
-                    {notifications.map(n => {
-                        let text = "";
-                        if (typeof n.msg === 'string') {
-                            text = n.msg;
-                        } else if (n.msg && n.msg.key) {
-                            text = t(n.msg.key, n.msg.args);
-                        }
-                        return <div key={n.id} className={`toast ${n.type}`}>{text}</div>;
-                    })}
-                </div>
+                {/* Toast Container - Portaled to Body for correct z-index over Modals */}
+                {ReactDOM.createPortal(
+                    <div className="toast-container">
+                        {notifications.map(n => {
+                            let text = "";
+                            if (typeof n.msg === 'string') {
+                                text = n.msg;
+                            } else if (n.msg && n.msg.key) {
+                                text = t(n.msg.key, n.msg.args);
+                            }
+                            return <div key={n.id} className={`toast ${n.type}`}>{text}</div>;
+                        })}
+                    </div>,
+                    document.body
+                )}
             </div>
 
             <BottomNav

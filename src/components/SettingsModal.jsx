@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Icons from './Icons';
 import Flag from './layout/Flag';
+import UnifiedModal from './layout/UnifiedModal';
 import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/auth';
 import AdminDashboard from './AdminDashboard';
@@ -172,138 +173,132 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>{t('settings_title')}</h2>
-                    <button className="btn-icon" onClick={onClose}><Icons.X /></button>
-                </div>
-                <div className="modal-body" style={{ gap: '8px', padding: '0 5px' }}>
+        <UnifiedModal isOpen={true} onClose={onClose} title={t('settings_title')}>
+            <div style={{ gap: '8px', padding: '0 5px', display: 'flex', flexDirection: 'column' }}>
 
-                    {/* PLAYER & LOGIN STATUS COMBINED */}
-                    <div className="card" style={{ padding: '10px' }}>
-                        <div className="modal-form-group" style={{ marginBottom: '10px' }}>
-                            <label style={{ fontSize: '0.85em', color: '#666' }}>{t('player_name')}</label>
-                            <input
-                                type="text"
-                                value={localPlayerName}
-                                onChange={(e) => setLocalPlayerName(e.target.value)}
-                                onBlur={() => updatePlayerName(localPlayerName)}
-                                placeholder={t('player_name')}
-                                style={{ padding: '6px' }}
-                            />
-                        </div>
-
-                        {user ? (
-                            <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
-                                <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>{t('cloud_desc_user')} <strong>{user.email}</strong></p>
-                                <div style={{ display: 'flex', gap: '5px' }}>
-                                    {isAdmin && (
-                                        <button className="btn" onClick={() => setShowAdmin(true)} style={{ flex: 1, backgroundColor: '#8e44ad', borderColor: '#6c3483', padding: '6px', fontSize: '0.9em' }}>
-                                            <Icons.Crown /> Admin
-                                        </button>
-                                    )}
-                                    <button className="btn" onClick={handleLogout} style={{ flex: 1, backgroundColor: '#c0392b', borderColor: '#962d22', padding: '6px', fontSize: '0.9em' }}>{t('logout')}</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
-                                <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>
-                                    {t('logged_in_as')}: <strong>{t('local_login_status')}</strong>
-                                </p>
-                                <div style={{
-                                    backgroundColor: '#fff3cd',
-                                    border: '1px solid #ffeeba',
-                                    color: '#856404',
-                                    padding: '6px',
-                                    borderRadius: '4px',
-                                    fontSize: '0.75em',
-                                    margin: '5px 0',
-                                    lineHeight: '1.3'
-                                }}>
-                                    <Icons.CloudOffline style={{ marginRight: '4px', width: '12px', height: '12px', verticalAlign: 'middle' }} />
-                                    {t('welcome_local_desc')}
-                                </div>
-                                <div style={{ display: 'flex', gap: '5px' }}>
-                                    <button className="btn" onClick={onLogin} style={{ flex: 2, padding: '6px', fontSize: '0.9em' }}>{t('login_btn')} / {t('register_btn')}</button>
-                                    <button
-                                        className="btn"
-                                        onClick={onLocalLogout}
-                                        style={{ flex: 1, backgroundColor: '#7f8c8d', borderColor: '#666', padding: '6px', fontSize: '0.9em' }}
-                                    >
-                                        {t('logout')}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                {/* PLAYER & LOGIN STATUS COMBINED */}
+                <div className="card" style={{ padding: '10px' }}>
+                    <div className="modal-form-group" style={{ marginBottom: '10px' }}>
+                        <label style={{ fontSize: '0.85em', color: '#666' }}>{t('player_name')}</label>
+                        <input
+                            type="text"
+                            value={localPlayerName}
+                            onChange={(e) => setLocalPlayerName(e.target.value)}
+                            onBlur={() => updatePlayerName(localPlayerName)}
+                            placeholder={t('player_name')}
+                            style={{ padding: '6px' }}
+                        />
                     </div>
 
-                    {/* DISPLAY SETTINGS */}
-                    <div className="card" style={{ padding: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '0.9em' }}>{t('lbl_language')}</span>
+                    {user ? (
+                        <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
+                            <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>{t('cloud_desc_user')} <strong>{user.email}</strong></p>
                             <div style={{ display: 'flex', gap: '5px' }}>
-                                {['en', 'nl', 'es', 'de'].map(langKey => (
-                                    <button
-                                        key={langKey}
-                                        onClick={() => changeLanguage(langKey)}
-                                        style={{
-                                            padding: '0',
-                                            width: '28px',
-                                            height: '28px',
-                                            border: language === langKey ? '2px solid #8E1600' : '1px solid #ccc',
-                                            borderRadius: '50%',
-                                            backgroundColor: language === langKey ? '#fff0e0' : 'white',
-                                            cursor: 'pointer',
-                                            opacity: language === langKey ? 1 : 0.6,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            overflow: 'hidden'
-                                        }}
-                                        title={translations[langKey].name}
-                                    >
-                                        <Flag code={langKey} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                {isAdmin && (
+                                    <button className="btn" onClick={() => setShowAdmin(true)} style={{ flex: 1, backgroundColor: '#8e44ad', borderColor: '#6c3483', padding: '6px', fontSize: '0.9em' }}>
+                                        <Icons.Crown /> Admin
                                     </button>
-                                ))}
+                                )}
+                                <button className="btn" onClick={handleLogout} style={{ flex: 1, backgroundColor: '#c0392b', borderColor: '#962d22', padding: '6px', fontSize: '0.9em' }}>{t('logout')}</button>
                             </div>
                         </div>
+                    ) : (
+                        <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
+                            <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>
+                                {t('logged_in_as')}: <strong>{t('local_login_status')}</strong>
+                            </p>
+                            <div style={{
+                                backgroundColor: '#fff3cd',
+                                border: '1px solid #ffeeba',
+                                color: '#856404',
+                                padding: '6px',
+                                borderRadius: '4px',
+                                fontSize: '0.75em',
+                                margin: '5px 0',
+                                lineHeight: '1.3'
+                            }}>
+                                <Icons.CloudOffline style={{ marginRight: '4px', width: '12px', height: '12px', verticalAlign: 'middle' }} />
+                                {t('welcome_local_desc')}
+                            </div>
+                            <div style={{ display: 'flex', gap: '5px' }}>
+                                <button className="btn" onClick={onLogin} style={{ flex: 2, padding: '6px', fontSize: '0.9em' }}>{t('login_btn')} / {t('register_btn')}</button>
+                                <button
+                                    className="btn"
+                                    onClick={onLocalLogout}
+                                    style={{ flex: 1, backgroundColor: '#7f8c8d', borderColor: '#666', padding: '6px', fontSize: '0.9em' }}
+                                >
+                                    {t('logout')}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
-                        <div className="settings-row" style={{ marginTop: '5px', padding: '5px 0', borderTop: '1px solid #f0f0f0' }}>
-                            <span style={{ fontSize: '0.9em' }}>{t('roman_nums')}</span>
-                            <input
-                                type="checkbox"
-                                checked={useRomanNumerals}
-                                onChange={toggleRomanNumerals}
-                                className="settings-checkbox"
-                                style={{ transform: 'scale(0.9)' }}
-                            />
+                {/* DISPLAY SETTINGS */}
+                <div className="card" style={{ padding: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.9em' }}>{t('lbl_language')}</span>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                            {['en', 'nl', 'es', 'de'].map(langKey => (
+                                <button
+                                    key={langKey}
+                                    onClick={() => changeLanguage(langKey)}
+                                    style={{
+                                        padding: '0',
+                                        width: '28px',
+                                        height: '28px',
+                                        border: language === langKey ? '2px solid #8E1600' : '1px solid #ccc',
+                                        borderRadius: '50%',
+                                        backgroundColor: language === langKey ? '#fff0e0' : 'white',
+                                        cursor: 'pointer',
+                                        opacity: language === langKey ? 1 : 0.6,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        overflow: 'hidden'
+                                    }}
+                                    title={translations[langKey].name}
+                                >
+                                    <Flag code={langKey} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    {/* RESET ACCOUNT SECTION - Minimal */}
-                    <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
-                        <button
-                            onClick={handleResetAccount}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#c0392b',
-                                fontSize: '0.8em',
-                                cursor: 'pointer',
-                                opacity: 0.7,
-                                textDecoration: 'underline',
-                                display: 'flex',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Icons.Trash style={{ width: '12px', height: '12px', marginRight: '4px' }} />
-                            {t('reset_account_btn')}
-                        </button>
+                    <div className="settings-row" style={{ marginTop: '5px', padding: '5px 0', borderTop: '1px solid #f0f0f0' }}>
+                        <span style={{ fontSize: '0.9em' }}>{t('roman_nums')}</span>
+                        <input
+                            type="checkbox"
+                            checked={useRomanNumerals}
+                            onChange={toggleRomanNumerals}
+                            className="settings-checkbox"
+                            style={{ transform: 'scale(0.9)' }}
+                        />
                     </div>
+                </div>
+
+                {/* RESET ACCOUNT SECTION - Minimal */}
+                <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
+                    <button
+                        onClick={handleResetAccount}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#c0392b',
+                            fontSize: '0.8em',
+                            cursor: 'pointer',
+                            opacity: 0.7,
+                            textDecoration: 'underline',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Icons.Trash style={{ width: '12px', height: '12px', marginRight: '4px' }} />
+                        {t('reset_account_btn')}
+                    </button>
                 </div>
             </div>
-        </div>
+        </UnifiedModal>
     );
 };
 

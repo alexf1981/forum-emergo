@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import UnifiedModal from '../layout/UnifiedModal';
 import * as GameLogic from '../../logic/gameLogic';
 import Icons from '../Icons';
 
@@ -63,150 +64,117 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
         const categories = Object.keys(GameLogic.INSPIRATION_HABITS);
 
         return (
-            <div className="modal-overlay" onClick={() => setShowInspiration(false)}>
-                <div className="modal-content" onClick={e => e.stopPropagation()} style={{
-                    width: '90%',
-                    maxWidth: '800px',
-                    height: 'calc(100vh - 160px)',
-                    maxHeight: '800px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    backgroundColor: '#ecf0f1',
-                    color: '#000',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-                    overflow: 'hidden'
-                }}>
-                    {/* Fixed Header - Transparent BG */}
-                    {/* Fixed Header - Transparent BG */}
-                    <div style={{ padding: '20px', borderBottom: '1px solid #ccc', flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                            <h3 style={{ margin: '0 0 5px 0', color: '#000' }}>{t('header_inspiration')}</h3>
-                            <p style={{ fontStyle: 'italic', margin: 0, color: '#333', fontSize: '0.95rem' }}>{t('msg_inspiration_intro')}</p>
-                        </div>
-                        <button
-                            onClick={() => setShowInspiration(false)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                fontSize: '1.5rem',
-                                fontWeight: 'bold',
-                                color: '#7f8c8d',
-                                cursor: 'pointer',
-                                padding: '0 5px',
-                                lineHeight: '1'
-                            }}
-                            aria-label={t('btn_close')}
-                        >
-                            ×
-                        </button>
-                    </div>
+            <UnifiedModal
+                isOpen={true}
+                onClose={() => setShowInspiration(false)}
+                title={t('header_inspiration')}
+            >
+                <p style={{ fontStyle: 'italic', margin: '0 0 20px 0', color: '#555', fontSize: '0.95rem' }}>
+                    {t('msg_inspiration_intro')}
+                </p>
 
-                    <div className="inspiration-grid" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-                        {categories.map(cat => {
-                            const catHabits = GameLogic.INSPIRATION_HABITS[cat];
+                <div className="inspiration-grid">
+                    {categories.map(cat => {
+                        const catHabits = GameLogic.INSPIRATION_HABITS[cat];
 
-                            // Filter out habits that are already in the user's list
-                            const availableHabits = catHabits.filter(h =>
-                                !habits.some(userHabit => userHabit.text === t(h.text))
-                            );
+                        // Filter out habits that are already in the user's list
+                        const availableHabits = catHabits.filter(h =>
+                            !habits.some(userHabit => userHabit.text === t(h.text))
+                        );
 
-                            if (availableHabits.length === 0) return null;
+                        if (availableHabits.length === 0) return null;
 
-                            const virtues = availableHabits.filter(h => h.type === 'virtue');
-                            const vices = availableHabits.filter(h => h.type === 'vice');
+                        const virtues = availableHabits.filter(h => h.type === 'virtue');
+                        const vices = availableHabits.filter(h => h.type === 'vice');
 
-                            return (
-                                <div key={cat} style={{ marginBottom: '30px' }}>
-                                    <h4 style={{ textTransform: 'capitalize', borderBottom: '1px solid #ddd', marginBottom: '15px', color: '#2c3e50', paddingBottom: '5px' }}>
-                                        {t(cat) || cat}
-                                    </h4>
+                        return (
+                            <div key={cat} style={{ marginBottom: '30px' }}>
+                                <h4 style={{ textTransform: 'capitalize', borderBottom: '1px solid #ddd', marginBottom: '15px', color: '#2c3e50', paddingBottom: '5px' }}>
+                                    {t(cat) || cat}
+                                </h4>
 
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'flex-start' }}>
-                                        {/* Virtues Column (Green) */}
-                                        <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                            {virtues.length > 0 && virtues.map((habit, idx) => (
-                                                <button
-                                                    key={`v-${cat}-${idx}`}
-                                                    className="btn-text"
-                                                    style={{
-                                                        border: '1px solid #27ae60',
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                                                        color: '#000',
-                                                        padding: '10px 15px',
-                                                        borderRadius: '8px',
-                                                        fontSize: '0.95rem',
-                                                        textAlign: 'left',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '10px',
-                                                        width: '100%',
-                                                        boxSizing: 'border-box',
-                                                        transition: 'all 0.2s'
-                                                    }}
-                                                    onClick={() => actions.addHabit(t(habit.text), habit.type, true)}
-                                                    onMouseOver={(e) => {
-                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-                                                        e.currentTarget.style.boxShadow = '0 2px 5px rgba(39, 174, 96, 0.3)';
-                                                    }}
-                                                    onMouseOut={(e) => {
-                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
-                                                        e.currentTarget.style.boxShadow = 'none';
-                                                    }}
-                                                >
-                                                    <span style={{ fontSize: '1.2rem' }}>🟢</span>
-                                                    <span style={{ fontWeight: '500' }}>{t(habit.text)}</span>
-                                                </button>
-                                            ))}
-                                        </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'flex-start' }}>
+                                    {/* Virtues Column (Green) */}
+                                    <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {virtues.length > 0 && virtues.map((habit, idx) => (
+                                            <button
+                                                key={`v-${cat}-${idx}`}
+                                                className="btn-text"
+                                                style={{
+                                                    border: '1px solid #27ae60',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                                    color: '#000',
+                                                    padding: '10px 15px',
+                                                    borderRadius: '8px',
+                                                    fontSize: '0.95rem',
+                                                    textAlign: 'left',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '10px',
+                                                    width: '100%',
+                                                    boxSizing: 'border-box',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                                onClick={() => actions.addHabit(t(habit.text), habit.type, true)}
+                                                onMouseOver={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                                                    e.currentTarget.style.boxShadow = '0 2px 5px rgba(39, 174, 96, 0.3)';
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                                                    e.currentTarget.style.boxShadow = 'none';
+                                                }}
+                                            >
+                                                <span style={{ fontSize: '1.2rem' }}>🟢</span>
+                                                <span style={{ fontWeight: '500' }}>{t(habit.text)}</span>
+                                            </button>
+                                        ))}
+                                    </div>
 
-                                        {/* Vices Column (Red) */}
-                                        <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                            {vices.length > 0 && vices.map((habit, idx) => (
-                                                <button
-                                                    key={`vc-${cat}-${idx}`}
-                                                    className="btn-text"
-                                                    style={{
-                                                        border: '1px solid #c0392b',
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                                                        color: '#000',
-                                                        padding: '10px 15px',
-                                                        borderRadius: '8px',
-                                                        fontSize: '0.95rem',
-                                                        textAlign: 'left',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '10px',
-                                                        width: '100%',
-                                                        boxSizing: 'border-box',
-                                                        transition: 'all 0.2s'
-                                                    }}
-                                                    onClick={() => actions.addHabit(t(habit.text), habit.type, true)}
-                                                    onMouseOver={(e) => {
-                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-                                                        e.currentTarget.style.boxShadow = '0 2px 5px rgba(192, 57, 43, 0.3)';
-                                                    }}
-                                                    onMouseOut={(e) => {
-                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
-                                                        e.currentTarget.style.boxShadow = 'none';
-                                                    }}
-                                                >
-                                                    <span style={{ fontSize: '1.2rem' }}>🔴</span>
-                                                    <span style={{ fontWeight: '500' }}>{t(habit.text)}</span>
-                                                </button>
-                                            ))}
-                                        </div>
+                                    {/* Vices Column (Red) */}
+                                    <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {vices.length > 0 && vices.map((habit, idx) => (
+                                            <button
+                                                key={`vc-${cat}-${idx}`}
+                                                className="btn-text"
+                                                style={{
+                                                    border: '1px solid #c0392b',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                                    color: '#000',
+                                                    padding: '10px 15px',
+                                                    borderRadius: '8px',
+                                                    fontSize: '0.95rem',
+                                                    textAlign: 'left',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '10px',
+                                                    width: '100%',
+                                                    boxSizing: 'border-box',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                                onClick={() => actions.addHabit(t(habit.text), habit.type, true)}
+                                                onMouseOver={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                                                    e.currentTarget.style.boxShadow = '0 2px 5px rgba(192, 57, 43, 0.3)';
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                                                    e.currentTarget.style.boxShadow = 'none';
+                                                }}
+                                            >
+                                                <span style={{ fontSize: '1.2rem' }}>🔴</span>
+                                                <span style={{ fontWeight: '500' }}>{t(habit.text)}</span>
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Footer Removed - Close button moved to header */}
+                            </div>
+                        );
+                    })}
                 </div>
-            </div>
+            </UnifiedModal>
         );
     };
 
