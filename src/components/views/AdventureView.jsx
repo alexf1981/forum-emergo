@@ -3,6 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import UnifiedModal from '../layout/UnifiedModal';
 import * as GameLogic from '../../logic/gameLogic';
 import Icons from '../Icons';
+import '../../css/adventure.css';
 
 const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) => {
     const { t } = useLanguage();
@@ -179,7 +180,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
     };
 
     return (
-        <div className="adventure-view adventure-view-stable">
+        <div className="adventure-view">
             <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#f1c40f', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                 {t('nav_adventure') || 'Avonturen'}
             </h2>
@@ -202,8 +203,6 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
 
                             if (isIntrospection) {
                                 // Count habits created AFTER quest start
-                                // Fallback: if createdAt missing, assume 0 or handle gracefull 
-                                // (Actually, newly created ones will have it)
                                 const addedCount = habits.filter(h => {
                                     if (!h.createdAt) return false;
                                     return new Date(h.createdAt) > new Date(q.startTime);
@@ -214,46 +213,27 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                                 introspectionProgress = progressText;
                                 isComplete = addedCount >= target;
                             } else {
-                                // Other quests (e.g. Patrol)
-                                // For now, assume auto-complete or always pending until logic added
-                                // Assuming other quests are duration-based or instant logic handled elsewhere
-                                // For now, prevent completing them unless logic exists
                                 isComplete = false;
                             }
 
                             return (
-                                <div key={q.id} className="card quest-card active" style={{
-                                    background: 'rgba(255, 255, 255, 0.95)',
-                                    color: '#333',
-                                    borderRadius: '8px',
-                                    padding: '14px',
+                                <div key={q.id} className="quest-card active" style={{
                                     border: '2px solid #27ae60', // Green border for active
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    width: '100%',
-                                    boxSizing: 'border-box',
                                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                                 }}>
                                     {/* Header Section: Image, Content, Icons */}
-                                    <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
+                                    <div className="quest-card-header">
                                         {/* 1. Image */}
                                         <img
                                             src="/assets/quest_placeholder.png"
                                             alt="Quest"
-                                            style={{
-                                                width: '80px',
-                                                height: '80px',
-                                                borderRadius: '4px',
-                                                objectFit: 'cover',
-                                                flexShrink: 0,
-                                                border: '1px solid #7f8c8d'
-                                            }}
+                                            className="quest-card-image"
                                             onError={(e) => { e.target.style.display = 'none'; }}
                                         />
 
                                         {/* 2. Middle Content: Title, Inspiration, Progress */}
-                                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: '5px' }}>
-                                            <h4 style={{ margin: '0', color: '#2c3e50', fontSize: '1.1rem' }}>
+                                        <div className="quest-card-content" style={{ minWidth: 0, flex: 1 }}>
+                                            <h4 style={{ margin: '0 0 5px 0', color: '#2c3e50', fontSize: '1.1rem' }}>
                                                 {t(`quest_${template.id}_name`) || template.name}
                                             </h4>
 
@@ -291,7 +271,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                                         </div>
 
                                         {/* 3. Right Stats: 2 Rows + Complete Button */}
-                                        <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#555', minWidth: '80px', display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end', flexShrink: 0 }}>
+                                        <div className="quest-card-stats" style={{ textAlign: 'right', fontSize: '0.9rem', color: '#555', minWidth: '80px', display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end', flexShrink: 0 }}>
                                             {/* Row 1: Strength & Time */}
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                                 <div title="Helden Vereist" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -391,7 +371,6 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                             const isLocked = isIntroLocked || isLevelLocked;
 
                             // Determine Lock Message
-                            // Determine Lock Message
                             let subText = `"${t(template.flavor)}"`;
                             if (isLevelLocked) {
                                 subText = t('msg_level_too_low', { level: template.level });
@@ -400,60 +379,46 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                             }
 
                             return (
-                                <div key={template.id} className={`card quest-card ${isSelected ? 'selected' : ''}`}
+                                <div key={template.id} className={`quest-card ${isSelected ? 'selected' : ''}`}
                                     onClick={() => {
                                         if (isLocked) return;
                                         setSelectedQuestId(isSelected ? null : template.id);
                                     }}
                                     style={{
                                         cursor: isLocked ? 'not-allowed' : 'pointer',
-                                        background: 'rgba(255, 255, 255, 0.9)',
-                                        color: '#333',
-                                        borderRadius: '8px',
-                                        padding: '14px',
-                                        border: '2px solid transparent',
-                                        transition: 'box-shadow 0.2s ease, background-color 0.2s ease',
-                                        width: '100%',
-                                        boxSizing: 'border-box',
-                                        overflow: 'hidden',
+                                        // Inline overrides for dynamic logic specific to selection/locking
+                                        border: '2px solid transparent', // Reset by class but kept for safety
                                         opacity: isLocked ? 0.6 : 1,
                                         filter: isLocked ? 'grayscale(100%)' : 'none',
                                         boxShadow: isSelected
                                             ? 'inset 0 0 0 2px #3498db, 0 4px 8px rgba(0,0,0,0.2)'
-                                            : 'inset 0 0 0 1px #bdc3c7, 0 2px 4px rgba(0,0,0,0.1)'
+                                            : '0 2px 4px rgba(0,0,0,0.1)'
                                     }}
                                 >
                                     {/* Header / Collapsed View */}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div className="quest-card-header">
                                         {/* LEFT: Image + Title + Subtitle */}
                                         <div style={{ display: 'flex', gap: '15px', flex: 1, minWidth: 0 }}>
                                             {/* Thematic Image Placeholder */}
                                             <img
                                                 src="/assets/quest_placeholder.png"
                                                 alt="Quest"
-                                                style={{
-                                                    width: '80px',
-                                                    height: '80px',
-                                                    borderRadius: '4px',
-                                                    objectFit: 'cover',
-                                                    flexShrink: 0,
-                                                    border: '1px solid #7f8c8d'
-                                                }}
+                                                className="quest-card-image"
                                                 onError={(e) => { e.target.style.display = 'none'; }}
                                             />
 
-                                            <div style={{ minWidth: 0 }}>
+                                            <div className="quest-card-content" style={{ minWidth: 0 }}>
                                                 <h4 style={{ margin: '0 0 5px 0', color: '#2c3e50', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                     {t(template.name)}
                                                 </h4>
-                                                <div style={{ fontSize: '0.9rem', color: '#7f8c8d', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                <div className="quest-card-subtext" style={{ fontSize: '0.9rem', color: '#7f8c8d', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                     {subText}
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* RIGHT: Stats Icons (2 Rows) */}
-                                        <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#555', minWidth: '80px', display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end', flexShrink: 0 }}>
+                                        <div className="quest-card-stats" style={{ textAlign: 'right', fontSize: '0.9rem', color: '#555', minWidth: '80px', display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end', flexShrink: 0 }}>
                                             {/* Row 1: Strength & Time */}
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                                 <div title={template.level > 0 ? "Min Level" : "Helden Vereist"} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -584,7 +549,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
             </div>
 
             {renderInspirationModal()}
-        </div>
+        </div >
     );
 };
 
