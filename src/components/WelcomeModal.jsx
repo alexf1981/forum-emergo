@@ -3,7 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import HeroBanner from './layout/HeroBanner';
 import '../../css/components.css';
 import { translations } from '../locales/translations';
-import Flag from './layout/Flag';
+import UnifiedLanguageSelector from './common/UnifiedLanguageSelector';
 
 const VIDEO_FILES = [
     './assets/city/Introduction.mp4',
@@ -99,32 +99,8 @@ const WelcomeModal = ({ onLogin, onRegister, onPlayLocal, hasLocalData }) => {
                     </div>
 
                     {/* Language Switcher */}
-                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                        {Object.keys(translations).map(langKey => (
-                            <button
-                                key={langKey}
-                                onClick={() => changeLanguage(langKey)}
-                                style={{
-                                    background: 'none',
-                                    border: language === langKey ? '2px solid var(--color-gold)' : '2px solid transparent',
-                                    borderRadius: '6px', // Rounded rectangle
-                                    width: '48px', // Rectangular width
-                                    height: '32px', // Rectangular height
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    padding: '0',
-                                    overflow: 'hidden',
-                                    transition: 'transform 0.2s',
-                                    transform: language === langKey ? 'scale(1.2)' : 'scale(1)',
-                                    boxShadow: language === langKey ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none'
-                                }}
-                                title={translations[langKey].name}
-                            >
-                                <Flag code={langKey} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            </button>
-                        ))}
+                    <div style={{ marginTop: '20px' }}>
+                        <UnifiedLanguageSelector />
                     </div>
                 </div>
             </div>

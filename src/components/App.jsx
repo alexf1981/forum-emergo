@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import * as GameLogic from '../logic/gameLogic';
 import BottomNav from './layout/BottomNav';
 import HeroBanner from './layout/HeroBanner';
-import CityView from './views/CityView';
+import HabitsView from './views/HabitsView';
 // import TavernView from './views/TavernView'; // Deprecated
 import CapitalView from './views/CapitalView'; // New City Builder View
 import AdventureView from './views/AdventureView';
@@ -264,7 +264,7 @@ function App() {
 
             <div className="app-container">
                 {activeTab === 'city' && (
-                    <CityView
+                    <HabitsView
                         habits={habits}
                         stats={stats}
                         buildings={buildings} // Passed for population calculation

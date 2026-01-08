@@ -4,6 +4,10 @@ import Icons from './Icons';
 import '../../css/components.css'; // Reuse basic styles or add specific admin CSS
 import UnifiedModal from './layout/UnifiedModal';
 import { useLanguage } from '../context/LanguageContext';
+// Unified Components
+import UnifiedButton from './common/UnifiedButton';
+import UnifiedText from './common/UnifiedText';
+import UnifiedInput from './common/UnifiedInput';
 
 const AdminDashboard = ({ onClose, actions }) => {
     const [users, setUsers] = useState([]);
@@ -50,26 +54,26 @@ const AdminDashboard = ({ onClose, actions }) => {
             title={t('admin_header')} // "Keizerrijk" / "Empire"
         >
             <div style={{ padding: '10px' }}>
-                {loading ? <p>{t('admin_loading')}</p> : (
+                {loading ? <UnifiedText>{t('admin_loading')}</UnifiedText> : (
                     <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid #ccc' }}>
-                                    <th style={{ padding: '10px' }}>{t('lbl_user')}</th>
-                                    <th style={{ padding: '10px' }}>{t('lbl_email')}</th>
-                                    <th style={{ padding: '10px' }}>{t('lbl_language')}</th>
-                                    <th style={{ padding: '10px' }}>{t('gold')}</th>
-                                    <th style={{ padding: '10px' }}>{t('lbl_last_seen')}</th>
+                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_user')}</UnifiedText></th>
+                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_email')}</UnifiedText></th>
+                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_language')}</UnifiedText></th>
+                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('gold')}</UnifiedText></th>
+                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_last_seen')}</UnifiedText></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {users.map(u => (
                                     <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
-                                        <td style={{ padding: '10px' }}>{u.username}</td>
-                                        <td style={{ padding: '10px' }}>{u.email}</td>
+                                        <td style={{ padding: '10px' }}><UnifiedText>{u.username}</UnifiedText></td>
+                                        <td style={{ padding: '10px' }}><UnifiedText>{u.email}</UnifiedText></td>
                                         <td style={{ padding: '10px' }}>{renderLanguage(u.language)}</td>
-                                        <td style={{ padding: '10px' }}>{u.gold}</td>
-                                        <td style={{ padding: '10px', fontSize: '0.8em' }}>{u.lastActive}</td>
+                                        <td style={{ padding: '10px' }}><UnifiedText>{u.gold}</UnifiedText></td>
+                                        <td style={{ padding: '10px' }}><UnifiedText variant="caption">{u.lastActive}</UnifiedText></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -77,12 +81,14 @@ const AdminDashboard = ({ onClose, actions }) => {
                     </div>
                 )}
                 <div className="modal-actions" style={{ marginTop: '20px' }}>
-                    <button className="btn" onClick={loadData}>{t('admin_refresh')}</button>
+                    <UnifiedButton onClick={loadData}>{t('admin_refresh')}</UnifiedButton>
                 </div>
 
                 {/* CHEAT ACTIONS */}
                 <div style={{ padding: '15px', borderTop: '1px solid #ddd', marginTop: '15px' }}>
-                    <h3 style={{ marginTop: 0, color: '#e74c3c', fontSize: '1rem' }}>⚡ {t('admin_god_mode')}</h3>
+                    <UnifiedText variant="h2" color="danger" style={{ fontSize: '1rem', marginTop: 0 }}>
+                        ⚡ {t('admin_god_mode')}
+                    </UnifiedText>
 
                     <div style={{ marginBottom: '15px' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem', cursor: 'pointer', background: editMode ? '#fff' : 'rgba(0,0,0,0.05)', padding: '4px 8px', borderRadius: '4px', color: '#000', fontWeight: 'bold', width: 'fit-content', border: '1px solid #ccc' }}>
@@ -95,29 +101,29 @@ const AdminDashboard = ({ onClose, actions }) => {
                         </label>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        <button
-                            className="btn"
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <UnifiedButton
+                            variant="danger"
                             onClick={() => {
                                 if (window.confirm("Zeker weten? Alle gebouwen behalve Stadhuis worden gereset.")) { // TODO: Localize confirm
                                     if (actions && actions.adminResetCity) actions.adminResetCity();
                                     else alert("Action not found");
                                 }
                             }}
-                            style={{ backgroundColor: '#e74c3c', borderColor: '#c0392b' }}
                         >
                             🏚️ {t('admin_evacuate')}
-                        </button>
+                        </UnifiedButton>
 
                         <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                            <input
+                            <UnifiedInput
                                 type="number"
                                 placeholder={t('admin_enter_amount')}
                                 id="adminGoldInput"
-                                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '120px' }}
+                                style={{ width: '120px' }}
+                                containerStyle={{ marginBottom: 0 }}
                             />
-                            <button
-                                className="btn"
+                            <UnifiedButton
+                                variant="primary"
                                 onClick={() => {
                                     const val = document.getElementById('adminGoldInput').value;
                                     if (val && actions && actions.adminSetGold) actions.adminSetGold(val);
@@ -127,7 +133,7 @@ const AdminDashboard = ({ onClose, actions }) => {
                                 style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
                             >
                                 💰 {t('admin_set_gold')}
-                            </button>
+                            </UnifiedButton>
                         </div>
                     </div>
                 </div>

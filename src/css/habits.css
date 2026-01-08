@@ -1,0 +1,81 @@
+/* Habits Layout Config for Mobile/Desktop */
+.city-dashboard {
+    display: grid;
+    gap: 20px;
+    width: 100%;
+
+    /* Mobile Default: 1 Column */
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "virtue"
+        "vice"
+        "todo"
+        "visual";
+}
+
+/* Flatten intermediate containers so children participate in the main grid */
+.habits-grid-wrapper-outer,
+.habits-grid-wrapper-inner {
+    display: contents;
+}
+
+/* Map Components to Grid Areas */
+#city-col-virtue {
+    grid-area: virtue;
+}
+
+#city-col-vice {
+    grid-area: vice;
+}
+
+#city-col-todo {
+    grid-area: todo;
+}
+
+.city-dashboard>.card {
+    grid-area: visual;
+}
+
+
+/* --- Tablet: 3 Columns (>= 768px) --- */
+@media (min-width: 768px) {
+    .city-dashboard {
+        /* 3 equal columns for the habits */
+        grid-template-columns: repeat(3, 1fr);
+        align-items: start;
+
+        /* Visual is explicitly in the first column of the second row */
+        grid-template-areas:
+            "virtue vice todo"
+            "visual .    .";
+    }
+
+    /* Ensure visual doesn't stretch or float weirdly */
+    .city-dashboard>.card {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
+
+/* --- Desktop: 4 Columns (>= 1024px) --- */
+@media (min-width: 1024px) {
+    .city-dashboard {
+        /* 4 equal columns: Visual + 3 Habits */
+        grid-template-columns: repeat(4, 1fr);
+        align-items: start;
+
+        /* Visual becomes the 1st column */
+        grid-template-areas:
+            "visual virtue vice todo";
+    }
+
+    .city-dashboard>.card {
+        margin-top: 0;
+
+        /* Sticky behavior for the visual */
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+}

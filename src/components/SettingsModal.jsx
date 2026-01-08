@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
 import Icons from './Icons';
-import Flag from './layout/Flag';
 import UnifiedModal from './layout/UnifiedModal';
+import UnifiedLanguageSelector from './common/UnifiedLanguageSelector';
 import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/auth';
 import AdminDashboard from './AdminDashboard';
 
 import { useLanguage } from '../context/LanguageContext';
-import { translations } from '../locales/translations';
 
 // IMPORTS needed for Reset Logic
 import { DataService } from '../services/dataService';
 import * as GameLogic from '../logic/gameLogic';
 
+// Unified Components
+import UnifiedButton from './common/UnifiedButton';
+import UnifiedCard from './common/UnifiedCard';
+import UnifiedInput from './common/UnifiedInput';
+import UnifiedText from './common/UnifiedText';
+
 const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin, onLocalLogout, actions }) => {
     const { user, playerName, updatePlayerName } = useAuth();
     const [localPlayerName, setLocalPlayerName] = useState(playerName || '');
 
-    // Keep local input in sync if context updates (e.g. after async fetch)
+    // Keep local input in sync if context updates
     React.useEffect(() => {
         setLocalPlayerName(playerName || '');
     }, [playerName]);
@@ -35,57 +40,30 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
 
     const handleLogout = async () => {
         const email = user?.email; // Capture email before it's gone
-
-        // 1. Attempt to sign out (server/client) with timeout safety
         try {
             const logoutPromise = signOut();
             const timeoutPromise = new Promise(resolve => setTimeout(resolve, 2000));
             await Promise.race([logoutPromise, timeoutPromise]);
         } catch (error) {
-            console.error("Logout error (or timeout):", error);
+            console.error("Logout error:", error);
         }
 
-        // 2. Capture Backup & Nuke Storage
-        // 2. Capture Backup & Nuke Storage
-        // 2. Capture Backup & Nuke Storage
         const backup = window.localStorage.getItem('romehabits_backup');
         const debugLogs = window.localStorage.getItem('emergo_debug_log');
         window.localStorage.clear();
 
-        // Restore Logs
-        if (debugLogs) {
-            window.localStorage.setItem('emergo_debug_log', debugLogs);
-        }
+        if (debugLogs) window.localStorage.setItem('emergo_debug_log', debugLogs);
+        if (backup && backup !== 'null') window.localStorage.setItem('romehabits', backup);
 
-        // 3. Restore Backup (if exists)
-        // If backup is 'null', we do nothing (storage stays empty, cleaner than restoring 'null')
-        if (backup && backup !== 'null') {
-            window.localStorage.setItem('romehabits', backup);
-        }
-
-        // CRITICAL CHANGE: Always force Welcome Screen after logout
-        // Do NOT set 'has_visited' to true.
-        // We ensure it is removed so the WelcomeModal appears.
         window.localStorage.removeItem('has_visited');
-
-        // 4. Set a flag for the "just logged out" message (must be done AFTER clear)
-        if (email) {
-            window.localStorage.setItem('logout_message', `Uitgelogd als ${email}`);
-        }
-
-        // 4. Force reload
+        if (email) window.localStorage.setItem('logout_message', `Uitgelogd als ${email}`);
         window.location.reload();
     };
 
     const handleResetAccount = async () => {
         if (!window.confirm(t('msg_confirm_reset'))) return;
 
-        // 1. Construct Default State
-        // Habits: We must generate them here manually since we can't easily import "App's internal logic"
-        // Using same keys as App.jsx seeding
         const now = Date.now();
-        // Helper to generate 4 weeks of random history (strings)
-        // MUST match HabitItem.jsx formatting (Local Time YYYY-MM-DD)
         const defaultHabits = [
             { id: now + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: GameLogic.generateRandomHistory(), recurring: false },
             { id: now + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
@@ -106,10 +84,8 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
         };
 
         if (user) {
-            // Logged In: Overwrite Cloud Data
             try {
                 await DataService.saveGameData(user.id, resetData);
-                // Also overwrite local storage to ensure immediate consistency before reload
                 window.localStorage.setItem('romestats', JSON.stringify(resetData.romestats));
                 window.localStorage.setItem('romeheroes', JSON.stringify(resetData.romeheroes));
                 window.localStorage.setItem('romehabits', JSON.stringify(resetData.romehabits));
@@ -117,185 +93,128 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                 window.localStorage.setItem('romeresources', JSON.stringify(resetData.romeresources));
                 window.localStorage.setItem('romeresearch', JSON.stringify(resetData.romeresearch));
                 window.localStorage.setItem('romeloginhistory', JSON.stringify(resetData.romeloginhistory));
-
-                // Preserve Debug Logs
-                const debugLogs = window.localStorage.getItem('emergo_debug_log');
-                if (debugLogs) {
-                    // We didn't clear storage here, we just overwrote data keys.
-                    // But if we wanted to be safe... actually we don't clear storage for logged in user above.
-                    // We overwrite keys.
-                    // So logs should be SAFE.
-                    // Wait, checking code above...
-                    // line 128: await DataService.saveGameData(user.id, resetData);
-                    // line 130-136: window.localStorage.setItem(...)
-
-                    // We do NOT call localStorage.clear() for logged in user!
-                    // So logs are already safe.
-                    // I will NOT modify this block then.
-                }
-
-                // Set flag to trigger onboarding after reload
                 window.localStorage.setItem('trigger_onboarding', 'true');
-
-                // Reload to refresh game state completely
                 window.location.reload();
             } catch (error) {
                 console.error("Reset Failed:", error);
                 alert("Reset failed: " + error.message);
             }
         } else {
-            // Local: Clear and Reload (triggering Welcome)
-            // Local: Clear and Reload (triggering Welcome)
-            // Local: Clear and Reload (triggering Welcome)
-            // Preserve logs
             const debugLogs = window.localStorage.getItem('emergo_debug_log');
             window.localStorage.clear();
-            if (debugLogs) {
-                window.localStorage.setItem('emergo_debug_log', debugLogs);
-            }
-
-            // We specifically want to trigger Welcome Modal, so ensure has_visited is GONE.
-            // But wait! If we clear(), it IS gone.
-            // AND we want default habits? 
-            // If we clear and reload, App.jsx `onPlayLocal` logic (via WelcomeModal) handles the seeding.
-            // So for local user, just clearing and reloading is enough to "Start Over".
-            // Prompt says: "standaardtaken worden weer toegevoegd".
-            // App.jsx logic: if habits.length === 0, seed defaults.
-            // So simply clearing storage works.
-
-            // Set flag to trigger onboarding after reload
-            // REMOVED: For local user, we want the "Welcome Modal" to take precedence. 
-            // The Welcome Modal -> "Play Local" flow will naturally trigger onboarding.
-            // window.localStorage.setItem('trigger_onboarding', 'true');
-
+            if (debugLogs) window.localStorage.setItem('emergo_debug_log', debugLogs);
             window.location.reload();
         }
     };
 
     return (
         <UnifiedModal isOpen={true} onClose={onClose} title={t('settings_title')}>
-            <div style={{ gap: '8px', padding: '0 5px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ gap: '15px', padding: '10px 0', display: 'flex', flexDirection: 'column' }}>
 
-                {/* PLAYER & LOGIN STATUS COMBINED */}
-                <div className="card" style={{ padding: '10px' }}>
-                    <div className="modal-form-group" style={{ marginBottom: '10px' }}>
-                        <label style={{ fontSize: '0.85em', color: '#666' }}>{t('player_name')}</label>
-                        <input
+                {/* PLAYER & LOGIN STATUS */}
+                <UnifiedCard variant="papyrus" padding="15px">
+                    <div style={{ marginBottom: '15px' }}>
+                        <UnifiedInput
+                            label={t('player_name')}
                             type="text"
                             value={localPlayerName}
                             onChange={(e) => setLocalPlayerName(e.target.value)}
                             onBlur={() => updatePlayerName(localPlayerName)}
                             placeholder={t('player_name')}
-                            style={{ padding: '6px' }}
+                            fullWidth
                         />
                     </div>
 
                     {user ? (
-                        <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
-                            <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>{t('cloud_desc_user')} <strong>{user.email}</strong></p>
-                            <div style={{ display: 'flex', gap: '5px' }}>
+                        <div style={{ borderTop: '1px solid #d4c5a3', paddingTop: '15px' }}>
+                            <UnifiedText variant="caption">{t('cloud_desc_user')} <strong>{user.email}</strong></UnifiedText>
+                            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                                 {isAdmin && (
-                                    <button className="btn" onClick={() => setShowAdmin(true)} style={{ flex: 1, backgroundColor: '#8e44ad', borderColor: '#6c3483', padding: '6px', fontSize: '0.9em' }}>
+                                    <UnifiedButton
+                                        onClick={() => setShowAdmin(true)}
+                                        variant="secondary"
+                                        fullWidth
+                                        style={{ backgroundColor: '#8e44ad', borderColor: '#6c3483' }}
+                                    >
                                         <Icons.Crown /> Admin
-                                    </button>
+                                    </UnifiedButton>
                                 )}
-                                <button className="btn" onClick={handleLogout} style={{ flex: 1, backgroundColor: '#c0392b', borderColor: '#962d22', padding: '6px', fontSize: '0.9em' }}>{t('logout')}</button>
+                                <UnifiedButton
+                                    onClick={handleLogout}
+                                    variant="danger"
+                                    fullWidth
+                                >
+                                    {t('logout')}
+                                </UnifiedButton>
                             </div>
                         </div>
                     ) : (
-                        <div className="mt-sm" style={{ borderTop: '1px solid #eee', paddingTop: '8px' }}>
-                            <p style={{ fontSize: '0.85em', margin: '0 0 5px 0' }}>
+                        <div style={{ borderTop: '1px solid #d4c5a3', paddingTop: '15px' }}>
+                            <UnifiedText variant="body" style={{ marginBottom: '5px' }}>
                                 {t('logged_in_as')}: <strong>{t('local_login_status')}</strong>
-                            </p>
+                            </UnifiedText>
+
                             <div style={{
-                                backgroundColor: '#fff3cd',
-                                border: '1px solid #ffeeba',
-                                color: '#856404',
-                                padding: '6px',
+                                backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                                border: '1px solid #f39c12',
+                                color: '#d35400',
+                                padding: '8px',
                                 borderRadius: '4px',
-                                fontSize: '0.75em',
-                                margin: '5px 0',
-                                lineHeight: '1.3'
+                                fontSize: '0.85rem',
+                                marginBottom: '15px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
                             }}>
-                                <Icons.CloudOffline style={{ marginRight: '4px', width: '12px', height: '12px', verticalAlign: 'middle' }} />
-                                {t('welcome_local_desc')}
+                                <Icons.CloudOffline />
+                                <span style={{ flex: 1 }}>{t('welcome_local_desc')}</span>
                             </div>
-                            <div style={{ display: 'flex', gap: '5px' }}>
-                                <button className="btn" onClick={onLogin} style={{ flex: 2, padding: '6px', fontSize: '0.9em' }}>{t('login_btn')} / {t('register_btn')}</button>
-                                <button
-                                    className="btn"
+
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <UnifiedButton onClick={onLogin} variant="primary" style={{ flex: 2 }}>
+                                    {t('login_btn')} / {t('register_btn')}
+                                </UnifiedButton>
+                                <UnifiedButton
                                     onClick={onLocalLogout}
-                                    style={{ flex: 1, backgroundColor: '#7f8c8d', borderColor: '#666', padding: '6px', fontSize: '0.9em' }}
+                                    variant="secondary"
+                                    style={{ flex: 1 }}
                                 >
                                     {t('logout')}
-                                </button>
+                                </UnifiedButton>
                             </div>
                         </div>
                     )}
-                </div>
+                </UnifiedCard>
 
                 {/* DISPLAY SETTINGS */}
-                <div className="card" style={{ padding: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '0.9em' }}>{t('lbl_language')}</span>
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                            {['en', 'nl', 'es', 'de'].map(langKey => (
-                                <button
-                                    key={langKey}
-                                    onClick={() => changeLanguage(langKey)}
-                                    style={{
-                                        padding: '0',
-                                        width: '28px',
-                                        height: '28px',
-                                        border: language === langKey ? '2px solid #8E1600' : '1px solid #ccc',
-                                        borderRadius: '50%',
-                                        backgroundColor: language === langKey ? '#fff0e0' : 'white',
-                                        cursor: 'pointer',
-                                        opacity: language === langKey ? 1 : 0.6,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        overflow: 'hidden'
-                                    }}
-                                    title={translations[langKey].name}
-                                >
-                                    <Flag code={langKey} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </button>
-                            ))}
-                        </div>
+                <UnifiedCard variant="papyrus" padding="15px">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                        <UnifiedText variant="h2" style={{ fontSize: '1rem', margin: 0 }}>{t('lbl_language')}</UnifiedText>
+                        <UnifiedLanguageSelector style={{ gap: '10px' }} />
                     </div>
 
-                    <div className="settings-row" style={{ marginTop: '5px', padding: '5px 0', borderTop: '1px solid #f0f0f0' }}>
-                        <span style={{ fontSize: '0.9em' }}>{t('roman_nums')}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderTop: '1px solid #d4c5a3' }}>
+                        <UnifiedText variant="body" style={{ margin: 0 }}>{t('roman_nums')}</UnifiedText>
                         <input
                             type="checkbox"
                             checked={useRomanNumerals}
                             onChange={toggleRomanNumerals}
-                            className="settings-checkbox"
-                            style={{ transform: 'scale(0.9)' }}
+                            style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#8E1600' }}
                         />
                     </div>
-                </div>
+                </UnifiedCard>
 
-                {/* RESET ACCOUNT SECTION - Minimal */}
+                {/* DELETE ACCOUNT (DANGER ZONE) */}
                 <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
-                    <button
+                    <UnifiedButton
                         onClick={handleResetAccount}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#c0392b',
-                            fontSize: '0.8em',
-                            cursor: 'pointer',
-                            opacity: 0.7,
-                            textDecoration: 'underline',
-                            display: 'flex',
-                            alignItems: 'center'
-                        }}
+                        variant="danger"
+                        size="sm"
+                        style={{ backgroundColor: 'transparent', color: '#c0392b', border: 'none', boxShadow: 'none' }}
+                        icon={<Icons.Trash />}
                     >
-                        <Icons.Trash style={{ width: '12px', height: '12px', marginRight: '4px' }} />
-                        {t('reset_account_btn')}
-                    </button>
+                        <span style={{ textDecoration: 'underline' }}>{t('reset_account_btn')}</span>
+                    </UnifiedButton>
                 </div>
             </div>
         </UnifiedModal>
