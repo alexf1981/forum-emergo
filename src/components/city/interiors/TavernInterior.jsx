@@ -4,7 +4,7 @@ import * as GameLogic from '../../../logic/gameLogic';
 
 const TavernInterior = ({ heroes, stats, onRecruit, formatNumber, buildings }) => {
     const { t } = useLanguage();
-    const recruitCost = 100; // Hardcoded for now, could be passed or derived
+    const recruitCost = heroes.length === 0 ? 0 : 100;
 
     return (
         <div className="tavern-interior">
@@ -71,7 +71,7 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber, buildings }) =
                         btnContent = (
                             <>
                                 <span>🪙</span>
-                                <span>{formatNumber(recruitCost)}</span>
+                                <span>{recruitCost === 0 ? t('lbl_free') : formatNumber(recruitCost)}</span>
                             </>
                         );
                     }
@@ -113,7 +113,11 @@ const TavernInterior = ({ heroes, stats, onRecruit, formatNumber, buildings }) =
                     ) : (
                         heroes.map(hero => (
                             <div key={hero.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 10px', background: 'rgba(93, 64, 55, 0.15)', borderRadius: '4px', border: '1px solid rgba(141, 110, 99, 0.3)' }}>
-                                <span style={{ color: '#3e2723' }}>{hero.name} (Lvl {hero.lvl})</span>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <span style={{ color: '#3e2723', fontWeight: 'bold' }}>{hero.name}</span>
+                                    <span style={{ color: '#666', fontSize: '0.9em' }}>Lvl {hero.lvl}</span>
+                                    {hero.status === 'QUESTING' && <span style={{ color: '#e67e22' }}>⚔️</span>}
+                                </div>
                                 <span style={{ color: hero.hp < hero.maxHp * 0.5 ? '#d32f2f' : '#2e7d32', fontWeight: 'bold' }}>
                                     HP: {hero.hp}/{hero.maxHp}
                                 </span>

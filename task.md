@@ -1,0 +1,25 @@
+# Task List
+
+- [x] Brainstorming Quests & Heroes
+    - [x] Initial Proposal (Pricing, Mechanics, Types)
+    - [x] Refine Economy (Start Gold, Tavern Cost)
+    - [x] Design "Tutorial Quest" with Habit Examples
+    - [x] Define "Inspiration List" content
+- [x] Implementation Planning
+    - [x] Design Data Structure for Quests
+    - [x] Design UI for Quest Board
+    - [x] Design "Inspiration" UI for Habit Creation
+- [ ] Execution
+    - [x] Implement Tavern Economy Changes
+    - [x] Remove Legacy Data & Add New Quest Data
+    - [x] Update Game State (Quests Array)
+    - [x] Implement Quest Logic (Start/Complete)
+    - [x] Build Adventure/Quest Board UI (AdventureView)
+    - [x] Refactor Tavern Interior (Recruit Only)
+    - [x] Implement "Inspiration List" Helper
+    - [/] Verification & Testing
+        - [ ] Verify Tavern Cost (100G)
+        - [ ] Verify First Hero Free
+        - [ ] Verify Quest 0 Trigger (Only if Tavern Built)
+        - [ ] Verify Inspiration Modal
+        - [ ] Verify Quest Completion & Rewards

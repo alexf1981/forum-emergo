@@ -13,20 +13,178 @@ export const ITEMS = [
     { id: 'sword_legend', name: 'Zwaard van Mars', type: 'weapon', bonus: 10, icon: '🔥', rarity: 'legendary' }
 ];
 
-// Quest Types
-export const QUESTS = [
-    { id: 'patrol', name: 'Stadspatrouille', level: 1, risk: 4, reward: 25, xp: 20, desc: 'Verjaag dronkenlappen en dieven.' },
-    { id: 'bandits', name: 'Bandietenkamp', level: 3, risk: 12, reward: 60, xp: 50, desc: 'Val een kamp in het bos aan.' },
-    { id: 'ruins', name: 'Vervloekte Ruïnes', level: 5, risk: 25, reward: 150, xp: 120, desc: 'Verken duistere kerkers voor schatten.' }
+// Quest Templates
+export const QUEST_TEMPLATES = [
+    {
+        id: 'introspection',
+        type: 'instant',
+        name: 'quest_introspection_name',
+        desc: 'quest_introspection_desc',
+        flavor: 'quest_introspection_flavor',
+        requirements: { heroCount: 1 },
+        rewards: { gold: 50, xp: 50 },
+        isTutorial: true
+    },
+    {
+        id: 'patrol',
+        type: 'duration',
+        durationDays: 1,
+        level: 2,
+        risk: 5,
+        name: 'quest_patrol_name',
+        desc: 'quest_patrol_desc',
+        flavor: 'quest_patrol_flavor',
+        rewards: { gold: 25, xp: 20 },
+        requirements: { minPower: 5 }
+    },
+    {
+        id: 'inventory',
+        type: 'instant',
+        level: 2,
+        name: 'quest_inventory_name',
+        desc: 'quest_inventory_desc',
+        flavor: 'quest_inventory_flavor',
+        rewards: { gold: 15, xp: 10 },
+        requirements: { heroCount: 1 }
+    },
+    {
+        id: 'training',
+        type: 'duration',
+        durationDays: 1,
+        level: 2,
+        risk: 8,
+        name: 'quest_training_name',
+        desc: 'quest_training_desc',
+        flavor: 'quest_training_flavor',
+        rewards: { gold: 30, xp: 25 },
+        requirements: { minPower: 8 }
+    },
+    {
+        id: 'bandits',
+        type: 'duration',
+        durationDays: 1, // Simplified for MVP
+        level: 3,
+        risk: 20,
+        name: 'quest_bandits_name',
+        desc: 'quest_bandits_desc',
+        flavor: 'quest_bandits_flavor',
+        rewards: { gold: 60, xp: 50 },
+        requirements: { minPower: 20 }
+    }
 ];
 
-export const ENEMY_TYPES = [
-    { name: "Straatschoffie", str: 2 },
-    { name: "Wolvenroedel", str: 5 },
-    { name: "Gallische Krijger", str: 8 },
-    { name: "Deserteur", str: 10 },
-    { name: "Oude Minotaurus", str: 15 }
-];
+export const INSPIRATION_HABITS = {
+    health: [
+        { text: "habit_health_water", type: "virtue" },
+        { text: "habit_health_walk", type: "virtue" },
+        { text: "habit_health_sugar", type: "virtue" },
+        { text: "habit_health_sleep", type: "virtue" },
+        { text: "habit_health_fruit", type: "virtue" },
+        { text: "habit_health_alcohol", type: "virtue" },
+        { text: "habit_health_sport", type: "virtue" },
+        { text: "habit_health_stairs", type: "virtue" },
+        { text: "habit_health_cold_shower", type: "virtue" },
+        { text: "habit_health_floss", type: "virtue" },
+        { text: "habit_health_cooking", type: "virtue" },
+        { text: "habit_health_snacks", type: "virtue" },
+        { text: "habit_health_standing", type: "virtue" },
+        { text: "habit_health_meds", type: "virtue" },
+        { text: "habit_health_candy", type: "vice" },
+        { text: "habit_health_smoke", type: "vice" },
+        { text: "habit_health_night_owl", type: "vice" },
+        { text: "habit_health_snooze", type: "vice" },
+        { text: "habit_health_nail_biting", type: "vice" }
+    ],
+    productivity: [
+        { text: "habit_prod_inbox", type: "virtue" },
+        { text: "habit_prod_deep_work", type: "virtue" },
+        { text: "habit_prod_plan_tomorrow", type: "virtue" },
+        { text: "habit_prod_clean_desk", type: "virtue" },
+        { text: "habit_prod_finance", type: "virtue" },
+        { text: "habit_prod_email_batch", type: "virtue" },
+        { text: "habit_prod_learn", type: "virtue" },
+        { text: "habit_prod_pomodoro", type: "virtue" },
+        { text: "habit_prod_weekly_review", type: "virtue" },
+        { text: "habit_prod_backups", type: "virtue" },
+        { text: "habit_prod_organize_notes", type: "virtue" },
+        { text: "habit_prod_social_media", type: "vice" },
+        { text: "habit_prod_procrastinate", type: "vice" },
+        { text: "habit_prod_late", type: "vice" },
+        { text: "habit_prod_doomscrolling", type: "vice" },
+        { text: "habit_prod_multitask", type: "vice" }
+    ],
+    mindset: [
+        { text: "habit_mind_gratitude", type: "virtue" },
+        { text: "habit_mind_meditation", type: "virtue" },
+        { text: "habit_mind_read_10", type: "virtue" },
+        { text: "habit_mind_journal", type: "virtue" },
+        { text: "habit_mind_compliment", type: "virtue" },
+        { text: "habit_mind_call_friend", type: "virtue" },
+        { text: "habit_mind_no_news", type: "virtue" },
+        { text: "habit_mind_nature_walk", type: "virtue" },
+        { text: "habit_mind_visualization", type: "virtue" },
+        { text: "habit_mind_breathing", type: "virtue" },
+        { text: "habit_mind_complain", type: "vice" },
+        { text: "habit_mind_gossip", type: "vice" },
+        { text: "habit_mind_negative_self", type: "vice" },
+        { text: "habit_mind_road_rage", type: "vice" }
+    ],
+    sociaal: [
+        { text: "habit_social_call_friend", type: "virtue" },
+        { text: "habit_social_date_night", type: "virtue" },
+        { text: "habit_social_play_kids", type: "virtue" },
+        { text: "habit_social_card", type: "virtue" },
+        { text: "habit_social_network", type: "virtue" },
+        { text: "habit_social_volunteer", type: "virtue" },
+        { text: "habit_social_listen", type: "virtue" },
+        { text: "habit_social_phone_dinner", type: "virtue" },
+        { text: "habit_social_cancel", type: "vice" },
+        { text: "habit_social_isolate", type: "vice" },
+        { text: "habit_social_argue", type: "vice" },
+        { text: "habit_social_scroll_talk", type: "vice" }
+    ],
+    creativiteit: [
+        { text: "habit_creat_instrument", type: "virtue" },
+        { text: "habit_creat_draw", type: "virtue" },
+        { text: "habit_creat_write", type: "virtue" },
+        { text: "habit_creat_brainstorm", type: "virtue" },
+        { text: "habit_creat_fix", type: "virtue" },
+        { text: "habit_creat_craft", type: "virtue" },
+        { text: "habit_creat_cook_new", type: "virtue" },
+        { text: "habit_creat_learn_lang", type: "virtue" },
+        { text: "habit_creat_code", type: "virtue" },
+        { text: "habit_creat_consume", type: "vice" },
+        { text: "habit_creat_clutter", type: "vice" },
+        { text: "habit_creat_give_up", type: "vice" }
+    ],
+    huishouden: [
+        { text: "habit_home_bed", type: "virtue" },
+        { text: "habit_home_plants", type: "virtue" },
+        { text: "habit_home_tidy_10", type: "virtue" },
+        { text: "habit_home_laundry", type: "virtue" },
+        { text: "habit_home_vacuum", type: "virtue" },
+        { text: "habit_home_dishes_out", type: "virtue" },
+        { text: "habit_home_fridge", type: "virtue" },
+        { text: "habit_home_trash", type: "virtue" },
+        { text: "habit_home_clothes_chair", type: "virtue" },
+        { text: "habit_home_dishes_dirty", type: "vice" },
+        { text: "habit_home_procrast_clean", type: "vice" },
+        { text: "habit_home_lights", type: "vice" }
+    ],
+    financien: [
+        { text: "habit_fin_check_expenses", type: "virtue" },
+        { text: "habit_fin_save", type: "virtue" },
+        { text: "habit_fin_no_spend", type: "virtue" },
+        { text: "habit_fin_lunch", type: "virtue" },
+        { text: "habit_fin_subs", type: "virtue" },
+        { text: "habit_fin_invest", type: "virtue" },
+        { text: "habit_fin_pay_bills", type: "virtue" },
+        { text: "habit_fin_impulse_buy", type: "vice" },
+        { text: "habit_fin_gambling", type: "vice" },
+        { text: "habit_fin_overdraft", type: "vice" },
+        { text: "habit_fin_expensive_coffee", type: "vice" }
+    ]
+};
 
 // --- HELPERS ---
 export const getTodayString = () => {
@@ -186,7 +344,8 @@ export function createHabit(habits, text, type, isOneTime) {
         type: type || 'virtue',
         bucket: !!isOneTime,
         completed: false,
-        history: []
+        history: [],
+        createdAt: new Date().toISOString()
     };
     return [...habits, newHabit];
 }
@@ -381,7 +540,7 @@ export const BASE_TASK_GOLD = 5;
 // Building Costs (Level 1)
 export const BUILDING_COSTS = {
     house: 100,
-    tavern: 250,  // Unlock Cost
+    tavern: 100,  // Unlock Cost
     library: 250,
     market: 250,
     town_hall: 0   // Already exists
@@ -518,6 +677,115 @@ export const TAVERN_CAPS = {
 
 export function getTavernCap(level) {
     return TAVERN_CAPS[level] || 0;
+}
+
+// --- QUEST LOGIC ---
+
+export function checkQuestRequirements(quest, selectedHeroes) {
+    if (quest.requirements.heroCount !== undefined) {
+        if (selectedHeroes.length !== quest.requirements.heroCount) {
+            // Special case for heroCount 0 (e.g. Introspection)
+            if (quest.requirements.heroCount === 0 && selectedHeroes.length === 0) return { success: true };
+            return { success: false, msg: `Deze missie vereist ${quest.requirements.heroCount} held(en).` };
+        }
+    }
+
+    if (quest.requirements.minPower) {
+        const totalPower = selectedHeroes.reduce((sum, h) => sum + h.str + h.lvl, 0); // Simplified Power Calc
+        if (totalPower < quest.requirements.minPower) {
+            return { success: false, msg: `Team te zwak (Kracht: ${totalPower}/${quest.requirements.minPower})` };
+        }
+    }
+
+    if (quest.level) {
+        const totalLevel = selectedHeroes.reduce((sum, h) => sum + h.lvl, 0);
+        if (totalLevel < quest.level) {
+            return { success: false, msg: `Team level te laag (Level: ${totalLevel}/${quest.level})` };
+        }
+    }
+
+    return { success: true };
+}
+
+export function startQuest(quests, heroes, stats, questId, selectedHeroIds) {
+    const template = QUEST_TEMPLATES.find(q => q.id === questId);
+    if (!template) return { success: false, msg: "Missie niet gevonden." };
+
+    const selectedHeroes = heroes.filter(h => selectedHeroIds.includes(h.id));
+
+    // 1. Validate
+    const check = checkQuestRequirements(template, selectedHeroes);
+    if (!check.success) return check;
+
+    // 2. Resources (Travel cost? None for now)
+
+    // 3. Update Heroes (Lock them if duration > 0)
+    let newHeroes = [...heroes];
+    if (template.type === 'duration') {
+        newHeroes = heroes.map(h => selectedHeroIds.includes(h.id) ? { ...h, status: 'QUESTING' } : h);
+    }
+
+    // 4. Create Quest Instance
+    const newQuest = {
+        id: Date.now(),
+        templateId: questId,
+        heroIds: selectedHeroIds,
+        startTime: new Date().toISOString(),
+        status: 'active'
+    };
+
+    return {
+        success: true,
+        newQuests: [...quests, newQuest],
+        newHeroes,
+        newStats: stats, // No cost for now
+        msg: `Missie "${template.name}" gestart!`
+    };
+}
+
+export function completeQuest(quests, heroes, stats, questInstanceId) {
+    const quest = quests.find(q => q.id === questInstanceId);
+    if (!quest) return { success: false, msg: "Missie niet gevonden." };
+
+    const template = QUEST_TEMPLATES.find(t => t.id === quest.templateId);
+
+    // Calculate Rewards
+    let rewardGold = template.rewards.gold || 0;
+    let rewardXp = template.rewards.xp || 0;
+
+    // Update Heroes: Free them + Give XP
+    const newHeroes = heroes.map(h => {
+        if (quest.heroIds.includes(h.id)) {
+            // Gain XP
+            let newXp = h.xp + rewardXp;
+            let newLvl = h.lvl;
+            let newStr = h.str;
+
+            // Level Up?
+            if (newXp >= newLvl * 100) {
+                newXp -= newLvl * 100;
+                newLvl++;
+                newStr += 2;
+            }
+
+            return { ...h, status: 'IDLE', xp: newXp, lvl: newLvl, str: newStr };
+        }
+        return h;
+    });
+
+    // Update Quest Status
+    const newQuests = quests.map(q => q.id === questInstanceId ? { ...q, status: 'completed', completedTime: new Date().toISOString() } : q);
+
+    // Update Stats
+    const newStats = { ...stats, gold: stats.gold + rewardGold };
+
+    return {
+        success: true,
+        newQuests,
+        newHeroes,
+        newStats,
+        msg: `Missie Voltooid! +${rewardGold} Goud`
+    };
 }
 
 

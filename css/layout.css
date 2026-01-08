@@ -947,3 +947,21 @@
         height: 60px !important;
     }
 }
+
+/* Adventure View Stabilization */
+.adventure-view-stable {
+    width: 90%;
+    max-width: 600px;
+    padding: 20px;
+    padding-bottom: 80px;
+    color: #ecf0f1;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (min-width: 620px) {
+    .adventure-view-stable {
+        margin-left: calc(50vw - 300px);
+        margin-right: 0;
+    }
+}

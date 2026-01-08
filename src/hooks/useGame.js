@@ -11,6 +11,7 @@ export function useGame() {
     const [stats, setStats] = useLocalStorage('romestats', { gold: 200, know: 0, pop: 100 });
     const [heroes, setHeroes] = useLocalStorage('romeheroes', []); // We handle init logic in default val context if needed, but [] is safe fallback
     const [habits, setHabits] = useLocalStorage('romehabits', []);
+    const [quests, setQuests] = useLocalStorage('romequests', []); // New: Quests State
     const [lastWelcomeDate, setLastWelcomeDate] = useLocalStorage('rome_last_welcome', '');
     const [buildings, setBuildings] = useLocalStorage('romebuildings', GameLogic.INITIAL_BUILDINGS);
     const [resources, setResources] = useLocalStorage('romeresources', GameLogic.INITIAL_RESOURCES);
@@ -125,7 +126,15 @@ export function useGame() {
 
     const addHabit = (text, type, bucket) => {
         setHabits(GameLogic.createHabit(habits, text, type, bucket));
-        notify({ key: 'msg_added_task' }, "success");
+
+        // Notify based on type
+        if (type === 'virtue') {
+            notify({ key: 'msg_added_virtue' }, "success");
+        } else if (type === 'vice') {
+            notify({ key: 'msg_added_vice' }, "error");
+        } else {
+            notify({ key: 'msg_added_task' }, "success");
+        }
     };
 
     const deleteHabit = (id) => {
@@ -201,10 +210,26 @@ export function useGame() {
             return;
         }
 
-        if (stats.gold < 100) { notify({ key: 'msg_recruit_fail_gold' }, "error"); return; }
+        // 3. Cost Check (First Hero Free!)
+        const isFirstHero = heroes.length === 0;
+        const cost = isFirstHero ? 0 : 100;
+
+        if (stats.gold < cost) { notify({ key: 'msg_recruit_fail_gold' }, "error"); return; }
+
         const name = GameLogic.HERO_NAMES[Math.floor(Math.random() * GameLogic.HERO_NAMES.length)];
-        const newHero = { id: Date.now(), name, lvl: 1, xp: 0, hp: 20, maxHp: 20, str: Math.floor(Math.random() * 3) + 3, items: [] };
-        setStats(s => ({ ...s, gold: s.gold - 100 }));
+        const newHero = {
+            id: Date.now(),
+            name,
+            lvl: 1,
+            xp: 0,
+            hp: 20,
+            maxHp: 20,
+            str: Math.floor(Math.random() * 3) + 3,
+            items: [],
+            status: 'IDLE'
+        };
+
+        setStats(s => ({ ...s, gold: s.gold - cost }));
         setHeroes([...heroes, newHero]);
         notify({ key: 'msg_recruit_success', args: { name } }, "success");
     };
@@ -215,6 +240,31 @@ export function useGame() {
         setHeroes(prev => prev.map(h => h.id === id ? { ...h, hp: h.maxHp } : h));
         notify({ key: 'msg_heal_success' }, "success");
         log({ key: 'msg_heal_success' });
+    };
+
+    // === ACTIONS: QUESTS ===
+    const startQuest = (questId, heroIds) => {
+        const result = GameLogic.startQuest(quests, heroes, stats, questId, heroIds);
+        if (result.success) {
+            setQuests(result.newQuests);
+            setHeroes(result.newHeroes);
+            setStats(result.newStats);
+            notify({ msg: result.msg }, "success");
+        } else {
+            notify({ msg: result.msg }, "error");
+        }
+    };
+
+    const completeQuest = (questInstanceId) => {
+        const result = GameLogic.completeQuest(quests, heroes, stats, questInstanceId);
+        if (result.success) {
+            setQuests(result.newQuests);
+            setHeroes(result.newHeroes);
+            setStats(result.newStats);
+            notify({ msg: result.msg }, "success");
+        } else {
+            notify({ msg: result.msg }, "error");
+        }
     };
 
 
@@ -411,6 +461,7 @@ export function useGame() {
                         if (cloudData.romeresources) setResources(cloudData.romeresources);
                         if (cloudData.romeresearch) setResearch(cloudData.romeresearch);
                         if (cloudData.romeloginhistory) setLoginHistory(cloudData.romeloginhistory);
+                        if (cloudData.romequests) setQuests(cloudData.romequests);
                         setIsNewUser(false);
                     } else {
                         // Valid load but no data found -> New User (or wiped)
@@ -459,7 +510,8 @@ export function useGame() {
                 romebuildings: buildings,
                 romeresources: resources,
                 romeresearch: research,
-                romeloginhistory: loginHistory
+                romeloginhistory: loginHistory,
+                romequests: quests
             };
 
             // Reduced timeout to 200ms to persist faster and feel snappier
@@ -542,6 +594,10 @@ export function useGame() {
             replaceHabits,
             setHabitCompletion, // NEW
 
+            // Quests
+            startQuest,
+            completeQuest,
+
             // City
             buildBuilding,
             upgradeBuilding,
@@ -556,6 +612,7 @@ export function useGame() {
         },
         isLoggedIn: !!user,
         isNewUser, // NEW
-        isCloudSynchronized // Exposed for checks if needed
+        isCloudSynchronized, // Exposed for checks if needed
+        quests // NEW
     };
 }

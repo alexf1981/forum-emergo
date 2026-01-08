@@ -35,7 +35,7 @@ function App() {
     const [showDebugModal, setShowDebugModal] = useState(false);
 
     // === HOOK ===
-    const { stats, heroes, habits, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research, loginHistory } = useGame();
+    const { stats, heroes, habits, quests, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research, loginHistory } = useGame();
 
     // Scroll listener & First Visit Check
     useEffect(() => {
@@ -258,8 +258,8 @@ function App() {
                 <button className="fab" onClick={() => setShowAddTaskModal(true)} title={t('habit_new')}>+</button>
             )}
 
-            <div className={`hero-placeholder ${isHeaderCompact || activeTab === 'tavern' ? 'compact' : ''}`} />
-            <HeroBanner isCompact={isHeaderCompact || activeTab === 'tavern'} />
+            <div className={`hero-placeholder ${isHeaderCompact || activeTab === 'tavern' || activeTab === 'adventure' ? 'compact' : ''}`} />
+            <HeroBanner isCompact={isHeaderCompact || activeTab === 'tavern' || activeTab === 'adventure'} />
 
             <div className="app-container">
                 {activeTab === 'city' && (
@@ -296,7 +296,14 @@ function App() {
                 )}
 
                 {activeTab === 'adventure' && (
-                    <AdventureView />
+                    <AdventureView
+                        quests={quests}
+                        heroes={heroes}
+                        stats={stats}
+                        actions={actions}
+                        buildings={buildings}
+                        habits={habits}
+                    />
                 )}
 
                 <div className="toast-container">
