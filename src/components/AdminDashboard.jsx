@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { AdminService } from '../services/adminService';
 import Icons from './Icons';
 import '../../css/components.css'; // Reuse basic styles or add specific admin CSS
+import UnifiedModal from './layout/UnifiedModal';
+import { useLanguage } from '../context/LanguageContext';
 
 const AdminDashboard = ({ onClose, actions }) => {
     const [users, setUsers] = useState([]);
@@ -11,6 +13,8 @@ const AdminDashboard = ({ onClose, actions }) => {
     useEffect(() => {
         loadData();
     }, []);
+
+    const { t } = useLanguage(); // Hook for translations
 
     const toggleEditMode = () => {
         const newValue = !editMode;
@@ -40,95 +44,95 @@ const AdminDashboard = ({ onClose, actions }) => {
     };
 
     return (
-        <div className="modal-overlay" style={{ zIndex: 2000 }}>
-            <div className="modal-content" style={{ maxWidth: '800px', width: '90%' }}>
-                <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                        <h2>Keizerlijk Overzicht</h2>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem', cursor: 'pointer', background: editMode ? '#fff' : 'rgba(255,255,255,0.5)', padding: '2px 8px', borderRadius: '4px' }}>
+        <UnifiedModal
+            isOpen={true}
+            onClose={onClose}
+            title={t('admin_header')} // "Keizerrijk" / "Empire"
+        >
+            <div style={{ padding: '10px' }}>
+                {loading ? <p>{t('admin_loading')}</p> : (
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '2px solid #ccc' }}>
+                                    <th style={{ padding: '10px' }}>{t('lbl_user')}</th>
+                                    <th style={{ padding: '10px' }}>{t('lbl_email')}</th>
+                                    <th style={{ padding: '10px' }}>{t('lbl_language')}</th>
+                                    <th style={{ padding: '10px' }}>{t('gold')}</th>
+                                    <th style={{ padding: '10px' }}>{t('lbl_last_seen')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(u => (
+                                    <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
+                                        <td style={{ padding: '10px' }}>{u.username}</td>
+                                        <td style={{ padding: '10px' }}>{u.email}</td>
+                                        <td style={{ padding: '10px' }}>{renderLanguage(u.language)}</td>
+                                        <td style={{ padding: '10px' }}>{u.gold}</td>
+                                        <td style={{ padding: '10px', fontSize: '0.8em' }}>{u.lastActive}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                <div className="modal-actions" style={{ marginTop: '20px' }}>
+                    <button className="btn" onClick={loadData}>{t('admin_refresh')}</button>
+                </div>
+
+                {/* CHEAT ACTIONS */}
+                <div style={{ padding: '15px', borderTop: '1px solid #ddd', marginTop: '15px' }}>
+                    <h3 style={{ marginTop: 0, color: '#e74c3c', fontSize: '1rem' }}>⚡ {t('admin_god_mode')}</h3>
+
+                    <div style={{ marginBottom: '15px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem', cursor: 'pointer', background: editMode ? '#fff' : 'rgba(0,0,0,0.05)', padding: '4px 8px', borderRadius: '4px', color: '#000', fontWeight: 'bold', width: 'fit-content', border: '1px solid #ccc' }}>
                             <input
                                 type="checkbox"
                                 checked={editMode}
                                 onChange={toggleEditMode}
                             />
-                            Stad Bewerken
+                            {t('admin_edit_city')}
                         </label>
                     </div>
-                    <button className="btn-icon" onClick={onClose}>X</button>
-                </div>
-                <div className="modal-body">
-                    {loading ? <p>Gegevens ophalen uit het rijk...</p> : (
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead>
-                                    <tr style={{ borderBottom: '2px solid #ccc' }}>
-                                        <th style={{ padding: '10px' }}>Gebruiker</th>
-                                        <th style={{ padding: '10px' }}>Email</th>
-                                        <th style={{ padding: '10px' }}>Taal</th>
-                                        <th style={{ padding: '10px' }}>Goud</th>
-                                        <th style={{ padding: '10px' }}>Laatst Gezien</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {users.map(u => (
-                                        <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
-                                            <td style={{ padding: '10px' }}>{u.username}</td>
-                                            <td style={{ padding: '10px' }}>{u.email}</td>
-                                            <td style={{ padding: '10px' }}>{renderLanguage(u.language)}</td>
-                                            <td style={{ padding: '10px' }}>{u.gold}</td>
-                                            <td style={{ padding: '10px', fontSize: '0.8em' }}>{u.lastActive}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                    <div className="modal-actions">
-                        <button className="btn" onClick={loadData}>VERVERSEN</button>
-                    </div>
 
-                    {/* CHEAT ACTIONS */}
-                    <div style={{ padding: '15px', borderTop: '1px solid #ddd', marginTop: '15px' }}>
-                        <h3 style={{ marginTop: 0, color: '#e74c3c', fontSize: '1rem' }}>⚡ God Mode Actions</h3>
-                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        <button
+                            className="btn"
+                            onClick={() => {
+                                if (window.confirm("Zeker weten? Alle gebouwen behalve Stadhuis worden gereset.")) { // TODO: Localize confirm
+                                    if (actions && actions.adminResetCity) actions.adminResetCity();
+                                    else alert("Action not found");
+                                }
+                            }}
+                            style={{ backgroundColor: '#e74c3c', borderColor: '#c0392b' }}
+                        >
+                            🏚️ {t('admin_evacuate')}
+                        </button>
+
+                        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                            <input
+                                type="number"
+                                placeholder={t('admin_enter_amount')}
+                                id="adminGoldInput"
+                                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '120px' }}
+                            />
                             <button
                                 className="btn"
                                 onClick={() => {
-                                    if (window.confirm("Zeker weten? Alle gebouwen behalve Stadhuis worden gereset.")) {
-                                        if (actions && actions.adminResetCity) actions.adminResetCity();
-                                        else alert("Action not found");
-                                    }
+                                    const val = document.getElementById('adminGoldInput').value;
+                                    if (val && actions && actions.adminSetGold) actions.adminSetGold(val);
+                                    else if (!val) alert("Vul een bedrag in");
+                                    else alert("Action not found");
                                 }}
-                                style={{ backgroundColor: '#e74c3c', borderColor: '#c0392b' }}
+                                style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
                             >
-                                🏚️ Stad Ontruimen
+                                💰 {t('admin_set_gold')}
                             </button>
-
-                            <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                                <input
-                                    type="number"
-                                    placeholder="Goud hoeveelheid"
-                                    id="adminGoldInput"
-                                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '120px' }}
-                                />
-                                <button
-                                    className="btn"
-                                    onClick={() => {
-                                        const val = document.getElementById('adminGoldInput').value;
-                                        if (val && actions && actions.adminSetGold) actions.adminSetGold(val);
-                                        else if (!val) alert("Vul een bedrag in");
-                                        else alert("Action not found");
-                                    }}
-                                    style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
-                                >
-                                    💰 Zet Goud
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </UnifiedModal>
     );
 };
 

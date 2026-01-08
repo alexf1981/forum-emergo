@@ -78,11 +78,15 @@ const UnifiedModal = ({
                         <h2 style={{
                             margin: 0,
                             fontFamily: 'Trajan Pro, serif',
-                            fontSize: '2.4rem', // 2x larger
+                            fontSize: 'clamp(0.7rem, 5vw, 2.4rem)', // Scalable from small to large
                             textShadow: '3px 3px 0px #000',
                             textAlign: 'center',
-                            textTransform: 'uppercase', // Uppercase
-                            lineHeight: 1
+                            textTransform: 'uppercase',
+                            lineHeight: 1,
+                            whiteSpace: 'nowrap', // Force single line
+                            width: '100%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
                         }}>
                             {title}
                         </h2>
