@@ -413,13 +413,34 @@ export function useGame() {
         setHeroes([]); // Clear heroes
         setQuests([]); // Clear quests
         setLocalBuildings(GameLogic.INITIAL_BUILDINGS);
-        // Stats reset usually optional or kept? User said "Stad ontruimen", implying buildings/units gone.
-        // Assuming we keep Gold/Pop/Happiness or should reset? 
-        // Providing full reset as per previous context:
-        // setStats({ gold: 500, population: 0, happiness: 100 }); 
-        // But let's stick to just clearing the "Board" (Buildings + Units) + Research
         notify({ key: 'msg_admin_reset' }, "success");
         DebugLogger.log('ADMIN', 'City Reset (Stad Ontruimen)');
+    };
+
+    const adminAddLoginDay = () => {
+        // Use current state from closure to calculate logic
+        // This avoids side-effects inside the setter callback
+        const prev = loginHistory;
+        let targetDate = new Date();
+
+        if (prev.length > 0) {
+            // Find oldest date
+            const oldest = prev.reduce((a, b) => a < b ? a : b);
+            targetDate = new Date(oldest);
+            targetDate.setDate(targetDate.getDate() - 1);
+        } else {
+            // If empty, just add Yesterday
+            targetDate.setDate(targetDate.getDate() - 1);
+        }
+
+        const dateStr = targetDate.toISOString().split('T')[0];
+
+        // Perform Side Effects
+        notify({ key: 'msg_history_updated' }, "success");
+        DebugLogger.log('ADMIN', `Added History Day: ${dateStr}`);
+
+        // Update State
+        setLoginHistory(current => [...current, dateStr]);
     };
 
 
@@ -646,9 +667,10 @@ export function useGame() {
             doResearch,
 
             // Admin
-            adminSetGold,
+            // Admin
             adminSetGold,
             adminResetCity,
+            adminAddLoginDay,
             adminTriggerNewDay: () => {
                 setLastWelcomeDate("1970-01-01"); // Force mismatch with today
                 notify({ key: 'msg_admin_new_day' }, "success");

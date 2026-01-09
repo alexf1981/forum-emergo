@@ -722,7 +722,7 @@ export function startQuest(quests, heroes, stats, questId, selectedHeroIds) {
 
     // 3. Update Heroes (Lock them if duration > 0)
     let newHeroes = [...heroes];
-    if (template.type === 'duration') {
+    if (template.durationDays > 0) {
         newHeroes = heroes.map(h => selectedHeroIds.includes(h.id) ? { ...h, status: 'QUESTING' } : h);
     }
 

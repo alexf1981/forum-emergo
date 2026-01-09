@@ -184,6 +184,15 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                                         >
                                             <Icons.Sun />
                                         </UnifiedButton>
+                                        <UnifiedButton
+                                            onClick={actions.adminAddLoginDay}
+                                            variant="secondary"
+                                            fullWidth
+                                            style={{ backgroundColor: '#16a085', borderColor: '#1abc9c' }}
+                                            title="Add Login Day to History (+1 Day Streak)"
+                                        >
+                                            <Icons.Calendar />
+                                        </UnifiedButton>
                                     </>
                                 )}
                                 <UnifiedButton
