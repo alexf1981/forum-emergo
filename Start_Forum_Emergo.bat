@@ -1,5 +1,11 @@
 @echo off
 title Forum Emergo Launcher
+
+:: Sluit alle openstaande PowerShell vensters en Node processen (clean start)
+echo Oude sessies afsluiten...
+taskkill /F /IM powershell.exe /T >nul 2>&1
+taskkill /F /IM node.exe /T >nul 2>&1
+
 echo ==========================================
 echo   Forum Emergo wordt gestart...
 echo   De browser opent automatisch.

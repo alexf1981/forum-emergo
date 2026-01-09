@@ -71,10 +71,18 @@ export function useGame() {
             notify({ key: 'msg_habit_virtue_reward', args: { gold: absGold } }, "success");
         }
 
+        DebugLogger.log('HABIT', `Completed: ${habit.text} (${type})`);
+
         // Update Habits
         setHabits(prev => prev.map(h =>
             h.id === id ? { ...h, completed: true, history: [...h.history, today] } : h
         ));
+
+        // [MISSION] Log Progress for Daily Productivity
+        const hasProductivity = quests.some(q => q.templateId === 'daily_productivity' && !q.completed);
+        if (hasProductivity) {
+            DebugLogger.log('MISSION', `Progress: Daily Productivity`);
+        }
     };
 
     const decrementHabit = (id) => {
@@ -92,6 +100,8 @@ export function useGame() {
         newHistory.splice(idx, 1);
 
         setHabits(prev => prev.map(hab => hab.id === id ? { ...hab, history: newHistory } : hab));
+
+        DebugLogger.log('HABIT', `Undone: ${h.text} (${h.type || 'virtue'})`);
 
         const type = h.type || 'virtue';
 
@@ -134,6 +144,12 @@ export function useGame() {
             notify({ key: 'msg_added_vice' }, "error");
         } else {
             notify({ key: 'msg_added_task' }, "success");
+        }
+
+        // [MISSION] Log Progress for Introspection
+        const hasIntrospection = quests.some(q => q.templateId === 'introspection' && !q.completed);
+        if (hasIntrospection) {
+            DebugLogger.log('MISSION', `Progress: Introspection (Habit Added)`);
         }
     };
 
@@ -253,7 +269,11 @@ export function useGame() {
             if (result.msg && result.msg.key === 'msg_quest_started') {
                 result.msg.args.quest = t(result.msg.args.quest);
             }
+            if (result.msg && result.msg.key === 'msg_quest_started') {
+                result.msg.args.quest = t(result.msg.args.quest);
+            }
             notify(result.msg, "success");
+            DebugLogger.log('MISSION', `Started: ${questId}`);
         } else {
             notify(result.msg, "error");
         }
@@ -265,7 +285,9 @@ export function useGame() {
             setQuests(result.newQuests);
             setHeroes(result.newHeroes);
             setStats(result.newStats);
+            setStats(result.newStats);
             notify(result.msg, "success");
+            DebugLogger.log('MISSION', `Completed: ${questInstanceId}`);
         } else {
             notify(result.msg, "error");
         }
@@ -563,6 +585,7 @@ export function useGame() {
         setLastWelcomeDate(today); // Updates state -> trigger save
         setShowWelcome(false);
         setHabits(prev => GameLogic.resetDailyHabits(prev));
+        DebugLogger.log('MISSION', 'New Day Started (Welcome Screen Dismissed)');
     };
 
     return {

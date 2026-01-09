@@ -775,7 +775,7 @@ export function completeQuest(quests, heroes, stats, questInstanceId) {
     });
 
     // Update Quest Status
-    const newQuests = quests.map(q => q.id === questInstanceId ? { ...q, status: 'completed', completedTime: new Date().toISOString() } : q);
+    const newQuests = quests.map(q => q.id === questInstanceId ? { ...q, status: 'completed', completed: true, completedTime: new Date().toISOString() } : q);
 
     // Update Stats
     const newStats = { ...stats, gold: stats.gold + rewardGold };
