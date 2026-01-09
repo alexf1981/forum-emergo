@@ -386,7 +386,16 @@ export const translations = {
         onboarding_title: "Welcome, Emperor",
         onboarding_text: "Welcome to Forum Emergo. To help you get started, the Senate has already created some sample tasks for you. An extensive onboarding tutorial will arrive here soon.",
         btn_start_reign: "Begin Reign",
-        msg_no_tavern_quests: "Missions unavailable. Recruit heroes first!"
+        msg_no_tavern_quests: "Missions unavailable. Recruit heroes first!",
+        // AddTaskModal
+        title_add_task: "Add New Duty",
+        lbl_description: "Description",
+        lbl_created: "Created on",
+        lbl_virtue: "Virtue",
+        lbl_vice: "Vice",
+        lbl_todo: "Mandate",
+        lbl_recurring: "Recurring?",
+        btn_ok_new: "Ok & New",
     },
     nl: {
         flag: "🇳🇱",
@@ -757,7 +766,16 @@ export const translations = {
         onboarding_title: "Welkom, Keizer",
         onboarding_text: "Welkom bij Forum Emergo. Om u alvast op weg te helpen heeft de senaat al een aantal voorbeeld taken voor u aangemaakt. Binnenkort komt hier een uitgebreide onboarding tutorial.",
         btn_start_reign: "Start Regering",
-        msg_no_tavern_quests: "Missies nog niet beschikbaar. Rekruteer eerst helden."
+        msg_no_tavern_quests: "Missies nog niet beschikbaar. Rekruteer eerst helden.",
+        // AddTaskModal
+        title_add_task: "Nieuwe Plicht Toevoegen",
+        lbl_description: "Omschrijving",
+        lbl_created: "Aangemaakt op",
+        lbl_virtue: "Virtus",
+        lbl_vice: "Barbarium",
+        lbl_todo: "Mandatum",
+        lbl_recurring: "Repeterend?",
+        btn_ok_new: "Ok & Nieuwe",
     },
     es: {
         flag: "🇪🇸",
@@ -1154,7 +1172,16 @@ export const translations = {
         onboarding_title: "Bienvenido, Emperador",
         onboarding_text: "Bienvenido al Foro Emergo. Para ayudarle a empezar, el Senado ya ha creado algunas tareas de ejemplo para usted. Pronto habrá un tutorial más detallado.",
         btn_start_reign: "Comenzar Reinado",
-        msg_no_tavern_quests: "Misiones no disponibles. ¡Recluta héroes primero!"
+        msg_no_tavern_quests: "Misiones no disponibles. ¡Recluta héroes primero!",
+        // AddTaskModal
+        title_add_task: "Añadir Nueva Tarea",
+        lbl_description: "Descripción",
+        lbl_created: "Creado el",
+        lbl_virtue: "Virtud",
+        lbl_vice: "Vicio",
+        lbl_todo: "Mandato",
+        lbl_recurring: "¿Recurrente?",
+        btn_ok_new: "Ok y Nueva",
     },
     de: {
         flag: "🇩🇪",
@@ -1446,6 +1473,15 @@ export const translations = {
         nav_tavern: "Taverne",
         nav_adventure: "Abenteuer",
         msg_no_tavern_quests: "Noch keine Quests, baue zuerst eine Taverne und rekrutiere Helden.",
+        // AddTaskModal
+        title_add_task: "Neue Pflicht Hinzufügen",
+        lbl_description: "Beschreibung",
+        lbl_created: "Erstellt am",
+        lbl_virtue: "Tugend (Virtus)",
+        lbl_vice: "Laster (Barbarium)",
+        lbl_todo: "Mandat (Mandatum)",
+        lbl_recurring: "Wiederkehrend?",
+        btn_ok_new: "Ok & Neu",
         msg_level_too_low: "Gemeinsames Level zu niedrig (Benötigt: {level})",
         lbl_free: "KOSTENLOS",
 

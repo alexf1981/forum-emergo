@@ -307,44 +307,7 @@
     color: #666;
 }
 
-.modal-radio-group {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.modal-radio-label {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 8px 12px;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    transition: background-color 0.2s;
-}
-
-.modal-radio-indicator {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    transition: all 0.2s;
-    flex-shrink: 0;
-}
-
-.modal-radio-text {
-    font-weight: normal;
-}
-
-.modal-checkbox-label {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: normal;
-}
-
+/* Actions and Buttons */
 .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -384,7 +347,7 @@
 
     .modal-actions {
         flex-direction: column-reverse;
-        /* Stack buttons, OK on top usually preferred but context dependent. Here probably Cancel bottom is fine or side by side if possible. User asked "Buttons buttons under each other". */
+        /* Stack buttons */
     }
 
     .modal-actions .btn {
@@ -394,44 +357,65 @@
     }
 }
 
-/* Modal State Styles */
+/* Modal Radio Group (Centered) */
 .modal-radio-group {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
+    justify-content: center;
+    /* Centered */
+    width: 100%;
 }
 
-.modal-radio-label {
+/* Specificity fix: Ensure flex applies over generic label styles */
+.modal-form-group .modal-radio-label {
     cursor: pointer;
     display: flex;
+    /* Restored flex */
     align-items: center;
-    gap: 20px;
-    padding: 8px 12px;
+    /* Vertical alignment */
+    gap: 12px;
+    /* Nice gap */
+    padding: 8px 16px;
     border-radius: 4px;
     border: 1px solid transparent;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.1s;
     background: transparent;
+    margin-bottom: 0;
+    /* Reset generic label margin */
+    font-weight: normal;
+    /* Reset generic label bold */
+}
+
+.modal-radio-label:hover {
+    background: rgba(0, 0, 0, 0.03);
 }
 
 .modal-radio-label.selected {
     background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 .modal-radio-indicator {
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    /* Slightly larger */
+    height: 18px;
     border-radius: 50%;
     transition: all 0.2s;
     flex-shrink: 0;
-    border: 2px solid #ccc;
-    /* Default fallback */
-    background: transparent;
+    border: 2px solid #aaa;
+    background: white;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .modal-radio-text {
     font-weight: normal;
     transition: color 0.2s;
+    line-height: 1;
+    /* Tighten line height for alignment */
+    padding-top: 2px;
+    /* Visual optical alignment */
 }
 
 .modal-radio-label.selected .modal-radio-text {
@@ -453,14 +437,17 @@
 
 .modal-radio-label.selected.type-virtue .modal-radio-indicator {
     background: var(--color-virtue);
+    box-shadow: 0 0 5px var(--color-virtue);
 }
 
 .modal-radio-label.selected.type-vice .modal-radio-indicator {
     background: var(--color-vice);
+    box-shadow: 0 0 5px var(--color-vice);
 }
 
 .modal-radio-label.selected.type-todo .modal-radio-indicator {
     background: var(--color-mandatum);
+    box-shadow: 0 0 5px var(--color-mandatum);
 }
 
 .modal-radio-label.selected.type-virtue .modal-radio-text {
@@ -583,6 +570,7 @@
     color: #333;
     background: #f0f0f0;
 }
+
 /* Daily Welcome Video */
 @media (min-width: 1200px) {
     .welcome-video {

@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-// HMR trigger verify
-import Icons from './Icons';
+import UnifiedModal from './layout/UnifiedModal';
+import UnifiedButton from './common/UnifiedButton';
+import { useLanguage } from '../context/LanguageContext';
 
 function AddTaskModal({ onClose, onAdd }) {
+    const { t, language } = useLanguage();
     const [text, setText] = useState('');
     const [type, setType] = useState('virtue');
     const [isRecurring, setIsRecurring] = useState(false);
-    const today = new Date().toLocaleDateString('nl-NL');
+
+    // Dynamic locale based on language
+    const localeMap = {
+        nl: 'nl-NL',
+        en: 'en-US',
+        de: 'de-DE',
+        es: 'es-ES'
+    };
+    const today = new Date().toLocaleDateString(localeMap[language] || 'en-US');
 
     const handleTypeChange = (newType) => {
         setType(newType);
@@ -29,78 +39,75 @@ function AddTaskModal({ onClose, onAdd }) {
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>Nieuwe taak toevoegen</h2>
-                    <button className="btn-icon" onClick={onClose}><Icons.X /></button>
+        <UnifiedModal
+            isOpen={true}
+            onClose={onClose}
+            title={<span style={{ fontSize: '0.85em' }}>{t('title_add_task')}</span>}
+        >
+            <div className="modal-body" style={{ padding: '0 20px 20px 20px' }}>
+                <div className="modal-form-group">
+                    <label>{t('lbl_description')}:</label>
+                    <input
+                        type="text"
+                        value={text}
+                        onChange={e => setText(e.target.value)}
+                        autoFocus
+                        style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
+                    />
                 </div>
 
-                <div className="modal-body">
-                    <div className="modal-form-group">
-                        <label>Omschrijving:</label>
+                <div className="modal-form-group">
+                    <label>{t('lbl_created')}:</label>
+                    <div className="date-display">{today}</div>
+                </div>
+
+                <div className="modal-form-group">
+                    <div className="modal-radio-group">
+                        {[
+                            { value: 'virtue', label: t('lbl_virtue') },
+                            { value: 'vice', label: t('lbl_vice') },
+                            { value: 'todo', label: t('lbl_todo') }
+                        ].map((option) => (
+                            <label
+                                key={option.value}
+                                className={`modal-radio-label type-${option.value} ${type === option.value ? 'selected' : ''}`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="type"
+                                    value={option.value}
+                                    checked={type === option.value}
+                                    onChange={e => handleTypeChange(e.target.value)}
+                                    style={{ display: 'none' }}
+                                />
+                                <span className="modal-radio-indicator"></span>
+                                <span className="modal-radio-text">
+                                    {option.label}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="modal-form-group">
+                    <label className={`modal-checkbox-label ${type === 'todo' ? 'disabled' : ''}`}>
                         <input
-                            type="text"
-                            value={text}
-                            onChange={e => setText(e.target.value)}
-
-                            autoFocus
+                            type="checkbox"
+                            checked={isRecurring}
+                            onChange={e => setIsRecurring(e.target.checked)}
+                            disabled={type === 'todo'}
                         />
-                    </div>
+                        {t('lbl_recurring')}
+                    </label>
+                </div>
 
-                    <div className="modal-form-group">
-                        <label>Aangemaakt:</label>
-                        <div className="date-display">{today}</div>
-                    </div>
-
-                    <div className="modal-form-group">
-                        <div className="modal-radio-group">
-                            {[
-                                { value: 'virtue', label: 'Virtus' },
-                                { value: 'vice', label: 'Barbarium' },
-                                { value: 'todo', label: 'Mandatum' }
-                            ].map((option) => (
-                                <label
-                                    key={option.value}
-                                    className={`modal-radio-label type-${option.value} ${type === option.value ? 'selected' : ''}`}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="type"
-                                        value={option.value}
-                                        checked={type === option.value}
-                                        onChange={e => handleTypeChange(e.target.value)}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <span className="modal-radio-indicator"></span>
-                                    <span className="modal-radio-text">
-                                        {option.label}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="modal-form-group">
-                        <label className={`modal-checkbox-label ${type === 'todo' ? 'disabled' : ''}`}>
-                            <input
-                                type="checkbox"
-                                checked={isRecurring}
-                                onChange={e => setIsRecurring(e.target.checked)}
-                                disabled={type === 'todo'}
-                            />
-                            Repeterend?
-                        </label>
-                    </div>
-
-                    <div className="modal-actions">
-                        <button type="button" className="btn" onClick={onClose}>ANNULEER</button>
-                        <button type="button" className="btn" onClick={() => handleSubmit(null, true)}>OK & NIEUWE</button>
-                        <button type="button" className="btn" onClick={() => handleSubmit(null, false)}>OK</button>
-                    </div>
+                <div className="modal-actions" style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                    <UnifiedButton variant="secondary" onClick={onClose}>{t('cancel').toUpperCase()}</UnifiedButton>
+                    <UnifiedButton variant="primary" onClick={() => handleSubmit(null, true)}>{t('btn_ok_new').toUpperCase()}</UnifiedButton>
+                    <UnifiedButton variant="primary" onClick={() => handleSubmit(null, false)}>OK</UnifiedButton>
                 </div>
             </div>
-        </div>
+        </UnifiedModal>
     );
 }
 
