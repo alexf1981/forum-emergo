@@ -133,10 +133,10 @@ describe('Full Mission Simulation (CLI Style)', () => {
         expect(activeQuest.targetHabitId).toBeDefined();
         expect(activeQuest.targetHabitId).toBe(habitId); // Only 1 virtue exists, must match
 
-        // 3. Simulate 3 Days of Completion
-        const d1 = new Date();
-        const d2 = new Date(); d2.setDate(d2.getDate() - 1);
-        const d3 = new Date(); d3.setDate(d3.getDate() - 2);
+        // 3. Simulate 3 Days of Completion (Past Only, since 'today' is excluded from calculation)
+        const d1 = new Date(); d1.setDate(d1.getDate() - 1); // Yesterday
+        const d2 = new Date(); d2.setDate(d2.getDate() - 2);
+        const d3 = new Date(); d3.setDate(d3.getDate() - 3);
 
         const history = [
             d1.toISOString().split('T')[0],
@@ -188,10 +188,10 @@ describe('Full Mission Simulation (CLI Style)', () => {
         const activeQuest = state.quests[0];
         expect(activeQuest.targetHabitId).toBeDefined();
 
-        // 2. Simulate 3 "Green Days" (Logins without vice)
-        const d1 = new Date();
-        const d2 = new Date(); d2.setDate(d2.getDate() - 1);
-        const d3 = new Date(); d3.setDate(d3.getDate() - 2);
+        // 2. Simulate 3 "Green Days" (Logins without vice) - Past Only
+        const d1 = new Date(); d1.setDate(d1.getDate() - 1);
+        const d2 = new Date(); d2.setDate(d2.getDate() - 2);
+        const d3 = new Date(); d3.setDate(d3.getDate() - 3);
 
         state.loginHistory = [
             d1.toISOString().split('T')[0],

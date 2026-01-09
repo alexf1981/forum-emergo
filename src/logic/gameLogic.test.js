@@ -56,7 +56,10 @@ describe('Mission Logic', () => {
                 { type: 'virtue', history: [today, yesterday] }, // Streak 2
                 { type: 'virtue', history: [today] }             // Streak 1
             ];
-            expect(getVirtueStreak(habits)).toBe(2);
+            // Since 'today' is excluded from calculation:
+            // History: [Today, Yesterday] -> Valid filtered: [Yesterday].
+            // Streak: 1.
+            expect(getVirtueStreak(habits)).toBe(1);
         });
 
         it('ignores vices', () => {
@@ -91,7 +94,10 @@ describe('Mission Logic', () => {
                 history: [] // Never done! Resistance = 3 (since 3 login days)
             }];
 
-            expect(getViceResistanceStreak(habits, loginHistory)).toBe(3);
+            // Login History: Today, Yesterday, DayBefore.
+            // Exclude Today -> Yesterday, DayBefore.
+            // Result: 2.
+            expect(getViceResistanceStreak(habits, loginHistory)).toBe(2);
         });
 
         it('resets streak if vice committed on a login day', () => {
@@ -104,11 +110,10 @@ describe('Mission Logic', () => {
             }];
 
             // Login History: Today (Clean), Yesterday (Dirty), DayBefore (Clean)
-            // Sorted: Today, Yesterday, DayBefore
-            // Loop 1: Today -> Clean -> Streak 1
-            // Loop 2: Yesterday -> Dirty -> Break!
-            // Result: 1
-            expect(getViceResistanceStreak(habits, loginHistory)).toBe(1);
+            // Exclude Today -> Check [Yesterday, DayBefore]
+            // Loop 1: Yesterday -> Dirty (Vice in history). Break.
+            // Result: 0.
+            expect(getViceResistanceStreak(habits, loginHistory)).toBe(0);
         });
 
         it('ignores new vices (< 3 days old)', () => {
