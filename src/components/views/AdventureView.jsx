@@ -38,18 +38,27 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
         if (template.id !== 'introspection') {
             // If we have dailyQuestIds (meaning rotation is active), strict check
             if (dailyQuestIds && dailyQuestIds.length > 0) {
-                if (!dailyQuestIds.includes(template.id)) return false;
+                if (!dailyQuestIds.includes(template.id)) {
+                    // console.log(`[AdventureView] Hidden ${template.id}: Not in daily rotation`);
+                    return false;
+                }
             }
         }
 
         // Hero Requirement
-        if (template.requirements?.heroCount) {
-            // Hide if no heroes available (regardless of Tavern existence)
-            if (heroes.length === 0) return false;
-
-            return !isDone;
+        if (dailyQuestIds && dailyQuestIds.includes(template.id)) {
+            // Debug if we are hiding something in daily rotation
+            // But here we return true! So it SHOULD show.
+            // Unless hero check failed?
+            if (template.requirements?.heroCount && heroes.length === 0) {
+                console.warn(`[AdventureView] Hidden ${template.id} due to no heroes`);
+                return false;
+            }
+            console.log(`[AdventureView] Shown ${template.id}: In Daily Rotation`);
+            return true;
         }
 
+        // 2. Otherwise (e.g. Introspection or special quests), hide if done.
         return !isDone;
     });
 
@@ -94,7 +103,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
                 isComplete = addedCount >= target;
             }
             else if (q.templateId === 'login_streak') {
-                const current = GameLogic.getLoginStreak(loginHistory);
+                const current = GameLogic.getLoginStreak(loginHistory, q.startTime);
                 const target = template.target || 5;
                 introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
                 isComplete = current >= target;

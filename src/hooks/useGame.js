@@ -294,6 +294,13 @@ export function useGame() {
             setHeroes(result.newHeroes);
             setStats(result.newStats);
             setStats(result.newStats);
+
+            // --- Remove from Daily Rotation to prevent immediate re-play ---
+            const completedQuest = quests.find(q => q.id === questInstanceId);
+            if (completedQuest) {
+                setDailyQuestIds(prev => prev.filter(id => id !== completedQuest.templateId));
+            }
+
             notify(result.msg, "success");
             DebugLogger.log('MISSION', `Completed: ${questInstanceId}`);
         } else {
@@ -598,10 +605,19 @@ export function useGame() {
 
         // --- NEW: UPDATE LOGIN HISTORY ---
         // Always ensure 'today' is in login history if we are running
+        // --- NEW: UPDATE LOGIN HISTORY ---
+        // Always ensure 'today' is in login history if we are running
         if (!loginHistory.includes(today)) {
             setLoginHistory(prev => [...prev, today]);
         }
-    }, [lastWelcomeDate, loginHistory]);
+
+        // --- NEW: INIT DAILY QUESTS ---
+        if (dailyQuestIds.length === 0) {
+            const activeIds = quests.filter(q => !q.completed).map(q => q.templateId);
+            const newDailies = GameLogic.generateDailyAvailableQuests(activeIds);
+            setDailyQuestIds(newDailies);
+        }
+    }, [lastWelcomeDate, loginHistory, dailyQuestIds.length, quests]);
 
     const dismissWelcome = () => {
         const today = GameLogic.getTodayString();
@@ -616,6 +632,13 @@ export function useGame() {
         }
 
         setLastWelcomeDate(today); // Updates state -> trigger save
+
+        // Reroll Daily Quests on New Day confirmation
+        const activeIds = quests.filter(q => !q.completed).map(q => q.templateId);
+        const newDailies = GameLogic.generateDailyAvailableQuests(activeIds);
+        setDailyQuestIds(newDailies);
+        DebugLogger.log('MISSION', `Daily Rotation Updated: ${newDailies.join(', ')}`);
+
         setShowWelcome(false);
         setHabits(prev => GameLogic.resetDailyHabits(prev));
         DebugLogger.log('MISSION', 'New Day Started (Welcome Screen Dismissed)');
@@ -742,15 +765,17 @@ export function useGame() {
                 setLastWelcomeDate("1970-01-01");
 
                 // 5. Reroll Daily Quests (Simulate "Next Morning" shuffle)
-                const newDailies = GameLogic.generateDailyAvailableQuests();
+                const activeIds = quests.filter(q => !q.completed).map(q => q.templateId);
+                const newDailies = GameLogic.generateDailyAvailableQuests(activeIds);
+
+                DebugLogger.log('MISSION', `Admin New Day. Active: ${activeIds.join(',')}. New Dailies: ${newDailies.join(',')}`);
+
                 setDailyQuestIds(newDailies);
 
                 notify({ key: 'msg_admin_new_day' }, "success");
             }
         },
         isLoggedIn: !!user,
-        isNewUser, // NEW
-        isCloudSynchronized, // Exposed for checks if needed
         isNewUser, // NEW
         isCloudSynchronized, // Exposed for checks if needed
         quests, // NEW

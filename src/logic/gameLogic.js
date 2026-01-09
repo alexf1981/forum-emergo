@@ -814,11 +814,20 @@ export function completeQuest(quests, heroes, stats, questInstanceId) {
  * @param {Array<string>} loginHistory - Array of date strings (YYYY-MM-DD)
  * @returns {number} Current streak in days
  */
-export function getLoginStreak(loginHistory) {
+export function getLoginStreak(loginHistory, questStartTime = null) {
     if (!loginHistory || loginHistory.length === 0) return 0;
 
     // Sort descending
-    const sorted = [...loginHistory].sort((a, b) => new Date(b) - new Date(a));
+    let sorted = [...loginHistory].sort((a, b) => new Date(b) - new Date(a));
+
+    // FILTER: Keep only dates >= questStartTime
+    if (questStartTime) {
+        const startYMD = questStartTime.split('T')[0];
+        sorted = sorted.filter(dateStr => dateStr >= startYMD);
+    }
+
+    if (sorted.length === 0) return 0;
+
     const today = getTodayString();
 
     // Check if today is logged. If not, maybe yesterday was?
@@ -1056,14 +1065,27 @@ export function get24hTaskCount(habits, startTimeISO) {
 }
 
 /**
- * Generates regular quests (daily rotation)
- * Picks 2 random achievement quests from the pool
+ * Picks 2 random quests for the daily rotation.
+ * Excludes 'introspection' (always available/tutorial) AND any currently active quests.
+ * @param {Array<string>} excludedIds - Array of template IDs to exclude (e.g. active quests)
+ * @returns {Array<string>} Array of 2 template IDs.
  */
-export const generateDailyQuests = () => {
-    // Pool of rotating missions (exclude tutorial 'introspection')
-    const pool = ['login_streak', 'virtue_streak', 'vice_resistance', 'daily_productivity'];
+export function generateDailyAvailableQuests(excludedIds = []) {
+    // Use the internal QUEST_TEMPLATES or export it and use it. 
+    // Assuming QUEST_TEMPLATES is defined in file scope (it is exported usually).
+    // If not, we might need to rely on the pool array if QUEST_TEMPLATES isn't global in this module scope.
+    // However, QUEST_TEMPLATES is defined at top of file usually. 
+    // Let's use filter on the array directly if we are unsure, but better to use the constant.
 
-    // Shuffle and pick 2
-    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    // Quick Fix: iterate the known IDs if QUEST_TEMPLATES is not safely in scope here (it is usually at top).
+    // But to be safe against scope reference errors if it's defined as `export const QUEST_TEMPLATES` and we are using it:
+
+    const allIds = ['login_streak', 'virtue_streak', 'vice_resistance', 'daily_productivity'];
+    const available = allIds.filter(id => id !== 'introspection' && !excludedIds.includes(id));
+
+    // Shuffle
+    const shuffled = [...available].sort(() => 0.5 - Math.random());
+
+    // Pick 2
     return shuffled.slice(0, 2);
-};
+}

@@ -35,28 +35,13 @@ function App() {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [showDebugModal, setShowDebugModal] = useState(false);
 
-    // Daily Quests Rotation State
-    const [dailyQuestIds, setDailyQuestIds] = useState(() => {
-        const saved = localStorage.getItem('daily_quest_ids');
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    // Save dailyQuestIds whenever it changes
-    useEffect(() => {
-        localStorage.setItem('daily_quest_ids', JSON.stringify(dailyQuestIds));
-    }, [dailyQuestIds]);
-
     // === HOOK ===
-    const { stats, heroes, habits, quests, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research, loginHistory } = useGame();
+    const { stats, heroes, habits, quests, notifications, actions, combatLog, saveStatus, isLoggedIn, showWelcome, lastWelcomeDate, isNewUser, isCloudSynchronized, buildings, resources, research, loginHistory, dailyQuestIds } = useGame();
 
     // Handle Daily Welcome Dismiss (New Day Trigger)
     const handleDismissWelcome = () => {
         actions.dismissWelcome();
-
-        // Generate new daily quests on new day
-        const newDailyIds = GameLogic.generateDailyQuests();
-        setDailyQuestIds(newDailyIds);
-        console.log("New Day! Generated Daily Quests:", newDailyIds);
+        // Daily quests are now handled inside the hook (actions.dismissWelcome > useGame implementation)
     };
 
     // Scroll listener & First Visit Check
