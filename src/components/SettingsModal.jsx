@@ -158,7 +158,10 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                                         </UnifiedButton>
                                         {/* Row 2: Logic Tools */}
                                         <UnifiedButton
-                                            onClick={actions.adminSimulateNewDay}
+                                            onClick={() => {
+                                                onClose();
+                                                setTimeout(() => actions.adminSimulateNewDay(), 50); // Small delay to ensure modal close render cycle starts
+                                            }}
                                             variant="secondary"
                                             fullWidth
                                             style={{ backgroundColor: '#9b59b6', borderColor: '#8e44ad' }}

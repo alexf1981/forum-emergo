@@ -25,6 +25,7 @@ export function useGame() {
     const [resources, setResources] = useLocalStorage('romeresources', GameLogic.INITIAL_RESOURCES);
     const [research, setResearch] = useLocalStorage('romeresearch', {});
     const [loginHistory, setLoginHistory] = useLocalStorage('romeloginhistory', []); // New: Track days logged in
+    const [dailyQuestIds, setDailyQuestIds] = useLocalStorage('romedailyquests', []); // New: Daily Rotation
 
     const { t } = useLanguage();
 
@@ -568,7 +569,8 @@ export function useGame() {
                 romeresources: resources,
                 romeresearch: research,
                 romeloginhistory: loginHistory,
-                romequests: quests
+                romequests: quests,
+                romedailyquests: dailyQuestIds // Persist Daily Rotation
             };
 
             // Reduced timeout to 200ms to persist faster and feel snappier
@@ -739,12 +741,19 @@ export function useGame() {
                 // Reset lastWelcomeDate to trigger the "New Day" modal for the *actual* current date
                 setLastWelcomeDate("1970-01-01");
 
+                // 5. Reroll Daily Quests (Simulate "Next Morning" shuffle)
+                const newDailies = GameLogic.generateDailyAvailableQuests();
+                setDailyQuestIds(newDailies);
+
                 notify({ key: 'msg_admin_new_day' }, "success");
             }
         },
         isLoggedIn: !!user,
         isNewUser, // NEW
         isCloudSynchronized, // Exposed for checks if needed
-        quests // NEW
+        isNewUser, // NEW
+        isCloudSynchronized, // Exposed for checks if needed
+        quests, // NEW
+        dailyQuestIds // NEW
     };
 }
