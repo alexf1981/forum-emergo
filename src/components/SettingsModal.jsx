@@ -19,7 +19,7 @@ import UnifiedInput from './common/UnifiedInput';
 import UnifiedText from './common/UnifiedText';
 
 const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin, onLocalLogout, actions }) => {
-    const { user, playerName, updatePlayerName } = useAuth();
+    const { user, playerName, updatePlayerName, isAdmin } = useAuth();
     const [localPlayerName, setLocalPlayerName] = useState(playerName || '');
 
     // Keep local input in sync if context updates
@@ -29,10 +29,6 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
 
     const { language, changeLanguage, t } = useLanguage();
     const [showAdmin, setShowAdmin] = useState(false);
-
-    // Simple admin check
-    const ADMINS = ['alexfitie1981@gmail.com', 'olivierfitie2015@gmail.com'];
-    const isAdmin = user?.email && ADMINS.includes(user.email);
 
     if (showAdmin) {
         return <AdminDashboard onClose={() => setShowAdmin(false)} actions={actions} />;

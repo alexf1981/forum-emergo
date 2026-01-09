@@ -26,6 +26,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('player_name', newName); // Save it right away too
         return newName;
     })
+
+    // NEW: Admin State with Local Storage persistence to prevent flicker
+    const [isAdmin, setIsAdmin] = useState(() => {
+        return localStorage.getItem('is_admin') === 'true';
+    });
     const [loading, setLoading] = useState(true)
 
     // Standard Supabase Auth Pattern
@@ -102,9 +107,11 @@ export const AuthProvider = ({ children }) => {
                         }
                     });
             }
-            await loadProfileName(currentUser.id);
+            await loadProfileData(currentUser.id);
         } else {
             loadLocalName();
+            setIsAdmin(false);
+            localStorage.removeItem('is_admin');
         }
         return true;
     }
@@ -112,13 +119,16 @@ export const AuthProvider = ({ children }) => {
     // Track currently fetching user to prevent parallel requests for same ID
     const fetchingRef = React.useRef(null);
 
-    const loadProfileName = async (userId) => {
+    const loadProfileData = async (userId) => {
         if (!userId) return;
 
         // 1. CACHE HIT: Try to load from user-specific local storage immediately
         const cachedName = localStorage.getItem(`player_name_${userId}`);
         if (cachedName) {
             setPlayerName(cachedName);
+            // We don't stop here to allow admin check (which isn't fully cached or could change)
+            // But if we want no-flicker for name, this is fine
+            // We still want to fetch fresh data for admin status though
             setLoading(false);
         }
 
@@ -133,12 +143,12 @@ export const AuthProvider = ({ children }) => {
             // Force a timeout on the DB query (5 seconds)
             const fetchProfile = supabase
                 .from('profiles')
-                .select('username')
+                .select('username, is_admin')
                 .eq('id', userId)
                 .single();
 
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Profile fetch timed out')), 1000)
+                setTimeout(() => reject(new Error('Profile fetch timed out')), 2000)
             );
 
             const { data, error } = await Promise.race([fetchProfile, timeoutPromise]);
@@ -165,6 +175,15 @@ export const AuthProvider = ({ children }) => {
                     .then(({ error }) => {
                         if (error) console.error("Failed to save generated name:", error);
                     });
+            }
+
+            // Handle Admin Status
+            const adminStatus = data?.is_admin === true;
+            setIsAdmin(adminStatus);
+            if (adminStatus) {
+                localStorage.setItem('is_admin', 'true');
+            } else {
+                localStorage.removeItem('is_admin');
             }
         } catch (err) {
             if (err.message === 'Profile fetch timed out') {
@@ -228,6 +247,7 @@ export const AuthProvider = ({ children }) => {
         user,
         playerName,
         updatePlayerName,
+        isAdmin,
         loading
     }
 
