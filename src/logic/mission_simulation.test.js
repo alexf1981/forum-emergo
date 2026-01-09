@@ -45,7 +45,7 @@ describe('Full Mission Simulation (CLI Style)', () => {
         expect(state.stats.gold).toBe(200); // Default start gold
 
         // 2. Start Quest
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, ['h1']);
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, questId, ['h1']);
         expect(startResult.success).toBe(true);
 
         // Update State
@@ -74,7 +74,7 @@ describe('Full Mission Simulation (CLI Style)', () => {
         const questId = 'login_streak';
 
         // 1. Start Quest
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, ['h1']);
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, questId, ['h1']);
         expect(startResult.success).toBe(true);
         state.quests = startResult.newQuests;
         state.heroes = startResult.newHeroes;
@@ -123,9 +123,15 @@ describe('Full Mission Simulation (CLI Style)', () => {
         const habitId = state.habits[0].id;
 
         // 2. Start Quest
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, ['h1']);
+        // 2. Start Quest
+        // Ensure habits are passed so it can pick a target
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, questId, ['h1']);
         state.quests = startResult.newQuests;
         state.heroes = startResult.newHeroes;
+
+        const activeQuest = state.quests[0];
+        expect(activeQuest.targetHabitId).toBeDefined();
+        expect(activeQuest.targetHabitId).toBe(habitId); // Only 1 virtue exists, must match
 
         // 3. Simulate 3 Days of Completion
         const d1 = new Date();
@@ -142,11 +148,11 @@ describe('Full Mission Simulation (CLI Style)', () => {
         state.habits[0].history = history;
 
         // 4. Check Progress
-        const streak = GameLogic.getVirtueStreak(state.habits);
+        const streak = GameLogic.getVirtueStreak(state.habits, activeQuest.targetHabitId);
         expect(streak).toBe(3);
 
         // 5. Complete
-        const activeQuest = state.quests[0];
+        // 5. Complete
         const completeResult = GameLogic.completeQuest(state.quests, state.heroes, state.stats, activeQuest.id);
 
         expect(completeResult.success).toBe(true);
@@ -174,9 +180,13 @@ describe('Full Mission Simulation (CLI Style)', () => {
         }];
 
         // 1. Start Quest
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, ['h1']);
+        // 1. Start Quest
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, questId, ['h1']);
         state.quests = startResult.newQuests;
         state.heroes = startResult.newHeroes;
+
+        const activeQuest = state.quests[0];
+        expect(activeQuest.targetHabitId).toBeDefined();
 
         // 2. Simulate 3 "Green Days" (Logins without vice)
         const d1 = new Date();
@@ -190,11 +200,11 @@ describe('Full Mission Simulation (CLI Style)', () => {
         ];
 
         // 3. Check Progress
-        const resistance = GameLogic.getViceResistanceStreak(state.habits, state.loginHistory);
+        const resistance = GameLogic.getViceResistanceStreak(state.habits, state.loginHistory, activeQuest.targetHabitId);
         expect(resistance).toBe(3);
 
         // 4. Complete
-        const activeQuest = state.quests[0];
+        // 4. Complete
         const completeResult = GameLogic.completeQuest(state.quests, state.heroes, state.stats, activeQuest.id);
 
         expect(completeResult.success).toBe(true);
@@ -210,7 +220,7 @@ describe('Full Mission Simulation (CLI Style)', () => {
         const questId = 'daily_productivity';
 
         // 1. Start Quest
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, ['h1']);
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, questId, ['h1']);
         state.quests = startResult.newQuests;
         state.heroes = startResult.newHeroes;
 
@@ -250,7 +260,7 @@ describe('Full Mission Simulation (CLI Style)', () => {
         const questId = 'introspection'; // Requires 1 hero
 
         // Attempt start with EMPTY hero list
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, []);
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, questId, []);
 
         expect(startResult.success).toBe(false);
         expect(startResult.msg).toMatch(/missie vereist 1 held/i);
@@ -261,7 +271,7 @@ describe('Full Mission Simulation (CLI Style)', () => {
     // --- SCENARIO 7: UNHAPPY PATH - INVALID ID ---
     it('Scenario 7: Fails to start non-existent Quest', () => {
         let state = createNewState();
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, 'quest_404', ['h1']);
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, 'quest_404', ['h1']);
 
         expect(startResult.success).toBe(false);
         expect(startResult.msg).toBe("Missie niet gevonden.");
@@ -276,7 +286,7 @@ describe('Full Mission Simulation (CLI Style)', () => {
         state.heroes[0].status = 'QUESTING';
 
         const questId = 'introspection';
-        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, ['h1']);
+        const startResult = GameLogic.startQuest(state.quests, state.heroes, state.stats, state.habits, questId, ['h1']);
 
         // Note: The current gameLogic.startQuest implementation might NOT explicitly check for 'QUESTING' status
         // because the UI usually filters them out. 

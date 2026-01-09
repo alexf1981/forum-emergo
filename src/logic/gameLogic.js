@@ -692,7 +692,7 @@ export function checkQuestRequirements(quest, selectedHeroes) {
     return { success: true };
 }
 
-export function startQuest(quests, heroes, stats, questId, selectedHeroIds) {
+export function startQuest(quests, heroes, stats, habits, questId, selectedHeroIds) {
     const template = QUEST_TEMPLATES.find(q => q.id === questId);
     if (!template) return { success: false, msg: "Missie niet gevonden." };
 
@@ -707,19 +707,39 @@ export function startQuest(quests, heroes, stats, questId, selectedHeroIds) {
 
     // 2. Resources (Travel cost? None for now)
 
-    // 3. Update Heroes (Lock them if duration > 0)
+    // 3. Target Habit Selection
+    let targetHabitId = null;
+    let targetHabitText = null;
+
+    if (questId === 'virtue_streak') {
+        const virtues = habits.filter(h => h.type === 'virtue');
+        if (virtues.length === 0) return { success: false, msg: "Geen deugden gevonden om op te focussen." };
+        const target = virtues[Math.floor(Math.random() * virtues.length)];
+        targetHabitId = target.id;
+        targetHabitText = target.text;
+    } else if (questId === 'vice_resistance') {
+        const vices = habits.filter(h => h.type === 'vice');
+        if (vices.length === 0) return { success: false, msg: "Geen ondeugden gevonden om te weerstaan." };
+        const target = vices[Math.floor(Math.random() * vices.length)];
+        targetHabitId = target.id;
+        targetHabitText = target.text;
+    }
+
+    // 4. Update Heroes (Lock them if duration > 0)
     let newHeroes = [...heroes];
     if (template.durationDays > 0) {
         newHeroes = heroes.map(h => selectedHeroIds.includes(h.id) ? { ...h, status: 'QUESTING' } : h);
     }
 
-    // 4. Create Quest Instance
+    // 5. Create Quest Instance
     const newQuest = {
         id: Date.now(),
         templateId: questId,
         heroIds: selectedHeroIds,
         startTime: new Date().toISOString(),
-        status: 'active'
+        status: 'active',
+        targetHabitId,
+        targetHabitText
     };
 
     return {

@@ -317,6 +317,13 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
                                                 {t(`quest_${template.id}_name`) || template.name}
                                             </h4>
 
+                                            {/* Target Habit Display */}
+                                            {q.targetHabitText && (
+                                                <div style={{ fontSize: '0.9rem', color: '#2c3e50', marginBottom: '5px', fontStyle: 'italic' }}>
+                                                    <strong>{t('lbl_target') || 'Doel'}:</strong> {q.targetHabitText}
+                                                </div>
+                                            )}
+
                                             {/* Inspiration Button */}
                                             {isIntrospection && (
                                                 <button
