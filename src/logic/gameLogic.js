@@ -699,6 +699,9 @@ export function startQuest(quests, heroes, stats, questId, selectedHeroIds) {
     const selectedHeroes = heroes.filter(h => selectedHeroIds.includes(h.id));
 
     // 1. Validate
+    const busyHero = selectedHeroes.find(h => h.status === 'QUESTING');
+    if (busyHero) return { success: false, msg: `${busyHero.name} is al op avontuur.` };
+
     const check = checkQuestRequirements(template, selectedHeroes);
     if (!check.success) return check;
 
