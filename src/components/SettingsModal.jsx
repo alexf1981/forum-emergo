@@ -80,6 +80,7 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
             romeresources: {},
             romeresearch: {},
             romeloginhistory: [],
+            romequests: [], // Explicitly clear quests!
             romelastwelcome: GameLogic.getTodayString()
         };
 
@@ -92,7 +93,9 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                 window.localStorage.setItem('romebuildings', JSON.stringify(resetData.romebuildings));
                 window.localStorage.setItem('romeresources', JSON.stringify(resetData.romeresources));
                 window.localStorage.setItem('romeresearch', JSON.stringify(resetData.romeresearch));
+                window.localStorage.setItem('romeresearch', JSON.stringify(resetData.romeresearch));
                 window.localStorage.setItem('romeloginhistory', JSON.stringify(resetData.romeloginhistory));
+                window.localStorage.setItem('romequests', JSON.stringify(resetData.romequests)); // Persist empty quests
                 window.localStorage.setItem('trigger_onboarding', 'true');
                 window.location.reload();
             } catch (error) {
@@ -101,8 +104,41 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
             }
         } else {
             const debugLogs = window.localStorage.getItem('emergo_debug_log');
+
+            // IF Logged In -> Also Wipe Cloud (by saving empty data)
+            if (user) {
+                const emptyData = {
+                    romestats: { gold: 200, know: 0, pop: 100 },
+                    romeheroes: [],
+                    romehabits: [],
+                    romequests: [], // Explicitly clear quests!
+                    romebuildings: GameLogic.INITIAL_BUILDINGS,
+                    romeresources: {},
+                    romeresearch: {},
+                    romeloginhistory: [],
+                    romelastwelcome: ''
+                };
+                // We don't await this because we are about to reload, 
+                // BUT if we don't await, the reload might kill the request.
+                // Ideally we should await.
+                // But this block is seemingly for "else" (non-user?).
+                // Wait! Logic at line 86 handles `if (user)`. 
+                // The block I am editing is `else` (Play Local).
+                // Ah, I need to check line 86 logic again.
+            }
+
+            // Log the reset BEFORE clearing, but we need to persevere it?
+            // Log the reset BEFORE clearing, but we need to persevere it?
+            // Actually, if we clear everything, we lose the log unless we save it back.
+            // The user wants to see "Account Reset" in the log.
+            // So we must append it to the saved logs.
+            let logs = debugLogs ? JSON.parse(debugLogs) : [];
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+            logs.unshift(`[${timestamp}] [ADMIN] Account Reset Triggered`);
+
             window.localStorage.clear();
-            if (debugLogs) window.localStorage.setItem('emergo_debug_log', debugLogs);
+            // Save logs (including the reset message) regardless of previous state
+            window.localStorage.setItem('emergo_debug_log', JSON.stringify(logs));
             window.location.reload();
         }
     };

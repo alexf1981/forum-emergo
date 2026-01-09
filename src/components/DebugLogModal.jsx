@@ -13,7 +13,41 @@ const DebugLogModal = ({ onClose }) => {
     const handleCopy = () => {
         const text = logs.join('\n');
         navigator.clipboard.writeText(text).then(() => {
-            alert("Log copied to clipboard!");
+            alert("Full log copied to clipboard!");
+        });
+    };
+
+    const handleCopySession = () => {
+        // Find the index of the start of the session (App Mounted)
+        let startIndex = logs.findIndex(line => line.includes('[APP] App Mounted'));
+
+        // If we found 'App Mounted', check if the NEXT line is an Account Reset.
+        // Because Account Reset saves -> reloads -> App Mounts.
+        // So chronologically Reset is just before Mount (but in standard logs it's "older", so higher index).
+        // If we want to include "Account Reset" as part of this session's history:
+        if (startIndex !== -1) {
+            if (logs[startIndex + 1] && logs[startIndex + 1].includes('[ADMIN] Account Reset')) {
+                startIndex++;
+            }
+        } else {
+            // Fallback: If no App Mounted found (weird), maybe just look for Reset?
+            // Or just copy everything? Let's default to everything if we can't find a start.
+            // Or search for Reset as primary?
+            // User said: "always from starting the app".
+            // If we can't find start, we assume full log is the session.
+        }
+
+        // logs[0] is the NEWEST log. So we want from 0 to startIndex (inclusive).
+        let sessionLogs = [];
+        if (startIndex === -1) {
+            sessionLogs = logs;
+        } else {
+            sessionLogs = logs.slice(0, startIndex + 1);
+        }
+
+        const text = sessionLogs.join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Session log copied to clipboard!");
         });
     };
 
@@ -39,13 +73,18 @@ const DebugLogModal = ({ onClose }) => {
                 </pre>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', gap: '10px' }}>
                 <button className="btn" onClick={handleClear} style={{ backgroundColor: '#c0392b', borderColor: '#e74c3c' }}>
                     <Icons.Trash style={{ marginRight: '5px' }} /> Clear
                 </button>
-                <button className="btn" onClick={handleCopy} style={{ backgroundColor: '#27ae60', borderColor: '#2ecc71' }}>
-                    Copy to Clipboard
-                </button>
+                <div style={{ display: 'flex', gap: '5px' }}>
+                    <button className="btn" onClick={handleCopySession} style={{ backgroundColor: '#f39c12', borderColor: '#e67e22', color: '#fff' }}>
+                        Copy Session
+                    </button>
+                    <button className="btn" onClick={handleCopy} style={{ backgroundColor: '#27ae60', borderColor: '#2ecc71' }}>
+                        Copy All
+                    </button>
+                </div>
             </div>
         </UnifiedModal>
     );

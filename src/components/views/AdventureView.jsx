@@ -42,14 +42,31 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
 
         // Hero Requirement
         if (template.requirements?.heroCount) {
-            // Hide until player has tavern (and thus can implement heroes), unless they explicitly have heroes (legacy/edge case)
-            if (!hasTavern && heroes.length === 0) return false;
+            // Hide if no heroes available (regardless of Tavern existence)
+            if (heroes.length === 0) return false;
 
             return !isDone;
         }
 
         return !isDone;
     });
+
+    // [DEBUG] Log Adventure State
+    React.useEffect(() => {
+        // Import DebugLogger dynamically if needed or assume it's global/imported. 
+        // AdventureView doesn't import DebugLogger. Let's rely on console for now or add import.
+        console.log("AdventureView State:", {
+            heroesCount: heroes.length,
+            hasTavern,
+            activeQuestsCount: activeQuests.filter(q => {
+                const templ = GameLogic.QUEST_TEMPLATES.find(t => t.id === q.templateId);
+                if (templ && templ.requirements?.heroCount && heroes.length === 0) return false;
+                return true;
+            }).length,
+            availableTemplatesCount: availableTemplates.length,
+            availableNames: availableTemplates.map(t => t.id)
+        });
+    }, [heroes.length, hasTavern, activeQuests.length, availableTemplates.length]);
 
     const handleStartQuest = () => {
         if (!selectedQuestId) return;
@@ -207,7 +224,12 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
                         {t('quest_section_active') || 'Lopende avonturen'}
                     </h3>
                     <div className="quest-list" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        {activeQuests.map(q => {
+                        {activeQuests.filter(q => {
+                            // EXTRA CHECK: Hide active quests that need heroes if we have none (e.g. auto-started tutorial)
+                            const templ = GameLogic.QUEST_TEMPLATES.find(t => t.id === q.templateId);
+                            if (templ && templ.requirements?.heroCount && heroes.length === 0) return false;
+                            return true;
+                        }).map(q => {
                             const template = GameLogic.QUEST_TEMPLATES.find(t => t.id === q.templateId);
                             if (!template) return null;
 
@@ -384,7 +406,8 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
                     {t('quest_section_available') || 'Nieuwe avonturen'}
                 </h3>
 
-                {!hasTavern ? (
+                {/* Show "No Heroes" message if we have no heroes (regardless of Tavern) */}
+                {heroes.length === 0 ? (
                     <div style={{
                         padding: '30px',
                         textAlign: 'center',

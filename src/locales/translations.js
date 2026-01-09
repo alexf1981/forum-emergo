@@ -383,7 +383,8 @@ export const translations = {
         // Onboarding
         onboarding_title: "Welcome, Emperor",
         onboarding_text: "Welcome to Forum Emergo. To help you get started, the Senate has already created some sample tasks for you. An extensive onboarding tutorial will arrive here soon.",
-        btn_start_reign: "Begin Reign"
+        btn_start_reign: "Begin Reign",
+        msg_no_tavern_quests: "Missions unavailable. Recruit heroes first!"
     },
     nl: {
         flag: "🇳🇱",
@@ -752,7 +753,8 @@ export const translations = {
         // Onboarding
         onboarding_title: "Welkom, Keizer",
         onboarding_text: "Welkom bij Forum Emergo. Om u alvast op weg te helpen heeft de senaat al een aantal voorbeeld taken voor u aangemaakt. Binnenkort komt hier een uitgebreide onboarding tutorial.",
-        btn_start_reign: "Start Regering"
+        btn_start_reign: "Start Regering",
+        msg_no_tavern_quests: "Missies nog niet beschikbaar. Rekruteer eerst helden."
     },
     es: {
         flag: "🇪🇸",
@@ -1147,7 +1149,8 @@ export const translations = {
         // Onboarding
         onboarding_title: "Bienvenido, Emperador",
         onboarding_text: "Bienvenido al Foro Emergo. Para ayudarle a empezar, el Senado ya ha creado algunas tareas de ejemplo para usted. Pronto habrá un tutorial más detallado.",
-        btn_start_reign: "Comenzar Reinado"
+        btn_start_reign: "Comenzar Reinado",
+        msg_no_tavern_quests: "Misiones no disponibles. ¡Recluta héroes primero!"
     },
     de: {
         flag: "🇩🇪",
@@ -1530,7 +1533,8 @@ export const translations = {
         msg_daily_income: "Tägliches Einkommen: {total} Gold ({tax} Steuern + {interest} Zinsen)",
         // Onboarding
         onboarding_title: "Willkommen, Imperator",
-        onboarding_text: "Willkommen im Forum Emergo. Um Ihnen den Einstieg zu erleichtern, hat der Senat bereits einige Beispielaufgaben für Sie erstellt. Ein ausführliches Tutorial folgt in Kürze.",
-        btn_start_reign: "Beginne Herrschaft"
+        onboarding_text: "Willkommen im Forum Emergo. Um Ihnen den Einstieg zu erleichtern, hat der Senat bereits einige Beispielaufgaben für Sie erstellt. Ein ausführliches Einführungstutorial wird bald folgen.",
+        btn_start_reign: "Beginne Herrschaft",
+        msg_no_tavern_quests: "Missionen nicht verfügbar. Rekrutiere zuerst Helden."
     }
 };

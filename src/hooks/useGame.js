@@ -13,6 +13,14 @@ export function useGame() {
     const [habits, setHabits] = useLocalStorage('romehabits', []);
     const [quests, setQuests] = useLocalStorage('romequests', []); // New: Quests State
     const [lastWelcomeDate, setLastWelcomeDate] = useLocalStorage('rome_last_welcome', '');
+
+    // [DEBUG] Monitor Quest Changes
+    useEffect(() => {
+        if (quests.length > 0) {
+            DebugLogger.log('DEBUG', `Quests Changed. Count: ${quests.length}. Active: ${quests.filter(q => !q.completed).map(q => q.templateId).join(',')}`);
+        }
+    }, [quests]);
+
     const [buildings, setBuildings] = useLocalStorage('romebuildings', GameLogic.INITIAL_BUILDINGS);
     const [resources, setResources] = useLocalStorage('romeresources', GameLogic.INITIAL_RESOURCES);
     const [research, setResearch] = useLocalStorage('romeresearch', {});
@@ -248,6 +256,7 @@ export function useGame() {
         setStats(s => ({ ...s, gold: s.gold - cost }));
         setHeroes([...heroes, newHero]);
         notify({ key: 'msg_recruit_success', args: { name } }, "success");
+        DebugLogger.log('ACTION', `Hero Recruited: ${name} (-${cost} Gold)`);
     };
 
     const healHero = (id) => {
@@ -309,6 +318,7 @@ export function useGame() {
             setBuildings(result.newBuildings);
             setStats(s => ({ ...s, gold: s.gold - cost }));
             notify({ key: 'msg_building_built', args: { building: t(`building_${type}`), cost } }, "success");
+            DebugLogger.log('ACTION', `Building Built: ${type} (-${cost} Gold)`);
         } else {
             notify({ key: 'msg_no_space', args: { building: t(`building_${type}`) } }, "error");
         }
@@ -401,6 +411,7 @@ export function useGame() {
         setBuildings(GameLogic.INITIAL_BUILDINGS);
         setResearch({});
         setHeroes([]); // Clear heroes
+        setQuests([]); // Clear quests
         setLocalBuildings(GameLogic.INITIAL_BUILDINGS);
         // Stats reset usually optional or kept? User said "Stad ontruimen", implying buildings/units gone.
         // Assuming we keep Gold/Pop/Happiness or should reset? 
@@ -408,6 +419,7 @@ export function useGame() {
         // setStats({ gold: 500, population: 0, happiness: 100 }); 
         // But let's stick to just clearing the "Board" (Buildings + Units) + Research
         notify({ key: 'msg_admin_reset' }, "success");
+        DebugLogger.log('ADMIN', 'City Reset (Stad Ontruimen)');
     };
 
 
