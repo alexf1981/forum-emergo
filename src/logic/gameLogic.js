@@ -3,15 +3,8 @@
 export const HERO_NAMES = ["Lucius", "Titus", "Marcus", "Aurelius", "Flavius", "Maximus", "Octavius", "Casius", "Valerius", "Felix"];
 
 // Items Database
-export const ITEMS = [
-    { id: 'glad_bronze', name: 'Bronzen Gladius', type: 'weapon', bonus: 2, icon: '🗡️', rarity: 'common' },
-    { id: 'arm_leather', name: 'Leren Borstplaat', type: 'armor', bonus: 2, icon: '🛡️', rarity: 'common' },
-    { id: 'glad_iron', name: 'IJzeren Gladius', type: 'weapon', bonus: 4, icon: '⚔️', rarity: 'uncommon' },
-    { id: 'arm_chain', name: 'Maliënkolder', type: 'armor', bonus: 4, icon: '🛡️', rarity: 'uncommon' },
-    { id: 'spear_legion', name: 'Legioenspeer', type: 'weapon', bonus: 6, icon: '🔱', rarity: 'rare' },
-    { id: 'shield_scutum', name: 'Scutum Schild', type: 'armor', bonus: 6, icon: '🛡️', rarity: 'rare' },
-    { id: 'sword_legend', name: 'Zwaard van Mars', type: 'weapon', bonus: 10, icon: '🔥', rarity: 'legendary' }
-];
+// Items Database - REMOVED per user request
+export const ITEMS = [];
 
 // Quest Templates
 export const QUEST_TEMPLATES = [
@@ -222,6 +215,30 @@ export const generateRandomHistory = () => {
     return history;
 };
 
+export const getInitialState = (t = (s) => s) => {
+    const now = Date.now();
+    const defaultHabits = [
+        { id: now + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: generateRandomHistory(), recurring: false },
+        { id: now + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
+        { id: now + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
+        { id: now + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
+        { id: now + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
+    ];
+
+    return {
+        romestats: { gold: 200, know: 0, pop: 100 },
+        romeheroes: [],
+        romehabits: defaultHabits,
+        romebuildings: INITIAL_BUILDINGS,
+        romeresources: {},
+        romeresearch: {},
+        romeloginhistory: [],
+        romequests: [],
+        romelastwelcome: getTodayString()
+    };
+};
+
+
 // --- PURE LOGIC ---
 
 export function getScore(stats) {
@@ -238,11 +255,11 @@ export function getCityRank(stats) {
 }
 
 export function calculateBattleResult(hero, quest, randomFn = Math.random) {
-    // Calculate Powers
-    const itemBonus = hero.items.reduce((sum, item) => sum + item.bonus, 0);
-    const totalHeroStr = hero.str + itemBonus + hero.lvl;
+    // Calculate Power based on Level only (Items/Str removed)
+    // Base power 10 + Level
+    const totalPower = 10 + hero.lvl;
 
-    const performance = totalHeroStr * (0.8 + randomFn() * 0.4);
+    const performance = totalPower * (0.8 + randomFn() * 0.4);
     const difficulty = quest.risk * (0.8 + randomFn() * 0.4);
 
     if (performance >= difficulty) {
@@ -251,47 +268,16 @@ export function calculateBattleResult(hero, quest, randomFn = Math.random) {
         let earnedGold = quest.reward;
         const dmgTaken = Math.floor(randomFn() * 3);
 
-        let lootMsg = "";
-        let newItems = [...hero.items];
-
-        // Loot Logic: 35% chance
-        if (randomFn() < 0.35) {
-            const possibleItems = ITEMS.filter(i =>
-                (quest.level <= 1 && i.rarity === 'common') ||
-                (quest.level >= 3 && i.rarity === 'uncommon') ||
-                (quest.level >= 5)
-            );
-            if (possibleItems.length > 0) {
-                const foundItem = possibleItems[Math.floor(randomFn() * possibleItems.length)];
-
-                // Smart Inventory Management
-                const existingItemIndex = newItems.findIndex(i => i.type === foundItem.type);
-                if (existingItemIndex !== -1) {
-                    const existingItem = newItems[existingItemIndex];
-                    if (foundItem.bonus > existingItem.bonus) {
-                        newItems[existingItemIndex] = foundItem; // Upgrade
-                        lootMsg = { key: 'msg_loot_upgrade', args: { item: foundItem.name, oldItem: existingItem.name } };
-                    } else {
-                        earnedGold += 10;
-                        lootMsg = { key: 'msg_loot_sell', args: {} };
-                    }
-                } else {
-                    newItems.push(foundItem); // New slot
-                    lootMsg = { key: 'msg_loot_found', args: { item: foundItem.name } };
-                }
-            }
-        }
+        // Loot Logic Removed
 
         // Level Up Logic
         let newXp = hero.xp + earnedXp;
         let newLvl = hero.lvl;
-        let newStr = hero.str;
         let leveledUp = false;
 
         if (newXp >= newLvl * 100) {
             newXp -= newLvl * 100;
             newLvl++;
-            newStr += 2;
             leveledUp = true;
         }
 
@@ -300,11 +286,9 @@ export function calculateBattleResult(hero, quest, randomFn = Math.random) {
             earnedXp,
             earnedGold,
             dmgTaken,
-            lootMsg, // Now an object or null
-            newItems,
+            lootMsg: null,
             newXp,
             newLvl,
-            newStr,
             leveledUp,
             hp: Math.max(0, hero.hp - dmgTaken)
         };
@@ -760,16 +744,14 @@ export function completeQuest(quests, heroes, stats, questInstanceId) {
             // Gain XP
             let newXp = h.xp + rewardXp;
             let newLvl = h.lvl;
-            let newStr = h.str;
 
             // Level Up?
             if (newXp >= newLvl * 100) {
                 newXp -= newLvl * 100;
                 newLvl++;
-                newStr += 2;
             }
 
-            return { ...h, status: 'IDLE', xp: newXp, lvl: newLvl, str: newStr };
+            return { ...h, status: 'IDLE', xp: newXp, lvl: newLvl };
         }
         return h;
     });

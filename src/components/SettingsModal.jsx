@@ -63,26 +63,7 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
     const handleResetAccount = async () => {
         if (!window.confirm(t('msg_confirm_reset'))) return;
 
-        const now = Date.now();
-        const defaultHabits = [
-            { id: now + 1, text: t('habit_walk_10k'), type: 'virtue', completed: false, history: GameLogic.generateRandomHistory(), recurring: false },
-            { id: now + 3, text: t('habit_hobby'), type: 'virtue', completed: false, history: [], recurring: true },
-            { id: now + 4, text: t('habit_sleep_late'), type: 'vice', completed: false, history: [], recurring: false },
-            { id: now + 5, text: t('habit_smoke'), type: 'vice', completed: false, history: [], recurring: true },
-            { id: now + 7, text: t('habit_taxes'), type: 'todo', completed: false, history: [], recurring: false }
-        ];
-
-        const resetData = {
-            romestats: { gold: 200, know: 0, pop: 100 },
-            romeheroes: [],
-            romehabits: defaultHabits,
-            romebuildings: GameLogic.INITIAL_BUILDINGS,
-            romeresources: {},
-            romeresearch: {},
-            romeloginhistory: [],
-            romequests: [], // Explicitly clear quests!
-            romelastwelcome: GameLogic.getTodayString()
-        };
+        const resetData = GameLogic.getInitialState(t);
 
         if (user) {
             try {

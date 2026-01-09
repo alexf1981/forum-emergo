@@ -248,8 +248,6 @@ export function useGame() {
             xp: 0,
             hp: 20,
             maxHp: 20,
-            str: Math.floor(Math.random() * 3) + 3,
-            items: [],
             status: 'IDLE'
         };
 
