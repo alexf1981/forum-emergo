@@ -324,6 +324,7 @@ export const translations = {
         // Toasts
         // UI Labels
         lbl_level: "Lvl",
+        lbl_target: "Target",
         lbl_name: "Name",
         lbl_effect: "Effect",
         lbl_cost: "Cost",
@@ -694,6 +695,7 @@ export const translations = {
         // Toasts
         // UI Labels
         lbl_level: "Lvl",
+        lbl_target: "Doel",
         lbl_name: "Naam",
         lbl_effect: "Effect",
         lbl_cost: "Kosten",
@@ -1036,6 +1038,7 @@ export const translations = {
         // Toasts
         // UI Labels
         lbl_level: "Nivel",
+        lbl_target: "Objetivo",
         lbl_name: "Nombre",
         lbl_effect: "Efecto",
         lbl_cost: "Costo",

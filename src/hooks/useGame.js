@@ -266,8 +266,8 @@ export function useGame() {
     };
 
     // === ACTIONS: QUESTS ===
-    const startQuest = (questId, heroIds) => {
-        const result = GameLogic.startQuest(quests, heroes, stats, questId, heroIds);
+    const startQuest = (questId, heroIds, targetHabitId = null) => {
+        const result = GameLogic.startQuest(quests, heroes, stats, habits, questId, heroIds, targetHabitId);
         if (result.success) {
             setQuests(result.newQuests);
             setHeroes(result.newHeroes);
@@ -665,12 +665,80 @@ export function useGame() {
             doResearch,
 
             // Admin
-            // Admin
             adminSetGold,
             adminResetCity,
-            adminAddLoginDay,
-            adminTriggerNewDay: () => {
-                setLastWelcomeDate("1970-01-01"); // Force mismatch with today
+            adminSimulateNewDay: () => {
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+
+                // Helper to shift a date string back by 1 day
+                const shiftDateBack = (dateStr) => {
+                    // Handle "!" or "-" prefixes
+                    let prefix = "";
+                    let cleanDate = dateStr;
+                    if (dateStr.startsWith("!") || dateStr.startsWith("-")) {
+                        prefix = dateStr[0];
+                        cleanDate = dateStr.slice(1);
+                    }
+
+                    const d = new Date(cleanDate);
+                    d.setDate(d.getDate() - 1);
+                    return prefix + d.toISOString().split('T')[0];
+                };
+
+                // 1. Shift Login History
+                setLoginHistory(prev => {
+                    // Shift all existing entries back
+                    const shifted = prev.map(shiftDateBack);
+
+                    // Add "Yesterday" (which was effectively "Today" before we clicked)
+                    // If I am logged in now (todayStr), I want that directly converted to yesterday
+                    // Actually, if we shift ALL dates back:
+                    // Login "2023-10-05" (Today) -> becomes "2023-10-04" (Yesterday)
+                    // Login "2023-10-04" (Yesterday) -> becomes "2023-10-03" (-2 days)
+
+                    // So we just need to ensure 'todayStr' is in the list BEFORE shifting?
+                    // If loginHistory doesn't have Today yet (maybe distinct update), we should add it then shift.
+
+                    let completeHistory = [...shifted];
+
+                    // The standard behavior of 'loginHistory' is that it might NOT include today yet until save?
+                    // But usually it does. 
+                    // Let's just shift what we have. If the user is online "Now", they are "Active".
+                    // The goal is: simulating that "Now" becomes "Tomorrow".
+                    // So everything that IS happened, becomes [Date - 1].
+
+                    // Wait, if I shift [Today] -> [Yesterday]. 
+                    // And then the game renders "Today" (Real Time). 
+                    // "Yesterday" is now filled. "Today" is empty. Correct.
+
+                    // Ensure we don't have duplicates after shift (unlikely if unique before)
+                    return [...new Set(shifted)];
+                });
+
+                // 2. Shift Habit History
+                setHabits(prevHabits => prevHabits.map(h => {
+                    if (!h.history || h.history.length === 0) return h;
+
+                    const newHistory = h.history.map(shiftDateBack);
+                    return { ...h, history: newHistory };
+                }));
+
+                // 3. Shift Active Quest Start Times
+                // If we don't do this, quests started "Today" will look like they started in the "Future" relative to the shifted history.
+                setQuests(prevMap => prevMap.map(q => {
+                    if (q.completed) return q; // Keep completed timestamps as is (or shift them too? Let's leave them for record)
+
+                    // Shift startTime back 1 day
+                    const d = new Date(q.startTime);
+                    d.setDate(d.getDate() - 1);
+                    return { ...q, startTime: d.toISOString() };
+                }));
+
+                // 4. Trigger New Day
+                // Reset lastWelcomeDate to trigger the "New Day" modal for the *actual* current date
+                setLastWelcomeDate("1970-01-01");
+
                 notify({ key: 'msg_admin_new_day' }, "success");
             }
         },

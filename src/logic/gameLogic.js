@@ -1,3 +1,4 @@
+import { DebugLogger } from '../utils/DebugLogger';
 
 // --- RPG CONSTANTS ---
 export const HERO_NAMES = ["Lucius", "Titus", "Marcus", "Aurelius", "Flavius", "Maximus", "Octavius", "Casius", "Valerius", "Felix"];
@@ -692,7 +693,7 @@ export function checkQuestRequirements(quest, selectedHeroes) {
     return { success: true };
 }
 
-export function startQuest(quests, heroes, stats, habits, questId, selectedHeroIds) {
+export function startQuest(quests, heroes, stats, habits, questId, selectedHeroIds, specifiedTargetHabitId = null) {
     const template = QUEST_TEMPLATES.find(q => q.id === questId);
     if (!template) return { success: false, msg: "Missie niet gevonden." };
 
@@ -708,20 +709,29 @@ export function startQuest(quests, heroes, stats, habits, questId, selectedHeroI
     // 2. Resources (Travel cost? None for now)
 
     // 3. Target Habit Selection
-    let targetHabitId = null;
+    let targetHabitId = specifiedTargetHabitId; // Use argument if provided
     let targetHabitText = null;
 
     if (questId === 'virtue_streak') {
         const virtues = habits.filter(h => h.type === 'virtue');
         if (virtues.length === 0) return { success: false, msg: "Geen deugden gevonden om op te focussen." };
-        const target = virtues[Math.floor(Math.random() * virtues.length)];
-        targetHabitId = target.id;
+
+        // Use specified target or random fallback
+        let target = virtues.find(h => h.id === targetHabitId);
+        if (!target) {
+            target = virtues[Math.floor(Math.random() * virtues.length)];
+            targetHabitId = target.id;
+        }
         targetHabitText = target.text;
     } else if (questId === 'vice_resistance') {
         const vices = habits.filter(h => h.type === 'vice');
         if (vices.length === 0) return { success: false, msg: "Geen ondeugden gevonden om te weerstaan." };
-        const target = vices[Math.floor(Math.random() * vices.length)];
-        targetHabitId = target.id;
+
+        let target = vices.find(h => h.id === targetHabitId);
+        if (!target) {
+            target = vices[Math.floor(Math.random() * vices.length)];
+            targetHabitId = target.id;
+        }
         targetHabitText = target.text;
     }
 
@@ -868,18 +878,53 @@ export function getLoginStreak(loginHistory) {
  * @param {Array} habits 
  * @returns {number} Max streak found across all virtues
  */
-export function getVirtueStreak(habits) {
+export function getVirtueStreak(habits, targetHabitId = null, questStartTime = null) {
     let maxStreak = 0;
 
-    const virtues = habits.filter(h => h.type === 'virtue');
+    let virtues = habits.filter(h => h.type === 'virtue');
+    if (targetHabitId) {
+        virtues = virtues.filter(h => h.id === targetHabitId);
+        if (virtues.length > 0) {
+            DebugLogger.log('STREAK', `Checking Target Virtue: "${virtues[0].text}" (ID: ${virtues[0].id})`);
+        }
+    }
 
     virtues.forEach(v => {
         // History contains dates 'YYYY-MM-DD' when completed.
-        // Sort and count consecutive.
         if (!v.history || v.history.length === 0) return;
 
-        const sorted = [...v.history].sort((a, b) => new Date(b) - new Date(a));
+        // FILTER: Keep only dates >= questStartTime (if provided)
+        let filteredHistory = [...v.history];
+        if (questStartTime) {
+            const startYMD = questStartTime.split('T')[0];
+            filteredHistory = filteredHistory.filter(dateStr => dateStr >= startYMD);
+        }
+
+        if (filteredHistory.length === 0) return; // No progress since start
+
+        // EXCLUDE TODAY (Past-Only Logic)
+        const todayStr = new Date().toISOString().split('T')[0];
+        filteredHistory = filteredHistory.filter(d => d !== todayStr);
+
+        if (filteredHistory.length === 0) return; // No past completions
+
+        const sorted = filteredHistory.sort((a, b) => new Date(b) - new Date(a));
+
+        // STREAK RESET CHECK:
+        // The latest completion MUST be YESTERDAY to accept the streak as valid.
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        const lastDate = sorted[0];
+        if (lastDate !== yesterdayStr) {
+            // Streak broken (missed yesterday)
+            return;
+        }
+
         let currentStreak = 1;
+
+        // If single day, streak is 1. If more, count consecutive.
         let currentDate = new Date(sorted[0]);
 
         for (let i = 1; i < sorted.length; i++) {
@@ -908,37 +953,60 @@ export function getVirtueStreak(habits) {
  * @returns {number} Max resistance streak (capped at checking window, or just boolean effectively)
  * Actually return number of "Clean Green Days" in a row from now backwards.
  */
-export function getViceResistanceStreak(habits, loginHistory) {
+export function getViceResistanceStreak(habits, loginHistory, targetHabitId = null, questStartTime = null) {
     if (!habits || !loginHistory) return 0;
-    const vices = habits.filter(h => h.type === 'vice');
+
+    let vices = habits.filter(h => h.type === 'vice');
+    if (targetHabitId) {
+        vices = vices.filter(h => h.id === targetHabitId);
+        if (vices.length > 0) {
+            // DebugLogger.log('STREAK', `Checking Target Vice: "${vices[0].text}" (ID: ${vices[0].id})`);
+        }
+    }
     if (vices.length === 0) return 0;
 
     let maxResistance = 0;
     // ensure unique sorted descending
-    const sortedLogin = [...new Set(loginHistory)].sort((a, b) => new Date(b) - new Date(a));
+    let sortedLogin = [...new Set(loginHistory)].sort((a, b) => new Date(b) - new Date(a));
 
-    // If today is not in login history yet (edge case), add it essentially for calculation? 
-    // Or assume called after login.
+    // EXCLUDE TODAY from Vice Check (because the day isn't over, you might still fail)
+    const todayStr = new Date().toISOString().split('T')[0];
+    sortedLogin = sortedLogin.filter(d => d !== todayStr);
+
+    // FILTER: Keep only login dates >= questStartTime
+    if (questStartTime) {
+        const startYMD = questStartTime.split('T')[0];
+        sortedLogin = sortedLogin.filter(dateStr => dateStr >= startYMD);
+    }
+
+    if (sortedLogin.length === 0) {
+        // Special case: If quest started today, and we logged in today (implied), streak is 1 unless failed.
+        // But if loginHistory doesn't have today yet...
+        // Assuming loginHistory IS updated daily. If empty filtered, maybe 0.
+        // BUT logic usually wants at least 1 day to count.
+        return 0;
+    }
 
     vices.forEach(v => {
-        // 1. Check Age (Must exist > 3 days)
-        // Fallback to today if createdAt missing
-        const created = v.createdAt ? new Date(v.createdAt) : new Date();
-        const ageMsg = (new Date() - created) / (1000 * 60 * 60 * 24);
-        if (ageMsg < 3) return; // Too new
+        // 1. Check Age (Must exist > 3 days) -- DISABLE for Specific Quest?
+        // If user targets a NEW vice, they should be able to.
+        // Original logic: "Vice older than 3 days".
+        // Let's relaxation: If targetHabitId is specific, SKIP age check.
+
+        if (!targetHabitId) {
+            const created = v.createdAt ? new Date(v.createdAt) : new Date();
+            const ageMsg = (new Date() - created) / (1000 * 60 * 60 * 24);
+            if (ageMsg < 3) return; // Too new
+        }
 
         // 2. Check recent login days
-        // We look effectively at the last N login days.
         let resistanceStreak = 0;
 
         for (let dateStr of sortedLogin) {
             // Is vice completed on this day?
-            // Vice history contains date if DONE.
             if (v.history && v.history.includes(dateStr)) {
-                // Relapse! Streak ends.
-                break;
+                break; // Relapse
             } else {
-                // Clean day!
                 resistanceStreak++;
             }
         }

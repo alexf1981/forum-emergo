@@ -156,23 +156,15 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                                         >
                                             <Icons.Crown /> Admin
                                         </UnifiedButton>
+                                        {/* Row 2: Logic Tools */}
                                         <UnifiedButton
-                                            onClick={actions.adminTriggerNewDay}
+                                            onClick={actions.adminSimulateNewDay}
                                             variant="secondary"
                                             fullWidth
-                                            style={{ backgroundColor: '#e67e22', borderColor: '#d35400' }}
-                                            title="Trigger New Day"
+                                            style={{ backgroundColor: '#9b59b6', borderColor: '#8e44ad' }}
+                                            title="Simulate New Day (Advances Tasks & Streak)"
                                         >
-                                            <Icons.Sun />
-                                        </UnifiedButton>
-                                        <UnifiedButton
-                                            onClick={actions.adminAddLoginDay}
-                                            variant="secondary"
-                                            fullWidth
-                                            style={{ backgroundColor: '#16a085', borderColor: '#1abc9c' }}
-                                            title="Add Login Day to History (+1 Day Streak)"
-                                        >
-                                            <Icons.Calendar />
+                                            <Icons.FastForward size={20} /> <span style={{ marginLeft: '5px' }}>Next Day</span>
                                         </UnifiedButton>
                                     </>
                                 )}

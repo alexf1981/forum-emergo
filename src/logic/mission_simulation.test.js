@@ -318,6 +318,25 @@ describe('Full Mission Simulation (CLI Style)', () => {
         console.log("✅ Scenario 9: Invalid Completion Failure passed.");
     });
 
+    // --- SCENARIO 10: BUG REPRODUCTION - OLD SIGNATURE CALL ---
+    it('Scenario 10: Fails with "Missie niet gevonden" if habits arg is missing (Bug Repro)', () => {
+        let state = createNewState();
+        const questId = 'introspection'; // Valid quest
+
+        // Simulate incorrect call signature (Missing habits 4th arg)
+        // startQuest(quests, heroes, stats, habits, questId, selectedHeroIds) is correct.
+        // startQuest(quests, heroes, stats, questId, selectedHeroIds) is INCORRECT.
+
+        // @ts-ignore
+        const result = GameLogic.startQuest(state.quests, state.heroes, state.stats, questId, ['h1']);
+
+        // EXPECT FAILURE because arguments are shifted
+        expect(result.success).toBe(false);
+        expect(result.msg).toBe("Missie niet gevonden."); // This confirms the bug behavior
+
+        console.log("✅ Scenario 10: Bug Reproduced.");
+    });
+
     // --- ADDITIONAL: VERIFY INITIAL STATE ---
     it('Verify Initial State Cleanliness', () => {
         const state = GameLogic.getInitialState((s) => s);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import UnifiedModal from '../layout/UnifiedModal';
 import * as GameLogic from '../../logic/gameLogic';
@@ -9,11 +9,13 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
     const { t } = useLanguage();
     const [selectedQuestId, setSelectedQuestId] = useState(null);
     const [selectedHeroIds, setSelectedHeroIds] = useState([]);
+    const [selectedTargetHabit, setSelectedTargetHabit] = useState(null);
     const [showInspiration, setShowInspiration] = useState(false);
 
     // --- SECTIONS ---
-    const activeQuests = quests.filter(q => !q.completed);
-    const completedQuests = quests.filter(q => q.completed);
+    // --- SECTIONS ---
+    const activeQuests = useMemo(() => quests.filter(q => !q.completed), [quests]);
+    const completedQuests = useMemo(() => quests.filter(q => q.completed), [quests]);
 
     // Check if Tavern is built (used for hero requirements)
     const hasTavern = buildings.some(b => b.type === 'tavern');
@@ -68,14 +70,69 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
         });
     }, [heroes.length, hasTavern, activeQuests.length, availableTemplates.length]);
 
+    // --- OPTIMIZATION ---
+    // Calculate progress for all active quests ONCE per update, not on every render
+    const questProgressMap = useMemo(() => {
+        const map = {};
+        const QUEST_TEMPLATES = GameLogic.QUEST_TEMPLATES;
+
+        activeQuests.forEach(q => {
+            const template = QUEST_TEMPLATES.find(t => t.id === q.templateId);
+            if (!template) return;
+
+            // Only calculate progress for template types that need it
+            let introspectionProgress = "";
+            let isComplete = false;
+
+            if (q.templateId === 'introspection') {
+                const addedCount = habits.filter(h => {
+                    if (!h.createdAt) return false;
+                    return new Date(h.createdAt) > new Date(q.startTime);
+                }).length;
+                const target = template.target || 5;
+                introspectionProgress = t('quest_introspection_progress', { count: Math.min(addedCount, target), total: target });
+                isComplete = addedCount >= target;
+            }
+            else if (q.templateId === 'login_streak') {
+                const current = GameLogic.getLoginStreak(loginHistory);
+                const target = template.target || 5;
+                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
+                isComplete = current >= target;
+            }
+            else if (q.templateId === 'virtue_streak') {
+                const current = GameLogic.getVirtueStreak(habits, q.targetHabitId, q.startTime);
+                const target = template.target || 3;
+                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
+                isComplete = current >= target;
+            }
+            else if (q.templateId === 'vice_resistance') {
+                const current = GameLogic.getViceResistanceStreak(habits, loginHistory, q.targetHabitId, q.startTime);
+                const target = template.target || 3;
+                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
+                isComplete = current >= target;
+            }
+            else if (q.templateId === 'daily_productivity') {
+                const current = GameLogic.get24hTaskCount(habits, q.startTime);
+                const target = template.target || 5;
+                introspectionProgress = `${current} / ${target}`;
+                isComplete = current >= target;
+            }
+
+            map[q.id] = { introspectionProgress, isComplete };
+        });
+
+        return map;
+    }, [activeQuests, habits, loginHistory, t]);
+
     const handleStartQuest = () => {
         if (!selectedQuestId) return;
 
         // Update: Quest 0 now starts IMMEDIATELY -> moves to active section
-        actions.startQuest(selectedQuestId, selectedHeroIds);
+        actions.startQuest(selectedQuestId, selectedHeroIds, selectedTargetHabit?.id);
 
         setSelectedQuestId(null);
         setSelectedHeroIds([]);
+        setSelectedTargetHabit(null);
     };
 
     const handleCompleteQuest = (instanceId) => {
@@ -235,66 +292,28 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
 
                             // Special logic for specific missions
                             const isIntrospection = template.id === 'introspection';
-                            let introspectionProgress = "";
-                            let isComplete = false;
+                            // Optimized: Get pre-calculated progress
+                            const progressData = questProgressMap[q.id] || { introspectionProgress: "", isComplete: false };
+                            let { introspectionProgress, isComplete } = progressData;
 
-                            // Achievement Logic
-                            if (isIntrospection) {
-                                // Count habits created AFTER quest start
-                                const addedCount = habits.filter(h => {
-                                    if (!h.createdAt) return false;
-                                    return new Date(h.createdAt) > new Date(q.startTime);
-                                }).length;
 
-                                const target = 5;
-                                const progressText = t('quest_introspection_progress', { count: Math.min(addedCount, target), total: target });
-                                introspectionProgress = progressText;
-                                isComplete = addedCount >= target;
-                            }
-                            else if (template.id === 'login_streak') {
-                                const current = GameLogic.getLoginStreak(loginHistory);
-                                const target = template.target || 5;
-                                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
-                                isComplete = current >= target;
-                            }
-                            else if (template.id === 'virtue_streak') {
-                                const current = GameLogic.getVirtueStreak(habits);
-                                const target = template.target || 3;
-                                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
-                                isComplete = current >= target;
-                            }
-                            else if (template.id === 'vice_resistance') {
-                                const current = GameLogic.getViceResistanceStreak(habits, loginHistory);
-                                const target = template.target || 3;
-                                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
-                                isComplete = current >= target;
-                            }
-                            else if (template.id === 'daily_productivity') {
-                                const current = GameLogic.get24hTaskCount(habits, q.startTime);
-                                const target = template.target || 5;
 
-                                // Countdown Logic
+                            // Daily Productivity Timer (UI only)
+                            let timeRemaining = null;
+                            if (template.id === 'daily_productivity') {
                                 const start = new Date(q.startTime);
                                 const end = new Date(start.getTime() + (24 * 60 * 60 * 1000));
                                 const now = new Date();
-
-                                let timeText = "";
-                                if (now > end) {
-                                    timeText = t('expired') || "Verlopen";
+                                const diff = end - now;
+                                if (diff > 0) {
+                                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                    timeRemaining = `${hours}h ${mins}m`;
                                 } else {
-                                    const diffMs = end - now;
-                                    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-                                    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                                    timeText = `${diffHrs}u ${diffMins}m`;
+                                    timeRemaining = "0h 0m";
                                 }
+                            }
 
-                                const txt_tasks_completed = t('txt_tasks_completed') || 'taken afgerond';
-                                introspectionProgress = `${current} / ${target} ${txt_tasks_completed} (${timeText})`;
-                                isComplete = current >= target;
-                            }
-                            else {
-                                isComplete = false;
-                            }
 
                             return (
                                 <div key={q.id} className="quest-card active" style={{
@@ -470,7 +489,22 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
                                 <div key={template.id} className={`quest-card ${isSelected ? 'selected' : ''}`}
                                     onClick={() => {
                                         if (isLocked) return;
-                                        setSelectedQuestId(isSelected ? null : template.id);
+                                        if (isSelected) {
+                                            setSelectedQuestId(null);
+                                            setSelectedTargetHabit(null);
+                                        } else {
+                                            setSelectedQuestId(template.id);
+                                            // Auto-select target for habit quests
+                                            if (template.id === 'virtue_streak') {
+                                                const virtues = habits.filter(h => h.type === 'virtue');
+                                                if (virtues.length > 0) setSelectedTargetHabit(virtues[Math.floor(Math.random() * virtues.length)]);
+                                            } else if (template.id === 'vice_resistance') {
+                                                const vices = habits.filter(h => h.type === 'vice');
+                                                if (vices.length > 0) setSelectedTargetHabit(vices[Math.floor(Math.random() * vices.length)]);
+                                            } else {
+                                                setSelectedTargetHabit(null);
+                                            }
+                                        }
                                     }}
                                     style={{
                                         cursor: isLocked ? 'not-allowed' : 'pointer',
@@ -543,6 +577,13 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, logi
                                             overflow: 'hidden',
                                             wordBreak: 'break-word'
                                         }} onClick={e => e.stopPropagation()}>
+
+                                            {/* (NEW) Target Preview */}
+                                            {selectedTargetHabit && (
+                                                <div style={{ textAlign: 'center', marginBottom: '15px', padding: '10px', background: '#ecf0f1', borderRadius: '4px', borderLeft: '4px solid #3498db' }}>
+                                                    <strong>{t('lbl_target') || 'Doel'}:</strong> {selectedTargetHabit.text}
+                                                </div>
+                                            )}
 
                                             {/* Thematic Description */}
                                             <div style={{
