@@ -26,50 +26,51 @@ export const QUEST_TEMPLATES = [
         isTutorial: true
     },
     {
-        id: 'patrol',
-        type: 'duration',
-        durationDays: 1,
-        level: 2,
-        risk: 5,
-        name: 'quest_patrol_name',
-        desc: 'quest_patrol_desc',
-        flavor: 'quest_patrol_flavor',
-        rewards: { gold: 25, xp: 20 },
-        requirements: { minPower: 5 }
+        id: 'login_streak',
+        // Type 'passive' implies it auto-updates based on state, no "Start" button needed strictly speaking, 
+        // but for this game loop we might want to "Start" it to track it? 
+        // User asked for missions, let's keep them as quests you can complete.
+        type: 'achievement',
+        name: 'quest_login_streak_name',
+        desc: 'quest_login_streak_desc',
+        flavor: 'quest_login_streak_flavor',
+        requirements: { heroCount: 1 },
+        rewards: { gold: 250, xp: 250 },
+        target: 7, // 7 Days
+        durationDays: 7
     },
     {
-        id: 'inventory',
-        type: 'instant',
-        level: 2,
-        name: 'quest_inventory_name',
-        desc: 'quest_inventory_desc',
-        flavor: 'quest_inventory_flavor',
-        rewards: { gold: 15, xp: 10 },
-        requirements: { heroCount: 1 }
+        id: 'virtue_streak',
+        type: 'achievement',
+        name: 'quest_virtue_streak_name',
+        desc: 'quest_virtue_streak_desc',
+        flavor: 'quest_virtue_streak_flavor',
+        requirements: { heroCount: 1 },
+        rewards: { gold: 200, xp: 100 },
+        target: 3, // 3 Days
+        durationDays: 3
     },
     {
-        id: 'training',
-        type: 'duration',
-        durationDays: 1,
-        level: 2,
-        risk: 8,
-        name: 'quest_training_name',
-        desc: 'quest_training_desc',
-        flavor: 'quest_training_flavor',
-        rewards: { gold: 30, xp: 25 },
-        requirements: { minPower: 8 }
+        id: 'vice_resistance',
+        type: 'achievement',
+        name: 'quest_vice_resistance_name',
+        desc: 'quest_vice_resistance_desc',
+        flavor: 'quest_vice_resistance_flavor',
+        requirements: { heroCount: 1 },
+        rewards: { gold: 100, xp: 200 },
+        target: 3, // 3 Days
+        durationDays: 3
     },
     {
-        id: 'bandits',
-        type: 'duration',
-        durationDays: 1, // Simplified for MVP
-        level: 3,
-        risk: 20,
-        name: 'quest_bandits_name',
-        desc: 'quest_bandits_desc',
-        flavor: 'quest_bandits_flavor',
-        rewards: { gold: 60, xp: 50 },
-        requirements: { minPower: 20 }
+        id: 'daily_productivity',
+        type: 'achievement',
+        name: 'quest_daily_productivity_name',
+        desc: 'quest_daily_productivity_desc',
+        flavor: 'quest_daily_productivity_flavor',
+        requirements: { heroCount: 1 },
+        rewards: { gold: 50, xp: 50 },
+        target: 5, // 5 Tasks in 24h
+        durationDays: 1 // 1 Day (24h)
     }
 ];
 
@@ -790,3 +791,206 @@ export function completeQuest(quests, heroes, stats, questInstanceId) {
 
 
 
+
+// --- ACHIEVEMENT LOGIC HELPERS ---
+
+/**
+ * Calculates the current login streak based on login history.
+ * @param {Array<string>} loginHistory - Array of date strings (YYYY-MM-DD)
+ * @returns {number} Current streak in days
+ */
+export function getLoginStreak(loginHistory) {
+    if (!loginHistory || loginHistory.length === 0) return 0;
+
+    // Sort descending
+    const sorted = [...loginHistory].sort((a, b) => new Date(b) - new Date(a));
+    const today = getTodayString();
+
+    // Check if today is logged. If not, maybe yesterday was?
+    // If user hasn't logged in today yet (which is impossible if this code runs, but for robustness), 
+    // the streak continues from yesterday.
+    let streak = 0;
+
+    // Unique dates set to avoid double counting same day multiple logins
+    const uniqueDates = Array.from(new Set(sorted));
+
+    // If the most recent login is NOT today and NOT yesterday, streak is broken -> 0
+    // Wait, if I login today, uniqueDates[0] is today.
+    // If I didn't login today, uniqueDates[0] might be yesterday.
+
+    const lastLogin = uniqueDates[0];
+    const dLast = new Date(lastLogin);
+    const dToday = new Date(today);
+
+    const diffTime = Math.abs(dToday - dLast);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 1) {
+        // Gap of more than 1 day (e.g. Last login 2 days ago)
+        // Check if logic runs ON login? Assuming yes.
+        // If I run this function NOW, and I am logged in, today SHOULD be in history.
+        // If not (maybe history not updated yet), let's assume loose check.
+        return 0; // Streak broken
+    }
+
+    // Count consecutive days
+    // We start from the most recent date.
+    let currentDate = new Date(uniqueDates[0]);
+    streak = 1;
+
+    for (let i = 1; i < uniqueDates.length; i++) {
+        const prevDate = new Date(uniqueDates[i]);
+        const diff = (currentDate - prevDate) / (1000 * 60 * 60 * 24);
+
+        if (Math.round(diff) === 1) {
+            streak++;
+            currentDate = prevDate;
+        } else {
+            break;
+        }
+    }
+
+    return streak;
+}
+
+/**
+ * Checks for the max consecutive streak of ANY single virtue habit being completed.
+ * It counts consecutive days where the habit was completed.
+ * IMPORTANT: It only counts days where the user LOGGED IN (Green Days)??
+ * Wait, standard streak logic usually implies real days.
+ * But user said "Green Days" for Vices. For Virtues, usually it's "3 days in a row".
+ * Let's assume absolute days for Virtue to encourage daily play.
+ * @param {Array} habits 
+ * @returns {number} Max streak found across all virtues
+ */
+export function getVirtueStreak(habits) {
+    let maxStreak = 0;
+
+    const virtues = habits.filter(h => h.type === 'virtue');
+
+    virtues.forEach(v => {
+        // History contains dates 'YYYY-MM-DD' when completed.
+        // Sort and count consecutive.
+        if (!v.history || v.history.length === 0) return;
+
+        const sorted = [...v.history].sort((a, b) => new Date(b) - new Date(a));
+        let currentStreak = 1;
+        let currentDate = new Date(sorted[0]);
+
+        for (let i = 1; i < sorted.length; i++) {
+            const prev = new Date(sorted[i]);
+            const diff = (currentDate - prev) / (1000 * 60 * 60 * 24);
+
+            if (Math.round(diff) === 1) {
+                currentStreak++;
+                currentDate = prev;
+            } else {
+                break;
+            }
+        }
+        if (currentStreak > maxStreak) maxStreak = currentStreak;
+    });
+
+    return maxStreak;
+}
+
+/**
+ * Checks for Vice Resistance.
+ * Rule: A vice older than 3 days.
+ * AND: In the last 3 "Green Days" (days user logged in), the vice was NOT DONE.
+ * @param {Array} habits 
+ * @param {Array} loginHistory 
+ * @returns {number} Max resistance streak (capped at checking window, or just boolean effectively)
+ * Actually return number of "Clean Green Days" in a row from now backwards.
+ */
+export function getViceResistanceStreak(habits, loginHistory) {
+    if (!habits || !loginHistory) return 0;
+    const vices = habits.filter(h => h.type === 'vice');
+    if (vices.length === 0) return 0;
+
+    let maxResistance = 0;
+    // ensure unique sorted descending
+    const sortedLogin = [...new Set(loginHistory)].sort((a, b) => new Date(b) - new Date(a));
+
+    // If today is not in login history yet (edge case), add it essentially for calculation? 
+    // Or assume called after login.
+
+    vices.forEach(v => {
+        // 1. Check Age (Must exist > 3 days)
+        // Fallback to today if createdAt missing
+        const created = v.createdAt ? new Date(v.createdAt) : new Date();
+        const ageMsg = (new Date() - created) / (1000 * 60 * 60 * 24);
+        if (ageMsg < 3) return; // Too new
+
+        // 2. Check recent login days
+        // We look effectively at the last N login days.
+        let resistanceStreak = 0;
+
+        for (let dateStr of sortedLogin) {
+            // Is vice completed on this day?
+            // Vice history contains date if DONE.
+            if (v.history && v.history.includes(dateStr)) {
+                // Relapse! Streak ends.
+                break;
+            } else {
+                // Clean day!
+                resistanceStreak++;
+            }
+        }
+        if (resistanceStreak > maxResistance) maxResistance = resistanceStreak;
+    });
+
+    return maxResistance;
+}
+
+/**
+ * Count tasks completed within the 24h window of the quest (Start Date + Next Date).
+ * Since we don't have timestamps, we accept tasks from the start date and the day after.
+ * @param {Array} habits 
+ * @param {string} startTimeISO 
+ * @returns {number} Total tasks completed in the window
+ */
+export function get24hTaskCount(habits, startTimeISO) {
+    if (!startTimeISO) return 0;
+
+    const startDate = new Date(startTimeISO);
+    const startStr = startDate.toISOString().split('T')[0];
+
+    // Next day
+    const nextDate = new Date(startDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    const nextStr = nextDate.toISOString().split('T')[0];
+
+    let count = 0;
+    habits.forEach(h => {
+        if (h.history) {
+            // Count any entry that matches start date or next date
+            // Note: History entries might have '!' prefix for red days, but we want COMPLETED tasks.
+            // Usually history stores just date string for completion? 
+            // processHabitToggle pushes `dateString`.
+            // generateRandomHistory pushes `dateString` or `!dateString`.
+            // We assume 'virtue' or 'todo'.
+
+            // Logic: Count occurrences of startStr OR nextStr in history
+            const doneOnStart = h.history.includes(startStr);
+            const doneOnNext = h.history.includes(nextStr);
+
+            if (doneOnStart) count++;
+            if (doneOnNext) count++;
+        }
+    });
+    return count;
+}
+
+/**
+ * Generates regular quests (daily rotation)
+ * Picks 2 random achievement quests from the pool
+ */
+export const generateDailyQuests = () => {
+    // Pool of rotating missions (exclude tutorial 'introspection')
+    const pool = ['login_streak', 'virtue_streak', 'vice_resistance', 'daily_productivity'];
+
+    // Shuffle and pick 2
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 2);
+};

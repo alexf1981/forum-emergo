@@ -130,14 +130,25 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                             <UnifiedText variant="caption">{t('cloud_desc_user')} <strong>{user.email}</strong></UnifiedText>
                             <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                                 {isAdmin && (
-                                    <UnifiedButton
-                                        onClick={() => setShowAdmin(true)}
-                                        variant="secondary"
-                                        fullWidth
-                                        style={{ backgroundColor: '#8e44ad', borderColor: '#6c3483' }}
-                                    >
-                                        <Icons.Crown /> Admin
-                                    </UnifiedButton>
+                                    <>
+                                        <UnifiedButton
+                                            onClick={() => setShowAdmin(true)}
+                                            variant="secondary"
+                                            fullWidth
+                                            style={{ backgroundColor: '#8e44ad', borderColor: '#6c3483' }}
+                                        >
+                                            <Icons.Crown /> Admin
+                                        </UnifiedButton>
+                                        <UnifiedButton
+                                            onClick={actions.adminTriggerNewDay}
+                                            variant="secondary"
+                                            fullWidth
+                                            style={{ backgroundColor: '#e67e22', borderColor: '#d35400' }}
+                                            title="Trigger New Day"
+                                        >
+                                            <Icons.Sun />
+                                        </UnifiedButton>
+                                    </>
                                 )}
                                 <UnifiedButton
                                     onClick={handleLogout}

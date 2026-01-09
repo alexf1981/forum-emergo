@@ -5,35 +5,50 @@ import * as GameLogic from '../../logic/gameLogic';
 import Icons from '../Icons';
 import '../../css/adventure.css';
 
-const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) => {
+const AdventureView = ({ quests, heroes, stats, actions, buildings, habits, loginHistory, dailyQuestIds = [] }) => {
     const { t } = useLanguage();
     const [selectedQuestId, setSelectedQuestId] = useState(null);
     const [selectedHeroIds, setSelectedHeroIds] = useState([]);
     const [showInspiration, setShowInspiration] = useState(false);
 
-    // Filter Active Quests (Instances) vs Available Templates
-    const activeQuests = quests.filter(q => q.status === 'active');
+    // --- SECTIONS ---
+    const activeQuests = quests.filter(q => !q.completed);
+    const completedQuests = quests.filter(q => q.completed);
 
-    // Check if Tavern is built
-    const tavern = buildings.find(b => b.type === 'tavern');
-    const hasTavern = tavern && tavern.level > 0;
+    // Check if Tavern is built (used for hero requirements)
+    const hasTavern = buildings.some(b => b.type === 'tavern');
 
     // Check if Introspection (Quest 0) is completed
-    const isIntrospectionDone = quests.some(q => q.templateId === 'introspection' && q.status === 'completed');
+    const isIntrospectionDone = quests.some(q => q.templateId === 'introspection' && q.completed);
 
-    // Available Templates: 
-    // - Show if requirements met (level) or if it's Quest 0
-    // - Hide if unique and completed (e.g. Intro)
     const availableTemplates = GameLogic.QUEST_TEMPLATES.filter(template => {
-        // If tutorial/intro, hide if already active or completed
-        if (template.id === 'introspection') {
-            const isDone = quests.some(q => q.templateId === 'introspection' && q.status === 'completed');
-            const isActive = quests.some(q => q.templateId === 'introspection' && q.status === 'active');
+        // Only show quests that are NOT completed (unique quests logic)
+        // If we want repeatable quests later, we change this.
+        const isDone = completedQuests.some(q => q.templateId === template.id);
 
-            return !isDone && !isActive && hasTavern;
+        // Hide if already active (one instance allowed at a time)
+        const isActive = activeQuests.some(q => q.templateId === template.id);
+        if (isActive) return false;
+
+        // --- NEW: DAILY ROTATION FILTER ---
+        // If it's a daily legacy quest (not tutorial), check if it's in today's rotation
+        // Tutorial 'introspection' is always available if not done
+        if (template.id !== 'introspection') {
+            // If we have dailyQuestIds (meaning rotation is active), strict check
+            if (dailyQuestIds && dailyQuestIds.length > 0) {
+                if (!dailyQuestIds.includes(template.id)) return false;
+            }
         }
-        // Simplified: Show all others
-        return true;
+
+        // Hero Requirement
+        if (template.requirements?.heroCount) {
+            // Hide until player has tavern (and thus can implement heroes), unless they explicitly have heroes (legacy/edge case)
+            if (!hasTavern && heroes.length === 0) return false;
+
+            return !isDone;
+        }
+
+        return !isDone;
     });
 
     const handleStartQuest = () => {
@@ -196,11 +211,12 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                             const template = GameLogic.QUEST_TEMPLATES.find(t => t.id === q.templateId);
                             if (!template) return null;
 
-                            // Special logic for Introspection progress calculation
+                            // Special logic for specific missions
                             const isIntrospection = template.id === 'introspection';
                             let introspectionProgress = "";
                             let isComplete = false;
 
+                            // Achievement Logic
                             if (isIntrospection) {
                                 // Count habits created AFTER quest start
                                 const addedCount = habits.filter(h => {
@@ -212,7 +228,49 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                                 const progressText = t('quest_introspection_progress', { count: Math.min(addedCount, target), total: target });
                                 introspectionProgress = progressText;
                                 isComplete = addedCount >= target;
-                            } else {
+                            }
+                            else if (template.id === 'login_streak') {
+                                const current = GameLogic.getLoginStreak(loginHistory);
+                                const target = template.target || 5;
+                                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
+                                isComplete = current >= target;
+                            }
+                            else if (template.id === 'virtue_streak') {
+                                const current = GameLogic.getVirtueStreak(habits);
+                                const target = template.target || 3;
+                                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
+                                isComplete = current >= target;
+                            }
+                            else if (template.id === 'vice_resistance') {
+                                const current = GameLogic.getViceResistanceStreak(habits, loginHistory);
+                                const target = template.target || 3;
+                                introspectionProgress = `${current} / ${target} ${t('days') || 'dagen'}`;
+                                isComplete = current >= target;
+                            }
+                            else if (template.id === 'daily_productivity') {
+                                const current = GameLogic.get24hTaskCount(habits, q.startTime);
+                                const target = template.target || 5;
+
+                                // Countdown Logic
+                                const start = new Date(q.startTime);
+                                const end = new Date(start.getTime() + (24 * 60 * 60 * 1000));
+                                const now = new Date();
+
+                                let timeText = "";
+                                if (now > end) {
+                                    timeText = t('expired') || "Verlopen";
+                                } else {
+                                    const diffMs = end - now;
+                                    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                                    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                                    timeText = `${diffHrs}u ${diffMins}m`;
+                                }
+
+                                const txt_tasks_completed = t('txt_tasks_completed') || 'taken afgerond';
+                                introspectionProgress = `${current} / ${target} ${txt_tasks_completed} (${timeText})`;
+                                isComplete = current >= target;
+                            }
+                            else {
                                 isComplete = false;
                             }
 
@@ -266,7 +324,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
 
                                             {/* Progress Text */}
                                             <div style={{ color: '#e67e22', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                                                {isIntrospection ? introspectionProgress : (t('status_in_progress') || 'Bezig...')}
+                                                {introspectionProgress ? introspectionProgress : (t('status_in_progress') || 'Bezig...')}
                                             </div>
                                         </div>
 
@@ -278,7 +336,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                                                     <span>{template.requirements?.heroCount || 0}</span> <Icons.Arm width="16" height="16" />
                                                 </div>
                                                 <div title="Duur" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <span>{template.type === 'instant' ? t('duration_none') : `${template.durationDays}d`}</span> <Icons.Hourglass width="16" height="16" />
+                                                    <span>{template.id === 'daily_productivity' ? '24u' : (template.type === 'instant' ? t('duration_none') : `${template.durationDays}d`)}</span> <Icons.Hourglass width="16" height="16" />
                                                 </div>
                                             </div>
 
@@ -426,7 +484,7 @@ const AdventureView = ({ quests, heroes, stats, actions, buildings, habits }) =>
                                                     <span>{template.level > 0 ? `${template.level}+` : heroReq}</span> <Icons.Arm width="16" height="16" />
                                                 </div>
                                                 <div title="Duur" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <span>{template.type === 'instant' ? t('duration_none') : `${template.durationDays}d`}</span> <Icons.Hourglass width="16" height="16" />
+                                                    <span>{template.id === 'daily_productivity' ? '24u' : (template.type === 'instant' ? t('duration_none') : `${template.durationDays || '?'}d`)}</span> <Icons.Hourglass width="16" height="16" />
                                                 </div>
                                             </div>
 

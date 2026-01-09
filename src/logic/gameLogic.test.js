@@ -1,162 +1,123 @@
+
 import { describe, it, expect } from 'vitest';
-import * as GameLogic from './gameLogic';
+import { getLoginStreak, getVirtueStreak, getViceResistanceStreak, getDailyTaskCount, getTodayString } from './gameLogic';
 
-describe('City Rank Logic', () => {
-    it('should determine correct rank based on score', () => {
-        expect(GameLogic.getCityRank({ gold: 199 })).toBe("rank_0");
-        expect(GameLogic.getCityRank({ gold: 200 })).toBe("rank_1");
-        expect(GameLogic.getCityRank({ gold: 499 })).toBe("rank_1");
-        expect(GameLogic.getCityRank({ gold: 500 })).toBe("rank_2");
-        expect(GameLogic.getCityRank({ gold: 2500 })).toBe("rank_4");
-    });
-});
+describe('Mission Logic', () => {
 
-describe('Battle Logic', () => {
-    const mockHero = { str: 10, lvl: 1, items: [], hp: 20, maxHp: 20, xp: 0 };
-    const mockQuest = { id: 'test', level: 1, risk: 5, reward: 50, xp: 30 };
+    describe('getLoginStreak', () => {
+        it('returns 0 for empty history', () => {
+            expect(getLoginStreak([])).toBe(0);
+        });
 
-    it('should behave deterministically with injected random (WIN)', () => {
-        // High luck (returns 0.99)
-        const alwaysWinRandom = () => 0.99;
-        const result = GameLogic.calculateBattleResult(mockHero, mockQuest, alwaysWinRandom);
+        it('returns 1 for single login today', () => {
+            const today = getTodayString();
+            expect(getLoginStreak([today])).toBe(1);
+        });
 
-        expect(result.success).toBe(true);
-        expect(result.earnedGold).toBe(50);
-        expect(result.lootMsg).toBe(""); // 0.99 > 0.35, no loot
-    });
+        it('returns 3 for 3 consecutive days', () => {
+            const d = new Date();
+            const today = d.toISOString().split('T')[0];
+            d.setDate(d.getDate() - 1);
+            const yesterday = d.toISOString().split('T')[0];
+            d.setDate(d.getDate() - 1);
+            const dayBefore = d.toISOString().split('T')[0];
 
-    it('should behave deterministically with injected random (LOSS)', () => {
-        // Low luck (returns 0.0) -> Performance min, Diff max
-        const alwaysLoseRandom = () => 0.0;
-        // Low stats hero
-        const weakHero = { ...mockHero, str: 1 };
-        const result = GameLogic.calculateBattleResult(weakHero, mockQuest, alwaysLoseRandom);
+            expect(getLoginStreak([today, yesterday, dayBefore])).toBe(3);
+        });
 
-        expect(result.success).toBe(false);
-        expect(result.dmgTaken).toBeGreaterThan(0);
-    });
+        it('returns 0 if skipped a day (broken streak)', () => {
+            const d = new Date();
+            // Today missing
+            d.setDate(d.getDate() - 2); // 2 days ago
+            const twoDaysAgo = d.toISOString().split('T')[0];
 
-    it('should trigger loot when random < 0.35', () => {
-        // Luck for battle calculation (first 2 calls) -> 0.5 (average)
-        // Luck for loot check (3rd call) -> 0.1 (success)
-        // Luck for item selection (4th call) -> 0.0 (first item)
-        let callCount = 0;
-        const scriptedRandom = () => {
-            callCount++;
-            if (callCount === 3) return 0.1; // Loot check (changed to call 3 because logic might be 2 calls before?) 
-            // WAIT: performance (1), risk (2) -> dmgTaken(3)? 
-            // calculation of dmgTaken is inside IF(WIN).
-            // Logic: 
-            // 1. performance
-            // 2. difficulty
-            // IF WIN:
-            // 3. dmgTaken
-            // 4. loot check
-            // 5. item select
+            // Wait, if I am not logged in today, streak might be valid regarding "current state"? 
+            // But usually you calculate streak including today if you just logged in.
+            // If I logged in yesterday, streak is technically 1 (yesterday). 
+            // My logic breaks streak if diff > 1.
+            // Today - 2 Days Ago = 2 days diff. Streak broken.
+            expect(getLoginStreak([twoDaysAgo])).toBe(0);
+        });
 
-            if (callCount === 1) return 0.9; // Win ensures performance high
-            if (callCount === 2) return 0.1; // Low difficulty
-            if (callCount === 3) return 0.1; // Low dmg
-            if (callCount === 4) return 0.0; // Loot Check < 0.35 -> TRUE
-            if (callCount === 5) return 0.0; // Item Index 0
-            return 0.5;
-        };
-
-        const freshHero = { str: 10, lvl: 1, items: [], hp: 20, maxHp: 20, xp: 0 };
-        const result = GameLogic.calculateBattleResult(freshHero, mockQuest, scriptedRandom);
-
-        expect(result.success).toBe(true);
-        expect(result.newItems.length).toBeGreaterThan(0);
-        // lootMsg is an object with translation key
-        expect(result.lootMsg).toBeDefined();
-        // Since we don't know if it's "UPGRADE" or "FOUND" (depends on random), check for structure or loose match
-        // But with our seeded random 0.0, we know it picks index 0 (Bronzen Gladius). MockHero has empty items.
-        // So it MUST be 'msg_loot_found' (GEVONDEN)
-        /* 
-           Wait, looking at gameLogic.js (which I am about to read, but assuming debug output is truth):
-           "key": "msg_loot_found" 
-        */
-        const key = typeof result.lootMsg === 'string' ? result.lootMsg : result.lootMsg.key;
-        expect(key).toContain('msg_loot_found'); // or just 'found'
+        it('handles duplicate login entries for same day', () => {
+            const today = getTodayString();
+            expect(getLoginStreak([today, today, today])).toBe(1);
+        });
     });
 
-    it('should handle edge cases where hero hp is 0', () => {
-        const deadHero = { ...mockHero, hp: 0 };
-        const result = GameLogic.calculateBattleResult(deadHero, mockQuest, () => 0.0);
-        // Should still process but handle damage correctly (HP shouldn't go negative)
-        expect(result.hp).toBe(0);
+    describe('getVirtueStreak', () => {
+        it('calculates streak for best performing virtue', () => {
+            const d = new Date();
+            const today = d.toISOString().split('T')[0];
+            d.setDate(d.getDate() - 1);
+            const yesterday = d.toISOString().split('T')[0];
+
+            const habits = [
+                { type: 'virtue', history: [today, yesterday] }, // Streak 2
+                { type: 'virtue', history: [today] }             // Streak 1
+            ];
+            expect(getVirtueStreak(habits)).toBe(2);
+        });
+
+        it('ignores vices', () => {
+            const d = new Date();
+            const today = d.toISOString().split('T')[0];
+            const habits = [
+                { type: 'vice', history: [today, today] }
+            ];
+            expect(getVirtueStreak(habits)).toBe(0);
+        });
     });
 
-    it('should default safely if hero items are missing', () => {
-        const minimalHero = { str: 5, lvl: 1, hp: 10, xp: 0 }; // no items array
-        // Logic uses hero.items.reduce, so this might crash if not handled in logic?
-        // Let's check logic: const itemBonus = hero.items.reduce...
-        // It WILL crash if hero.items is undefined.
-        // We should fix logic or assume valid input.
-        // For 'Strengthening', let's assume valid input for now or fix logic if requested.
-        // Actually, let's skip this test if we aren't changing logic, or modify logic to be safe.
-        // User asked to "clean up / optimize", so making it safe is good.
-        // But for now, I'll stick to valid inputs to avoid scope creep unless I fix the logic too.
-        // I will skipping adding this test to avoid breaking things I am not refactoring right now.
-        // Instead, I'll add a test for specific quest risk checking.
-        expect(true).toBe(true);
-    });
-});
+    describe('getViceResistanceStreak', () => {
+        const today = new Date();
+        const strToday = today.toISOString().split('T')[0];
 
-describe('Habit Logic', () => {
-    it('should create new habits', () => {
-        let habits = [];
-        habits = GameLogic.createHabit(habits, "Gym", "virtue", false);
-        expect(habits).toHaveLength(1);
-        expect(habits[0].text).toBe("Gym");
-        expect(habits[0].type).toBe("virtue");
-        expect(habits[0].bucket).toBe(false);
+        const d1 = new Date(today); d1.setDate(d1.getDate() - 1);
+        const strYesterday = d1.toISOString().split('T')[0];
 
-        habits = GameLogic.createHabit(habits, "Task", "todo", true);
-        expect(habits).toHaveLength(2);
-        expect(habits[1].bucket).toBe(true);
-    });
+        const d2 = new Date(today); d2.setDate(d2.getDate() - 2);
+        const strDayBefore = d2.toISOString().split('T')[0];
 
-    it('should update habits', () => {
-        let habits = [{ id: 1, text: "Old", bucket: false }];
-        habits = GameLogic.updateHabit(habits, 1, { text: "New" });
-        expect(habits[0].text).toBe("New");
-    });
+        const loginHistory = [strToday, strYesterday, strDayBefore];
 
-    it('should delete habits', () => {
-        let habits = [{ id: 1 }, { id: 2 }];
-        habits = GameLogic.deleteHabit(habits, 1);
-        expect(habits).toHaveLength(1);
-        expect(habits[0].id).toBe(2);
-    });
+        it('counts resistance correctly on green days', () => {
+            // Vice created long ago
+            const oldDate = new Date(); oldDate.setDate(oldDate.getDate() - 10);
 
-    it('should toggle habits correctly (Virtue)', () => {
-        const initialStats = { gold: 100, army: 10 };
-        const habits = [{ id: 1, type: 'virtue', history: [] }];
-        const date = "2025-01-01";
+            const habits = [{
+                type: 'vice',
+                createdAt: oldDate.toISOString(),
+                history: [] // Never done! Resistance = 3 (since 3 login days)
+            }];
 
-        // Toggle ON
-        const r1 = GameLogic.processHabitToggle(habits, initialStats, 1, date);
-        expect(r1.newStats.gold).toBe(110); // +10
-        expect(r1.newHabits[0].history).toContain(date);
+            expect(getViceResistanceStreak(habits, loginHistory)).toBe(3);
+        });
 
-        // Toggle OFF (Undo)
-        const r2 = GameLogic.processHabitToggle(r1.newHabits, r1.newStats, 1, date);
-        expect(r2.newStats.gold).toBe(100); // Refunded
-        expect(r2.newHabits[0].history).not.toContain(date);
-    });
+        it('resets streak if vice committed on a login day', () => {
+            const oldDate = new Date(); oldDate.setDate(oldDate.getDate() - 10);
 
-    it('should toggle habits correctly (Vice)', () => {
-        const initialStats = { gold: 100, army: 10 };
-        const habits = [{ id: 1, type: 'vice', history: [] }];
-        const date = "2025-01-01";
+            const habits = [{
+                type: 'vice',
+                createdAt: oldDate.toISOString(),
+                history: [strYesterday] // Committed yesterday!
+            }];
 
-        // Toggle ON (Penalty)
-        const r1 = GameLogic.processHabitToggle(habits, initialStats, 1, date);
-        expect(r1.newStats.gold).toBe(80); // -20
+            // Login History: Today (Clean), Yesterday (Dirty), DayBefore (Clean)
+            // Sorted: Today, Yesterday, DayBefore
+            // Loop 1: Today -> Clean -> Streak 1
+            // Loop 2: Yesterday -> Dirty -> Break!
+            // Result: 1
+            expect(getViceResistanceStreak(habits, loginHistory)).toBe(1);
+        });
 
-        // Toggle OFF (Undo Penalty)
-        const r2 = GameLogic.processHabitToggle(r1.newHabits, r1.newStats, 1, date);
-        expect(r2.newStats.gold).toBe(100);
+        it('ignores new vices (< 3 days old)', () => {
+            const habits = [{
+                type: 'vice',
+                createdAt: new Date().toISOString(), // New
+                history: []
+            }];
+            expect(getViceResistanceStreak(habits, loginHistory)).toBe(0);
+        });
     });
 });

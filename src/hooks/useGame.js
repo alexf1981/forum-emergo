@@ -612,7 +612,12 @@ export function useGame() {
 
             // Admin
             adminSetGold,
-            adminResetCity
+            adminSetGold,
+            adminResetCity,
+            adminTriggerNewDay: () => {
+                setLastWelcomeDate("1970-01-01"); // Force mismatch with today
+                notify({ key: 'msg_admin_new_day' }, "success");
+            }
         },
         isLoggedIn: !!user,
         isNewUser, // NEW
