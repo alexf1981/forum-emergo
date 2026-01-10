@@ -1045,6 +1045,7 @@ export function get24hTaskCount(habits, startTimeISO) {
 
     let count = 0;
     habits.forEach(h => {
+        if (h.type === 'vice') return;
         if (h.history) {
             // Count any entry that matches start date or next date
             // Note: History entries might have '!' prefix for red days, but we want COMPLETED tasks.
