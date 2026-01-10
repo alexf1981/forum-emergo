@@ -146,9 +146,8 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                                     <>
                                         <UnifiedButton
                                             onClick={() => setShowAdmin(true)}
-                                            variant="secondary"
+                                            variant="primary"
                                             fullWidth
-                                            style={{ backgroundColor: '#8e44ad', borderColor: '#6c3483' }}
                                         >
                                             <Icons.Crown /> Admin
                                         </UnifiedButton>
@@ -158,9 +157,8 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                                                 onClose();
                                                 setTimeout(() => actions.adminSimulateNewDay(), 50); // Small delay to ensure modal close render cycle starts
                                             }}
-                                            variant="secondary"
+                                            variant="primary"
                                             fullWidth
-                                            style={{ backgroundColor: '#9b59b6', borderColor: '#8e44ad' }}
                                             title="Simulate New Day (Advances Tasks & Streak)"
                                         >
                                             <Icons.FastForward size={20} /> <span style={{ marginLeft: '5px' }}>Next Day</span>
@@ -237,7 +235,7 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                     <UnifiedButton
                         onClick={handleResetAccount}
                         variant="danger"
-                        size="sm"
+                        size="md"
                         style={{ backgroundColor: 'transparent', color: '#c0392b', border: 'none', boxShadow: 'none' }}
                         icon={<Icons.Trash />}
                     >

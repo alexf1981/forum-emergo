@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Icons from './Icons';
 import UnifiedModal from './layout/UnifiedModal';
+import UnifiedButton from './common/UnifiedButton';
 import { DebugLogger } from '../utils/DebugLogger';
 
 const DebugLogModal = ({ onClose }) => {
@@ -74,16 +75,16 @@ const DebugLogModal = ({ onClose }) => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', gap: '10px' }}>
-                <button className="btn" onClick={handleClear} style={{ backgroundColor: '#c0392b', borderColor: '#e74c3c' }}>
-                    <Icons.Trash style={{ marginRight: '5px' }} /> Clear
-                </button>
+                <UnifiedButton variant="danger" onClick={handleClear} icon={<Icons.Trash />}>
+                    Clear
+                </UnifiedButton>
                 <div style={{ display: 'flex', gap: '5px' }}>
-                    <button className="btn" onClick={handleCopySession} style={{ backgroundColor: '#f39c12', borderColor: '#e67e22', color: '#fff' }}>
+                    <UnifiedButton variant="primary" onClick={handleCopySession}>
                         Copy Session
-                    </button>
-                    <button className="btn" onClick={handleCopy} style={{ backgroundColor: '#27ae60', borderColor: '#2ecc71' }}>
+                    </UnifiedButton>
+                    <UnifiedButton variant="primary" onClick={handleCopy}>
                         Copy All
-                    </button>
+                    </UnifiedButton>
                 </div>
             </div>
         </UnifiedModal>

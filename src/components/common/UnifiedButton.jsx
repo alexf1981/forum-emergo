@@ -40,9 +40,9 @@ const UnifiedButton = ({
     // Color variants
     const variants = {
         primary: {
-            background: 'linear-gradient(to bottom, #f1c40f, #f39c12)',
-            color: '#2c3e50',
-            border: '1px solid #d35400',
+            background: 'linear-gradient(to bottom, #34495e, #2c3e50)', // Dark Blue Gradient
+            color: '#ffffff', // White text for contrast
+            border: '1px solid #1a252f',
             boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
         },
         secondary: {
