@@ -197,12 +197,15 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                             </div>
 
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                <UnifiedButton onClick={onLogin} variant="primary" style={{ flex: 2 }}>
-                                    {t('login_btn')} / {t('register_btn')}
+                                <UnifiedButton onClick={() => onLogin('login')} variant="primary" style={{ flex: 1 }}>
+                                    {t('login_btn')}
+                                </UnifiedButton>
+                                <UnifiedButton onClick={() => onLogin('register')} variant="primary" style={{ flex: 1 }}>
+                                    {t('register_btn')}
                                 </UnifiedButton>
                                 <UnifiedButton
                                     onClick={onLocalLogout}
-                                    variant="secondary"
+                                    variant="primary"
                                     style={{ flex: 1 }}
                                 >
                                     {t('logout')}

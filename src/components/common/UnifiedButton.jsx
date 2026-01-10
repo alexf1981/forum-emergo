@@ -69,11 +69,20 @@ const UnifiedButton = ({
         }
     };
 
+    // Standard Widths
+    const stdWidths = {
+        sm: '80px',
+        md: '140px',
+        lg: '200px'
+    };
+
     const computedStyle = {
         ...baseStyle,
         ...sizes[size],
         ...variants[variant],
-        // If it's an icon button, override padding from size if explicitly mostly just an icon
+        // Width Logic: FullWidth > Icon (Auto) > Standard Fixed Width
+        width: fullWidth ? '100%' : (variant === 'icon' ? 'auto' : stdWidths[size]),
+        // Icon override
         ...(variant === 'icon' ? { padding: '4px' } : {})
     };
 
@@ -84,9 +93,17 @@ const UnifiedButton = ({
             style={computedStyle}
             onClick={onClick}
             disabled={disabled}
+            title={typeof children === 'string' ? children : ''} // Tooltip for truncated text
         >
-            {icon && <span style={{ display: 'flex' }}>{icon}</span>}
-            {children}
+            {icon && <span style={{ display: 'flex', flexShrink: 0 }}>{icon}</span>}
+            <span style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%'
+            }}>
+                {children}
+            </span>
         </button>
     );
 };

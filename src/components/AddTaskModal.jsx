@@ -42,7 +42,7 @@ function AddTaskModal({ onClose, onAdd }) {
         <UnifiedModal
             isOpen={true}
             onClose={onClose}
-            title={<span style={{ fontSize: '0.65em' }}>{t('title_add_task')}</span>}
+            title={t('title_add_task')}
         >
             <div className="modal-body" style={{ padding: '0 20px 20px 20px' }}>
                 <div className="modal-form-group">

@@ -58,7 +58,7 @@ export const translations = {
         login_link: "Login here",
         login_success: "Logged in as",
         logout_success: "Logged out as",
-        reset_account_btn: "Reset Account",
+        reset_account_btn: "Reset",
         msg_confirm_reset: "Are you sure? ALL game data will be lost! This cannot be undone.",
 
         // Onboarding
@@ -388,7 +388,7 @@ export const translations = {
         btn_start_reign: "Begin Reign",
         msg_no_tavern_quests: "Missions unavailable. Recruit heroes first!",
         // AddTaskModal
-        title_add_task: "Add New Duty",
+        title_add_task: "New Duty",
         lbl_description: "Description",
         lbl_created: "Created on",
         lbl_virtue: "Virtue",
@@ -455,7 +455,7 @@ export const translations = {
         login_link: "Log hier in",
         login_success: "Ingelogd als",
         logout_success: "Uitgelogd als",
-        reset_account_btn: "Account Resetten",
+        reset_account_btn: "Reset",
         msg_confirm_reset: "Weet je het zeker? ALLE speldata gaat verloren! Dit kan niet ongedaan worden.",
 
         // Onboarding
@@ -768,7 +768,7 @@ export const translations = {
         btn_start_reign: "Start Regering",
         msg_no_tavern_quests: "Missies nog niet beschikbaar. Rekruteer eerst helden.",
         // AddTaskModal
-        title_add_task: "Nieuwe Plicht Toevoegen",
+        title_add_task: "Nieuwe Plicht",
         lbl_description: "Omschrijving",
         lbl_created: "Aangemaakt op",
         lbl_virtue: "Virtus",
@@ -835,7 +835,7 @@ export const translations = {
         login_link: "Entra aquí",
         login_success: "Conectado como",
         logout_success: "Desconectado como",
-        reset_account_btn: "Reiniciar Cuenta",
+        reset_account_btn: "Reiniciar",
         msg_confirm_reset: "¿Estás seguro? ¡Se perderán TODOS los datos! Esto no se puede deshacer.",
 
         // Onboarding (Spanish)
@@ -1174,7 +1174,7 @@ export const translations = {
         btn_start_reign: "Comenzar Reinado",
         msg_no_tavern_quests: "Misiones no disponibles. ¡Recluta héroes primero!",
         // AddTaskModal
-        title_add_task: "Añadir Nueva Tarea",
+        title_add_task: "Nueva Tarea",
         lbl_description: "Descripción",
         lbl_created: "Creado el",
         lbl_virtue: "Virtud",
@@ -1241,7 +1241,7 @@ export const translations = {
         login_link: "Hier einloggen",
         login_success: "Angemeldet als",
         logout_success: "Abgemeldet als",
-        reset_account_btn: "Konto zurücksetzen",
+        reset_account_btn: "Reset",
         msg_confirm_reset: "Bist du sicher? ALLE Spieldaten gehen verloren! Dies kann nicht rückgängig gemacht werden.",
 
         // Onboarding (German)
@@ -1474,7 +1474,7 @@ export const translations = {
         nav_adventure: "Abenteuer",
         msg_no_tavern_quests: "Noch keine Quests, baue zuerst eine Taverne und rekrutiere Helden.",
         // AddTaskModal
-        title_add_task: "Neue Pflicht Hinzufügen",
+        title_add_task: "Neue Pflicht",
         lbl_description: "Beschreibung",
         lbl_created: "Erstellt am",
         lbl_virtue: "Tugend (Virtus)",

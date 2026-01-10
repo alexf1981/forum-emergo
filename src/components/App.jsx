@@ -237,8 +237,8 @@ function App() {
                 onClose={() => setShowSettings(false)}
                 useRomanNumerals={useRomanNumerals}
                 toggleRomanNumerals={() => setUseRomanNumerals(prev => !prev)}
-                onLogin={() => {
-                    setAuthInitialMode('login');
+                onLogin={(mode = 'login') => {
+                    setAuthInitialMode(mode);
                     setAuthFromStart(false); // Normal login from settings
                     setShowAuthModal(true);
                 }}

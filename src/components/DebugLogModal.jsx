@@ -79,11 +79,11 @@ const DebugLogModal = ({ onClose }) => {
                     Clear
                 </UnifiedButton>
                 <div style={{ display: 'flex', gap: '5px' }}>
-                    <UnifiedButton variant="primary" onClick={handleCopySession}>
-                        Copy Session
+                    <UnifiedButton variant="primary" onClick={handleCopySession} icon={<Icons.Copy />}>
+                        Session
                     </UnifiedButton>
-                    <UnifiedButton variant="primary" onClick={handleCopy}>
-                        Copy All
+                    <UnifiedButton variant="primary" onClick={handleCopy} icon={<Icons.Copy />}>
+                        All
                     </UnifiedButton>
                 </div>
             </div>
