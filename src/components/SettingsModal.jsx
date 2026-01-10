@@ -31,7 +31,7 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
     const [showAdmin, setShowAdmin] = useState(false);
 
     if (showAdmin) {
-        return <AdminDashboard onClose={() => setShowAdmin(false)} actions={actions} />;
+        return <AdminDashboard onClose={onClose} actions={actions} />;
     }
 
     const handleLogout = async () => {
@@ -149,19 +149,9 @@ const SettingsModal = ({ onClose, useRomanNumerals, toggleRomanNumerals, onLogin
                                             variant="primary"
                                             fullWidth
                                         >
-                                            <Icons.Crown /> Admin
-                                        </UnifiedButton>
-                                        {/* Row 2: Logic Tools */}
-                                        <UnifiedButton
-                                            onClick={() => {
-                                                onClose();
-                                                setTimeout(() => actions.adminSimulateNewDay(), 50); // Small delay to ensure modal close render cycle starts
-                                            }}
-                                            variant="primary"
-                                            fullWidth
-                                            title="Simulate New Day (Advances Tasks & Streak)"
-                                        >
-                                            <Icons.FastForward size={20} /> <span style={{ marginLeft: '5px' }}>Next Day</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                                <Icons.Crown /> Admin
+                                            </div>
                                         </UnifiedButton>
                                     </>
                                 )}

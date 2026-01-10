@@ -90,31 +90,46 @@ const AdminDashboard = ({ onClose, actions }) => {
                         ⚡ {t('admin_god_mode')}
                     </UnifiedText>
 
-                    <div style={{ marginBottom: '15px' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem', cursor: 'pointer', background: editMode ? '#fff' : 'rgba(0,0,0,0.05)', padding: '4px 8px', borderRadius: '4px', color: '#000', fontWeight: 'bold', width: 'fit-content', border: '1px solid #ccc' }}>
-                            <input
-                                type="checkbox"
-                                checked={editMode}
-                                onChange={toggleEditMode}
-                            />
-                            {t('admin_edit_city')}
-                        </label>
-                    </div>
+                    {/* Checkbox removed */}
 
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        {/* 1. Next Day */}
                         <UnifiedButton
-                            variant="danger"
                             onClick={() => {
-                                if (window.confirm("Zeker weten? Alle gebouwen behalve Stadhuis worden gereset.")) { // TODO: Localize confirm
-                                    if (actions && actions.adminResetCity) actions.adminResetCity();
-                                    else alert("Action not found");
+                                if (actions && actions.adminSimulateNewDay) {
+                                    onClose();
+                                    setTimeout(() => actions.adminSimulateNewDay(), 50);
+                                } else {
+                                    alert("Action not found");
                                 }
                             }}
+                            variant="primary"
+                            title="Simulate New Day"
+                            style={{ width: 'fit-content' }}
                         >
-                            🏚️ {t('admin_evacuate')}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Icons.Sun /> {t('btn_next_day')}
+                            </div>
                         </UnifiedButton>
 
-                        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                        {/* 2. Set Gold */}
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                            <UnifiedButton
+                                variant="primary"
+                                onClick={() => {
+                                    const input = document.getElementById('adminGoldInput');
+                                    const val = input ? input.value : null;
+                                    if (val && actions && actions.adminSetGold) {
+                                        actions.adminSetGold(val);
+                                        input.value = ''; // Clear input
+                                    }
+                                    else if (!val) alert(t('admin_enter_amount'));
+                                    else alert("Action not found");
+                                }}
+                                style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
+                            >
+                                💰 {t('admin_set_gold')}
+                            </UnifiedButton>
                             <UnifiedInput
                                 type="number"
                                 placeholder={t('admin_enter_amount')}
@@ -122,19 +137,33 @@ const AdminDashboard = ({ onClose, actions }) => {
                                 style={{ width: '120px' }}
                                 containerStyle={{ marginBottom: 0 }}
                             />
-                            <UnifiedButton
-                                variant="primary"
-                                onClick={() => {
-                                    const val = document.getElementById('adminGoldInput').value;
-                                    if (val && actions && actions.adminSetGold) actions.adminSetGold(val);
-                                    else if (!val) alert("Vul een bedrag in");
-                                    else alert("Action not found");
-                                }}
-                                style={{ backgroundColor: '#f1c40f', borderColor: '#d4ac0d', color: '#000' }}
-                            >
-                                💰 {t('admin_set_gold')}
-                            </UnifiedButton>
                         </div>
+
+                        {/* 3. Reset City */}
+                        <UnifiedButton
+                            variant="danger"
+                            onClick={() => {
+                                if (window.confirm("Zeker weten? Alle gebouwen behalve Stadhuis worden gereset.")) {
+                                    if (actions && actions.adminResetCity) actions.adminResetCity();
+                                    else alert("Action not found");
+                                }
+                            }}
+                            style={{ width: 'fit-content' }}
+                        >
+                            🏚️ {t('admin_evacuate')}
+                        </UnifiedButton>
+
+                        {/* 4. Edit Mode Toggle */}
+                        <UnifiedButton
+                            variant={editMode ? "success" : "danger"}
+                            onClick={toggleEditMode}
+                            style={{ width: 'fit-content' }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {editMode ? <Icons.Unlock /> : <Icons.Lock />}
+                                {editMode ? t('admin_edit_active') : t('admin_locked')}
+                            </div>
+                        </UnifiedButton>
                     </div>
                 </div>
             </div>
