@@ -42,7 +42,7 @@ function AddTaskModal({ onClose, onAdd }) {
         <UnifiedModal
             isOpen={true}
             onClose={onClose}
-            title={<span style={{ fontSize: '0.85em' }}>{t('title_add_task')}</span>}
+            title={<span style={{ fontSize: '0.65em' }}>{t('title_add_task')}</span>}
         >
             <div className="modal-body" style={{ padding: '0 20px 20px 20px' }}>
                 <div className="modal-form-group">
@@ -102,7 +102,6 @@ function AddTaskModal({ onClose, onAdd }) {
                 </div>
 
                 <div className="modal-actions" style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
-                    <UnifiedButton variant="secondary" onClick={onClose}>{t('cancel').toUpperCase()}</UnifiedButton>
                     <UnifiedButton variant="primary" onClick={() => handleSubmit(null, true)}>{t('btn_ok_new').toUpperCase()}</UnifiedButton>
                     <UnifiedButton variant="primary" onClick={() => handleSubmit(null, false)}>OK</UnifiedButton>
                 </div>
