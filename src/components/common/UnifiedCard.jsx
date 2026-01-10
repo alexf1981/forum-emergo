@@ -39,8 +39,8 @@ const UnifiedCard = ({
     };
 
     const computedStyle = {
-        ...baseStyle,
-        ...variants[variant]
+        ...variants[variant],
+        ...baseStyle
     };
 
     return (

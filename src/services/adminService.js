@@ -14,14 +14,14 @@ export const AdminService = {
             // 1. Try fetching with new column
             const result1 = await supabase
                 .from('profiles')
-                .select('id, username, email, updated_at, language, last_sign_in_at');
+                .select('id, username, email, updated_at, language, last_sign_in_at, created_at');
 
             if (result1.error) {
                 console.warn("Admin fetch with last_sign_in_at failed, retrying without...", result1.error);
                 // 2. Fallback: fetch without new column
                 const result2 = await supabase
                     .from('profiles')
-                    .select('id, username, email, updated_at, language');
+                    .select('id, username, email, updated_at, language, created_at');
 
                 if (result2.error) throw result2.error;
                 profiles = result2.data;
@@ -40,16 +40,14 @@ export const AdminService = {
                 const games = gameData.find(g => g.id === p.id);
                 const gData = games?.data || {};
 
-                // Determine most recent activity
-                // 1. Prefer explicit last_sign_in_at from auth sync
-                let lastActiveDate = p.last_sign_in_at ? new Date(p.last_sign_in_at) : null;
+                // Determine most recent activity (Max of Login, Profile Update, Game Save)
+                const dates = [
+                    p.last_sign_in_at ? new Date(p.last_sign_in_at) : new Date(0),
+                    p.updated_at ? new Date(p.updated_at) : new Date(0),
+                    games?.updated_at ? new Date(games.updated_at) : new Date(0)
+                ];
 
-                if (!lastActiveDate) {
-                    const profileDate = p.updated_at ? new Date(p.updated_at) : new Date(0);
-                    const gameDate = games?.updated_at ? new Date(games.updated_at) : new Date(0);
-                    // Pick the latest date from update times
-                    lastActiveDate = profileDate > gameDate ? profileDate : gameDate;
-                }
+                const lastActiveDate = new Date(Math.max(...dates));
 
                 // If year is 1970, it means no data found
                 const lastActiveStr = lastActiveDate.getFullYear() === 1970
@@ -62,9 +60,11 @@ export const AdminService = {
                     email: p.email || '-',
                     language: p.language || 'en',
                     lastActive: lastActiveStr,
+                    createdAt: p.created_at ? new Date(p.created_at).toLocaleDateString() : '-',
                     gold: gData.romestats?.gold || 0,
-                    population: gData.romestats?.pop || 0,
-                    army: gData.romestats?.army || 0,
+                    buildings: Array.isArray(gData.romebuildings) ? gData.romebuildings : [],
+                    heroes: Array.isArray(gData.romeheroes) ? gData.romeheroes : [],
+                    research: gData.romeresearch || {},
                     score: calculateScore(gData.romestats)
                 };
             });

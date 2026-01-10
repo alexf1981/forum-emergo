@@ -8,11 +8,13 @@ import { useLanguage } from '../context/LanguageContext';
 import UnifiedButton from './common/UnifiedButton';
 import UnifiedText from './common/UnifiedText';
 import UnifiedInput from './common/UnifiedInput';
+import UnifiedCard from './common/UnifiedCard';
 
 const AdminDashboard = ({ onClose, actions }) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(localStorage.getItem('CITY_EDIT_MODE') === 'true');
+    const [expandedId, setExpandedId] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -54,43 +56,11 @@ const AdminDashboard = ({ onClose, actions }) => {
             title={t('admin_header')} // "Keizerrijk" / "Empire"
         >
             <div style={{ padding: '10px' }}>
-                {loading ? <UnifiedText>{t('admin_loading')}</UnifiedText> : (
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
-                            <thead>
-                                <tr style={{ borderBottom: '2px solid #ccc' }}>
-                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_user')}</UnifiedText></th>
-                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_email')}</UnifiedText></th>
-                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_language')}</UnifiedText></th>
-                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('gold')}</UnifiedText></th>
-                                    <th style={{ padding: '10px' }}><UnifiedText variant="caption" uppercase>{t('lbl_last_seen')}</UnifiedText></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map(u => (
-                                    <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
-                                        <td style={{ padding: '10px' }}><UnifiedText>{u.username}</UnifiedText></td>
-                                        <td style={{ padding: '10px' }}><UnifiedText>{u.email}</UnifiedText></td>
-                                        <td style={{ padding: '10px' }}>{renderLanguage(u.language)}</td>
-                                        <td style={{ padding: '10px' }}><UnifiedText>{u.gold}</UnifiedText></td>
-                                        <td style={{ padding: '10px' }}><UnifiedText variant="caption">{u.lastActive}</UnifiedText></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-                <div className="modal-actions" style={{ marginTop: '20px' }}>
-                    <UnifiedButton onClick={loadData}>{t('admin_refresh')}</UnifiedButton>
-                </div>
-
                 {/* CHEAT ACTIONS */}
-                <div style={{ padding: '15px', borderTop: '1px solid #ddd', marginTop: '15px' }}>
+                <div style={{ padding: '15px', borderBottom: '1px solid #ddd', marginBottom: '15px' }}>
                     <UnifiedText variant="h2" color="danger" style={{ fontSize: '1rem', marginTop: 0 }}>
                         ⚡ {t('admin_god_mode')}
                     </UnifiedText>
-
-                    {/* Checkbox removed */}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                         {/* 1. Next Day */}
@@ -166,6 +136,73 @@ const AdminDashboard = ({ onClose, actions }) => {
                         </UnifiedButton>
                     </div>
                 </div>
+
+                {loading ? <UnifiedText>{t('admin_loading')}</UnifiedText> : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {users.map(u => (
+                            <UnifiedCard key={u.id} padding="10px" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backgroundImage: 'none', border: '1px solid #ccc' }}>
+                                {/* Header */}
+                                <div
+                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                                    onClick={() => setExpandedId(expandedId === u.id ? null : u.id)}
+                                >
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <UnifiedText style={{ fontWeight: 'bold' }}>{u.email}</UnifiedText>
+                                        <UnifiedText variant="caption">{t('lbl_last_seen')}: {u.lastActive}</UnifiedText>
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', color: '#8E1600' }}>
+                                        <Icons.Menu />
+                                    </div>
+                                </div>
+
+                                {/* Expanded Details */}
+                                {expandedId === u.id && (
+                                    <div style={{ marginTop: '15px', paddingTop: '10px', borderTop: '1px solid #d4c5a3', fontSize: '0.9rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                                            <div><strong>{t('lbl_user')}:</strong> {u.username}</div>
+                                            <div><strong>{t('lbl_created')}:</strong> {u.createdAt}</div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <strong>{t('lbl_language')}:</strong> {renderLanguage(u.language)}
+                                            </div>
+                                            <div><strong>{t('gold')}:</strong> {u.gold}</div>
+                                            <div><strong>Heroes:</strong> {u.heroes.length}</div>
+                                        </div>
+
+                                        {/* Buildings */}
+                                        <div style={{ marginTop: '10px' }}>
+                                            <UnifiedText variant="caption" style={{ fontWeight: 'bold' }}>Buildings</UnifiedText>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', fontSize: '0.8rem' }}>
+                                                {u.buildings && u.buildings.length > 0 ? u.buildings.map(b => (
+                                                    <span key={b.id} style={{ background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                                                        {b.id}: {b.level}
+                                                    </span>
+                                                )) : <span>-</span>}
+                                            </div>
+                                        </div>
+
+                                        {/* Research */}
+                                        <div style={{ marginTop: '10px' }}>
+                                            <UnifiedText variant="caption" style={{ fontWeight: 'bold' }}>Research</UnifiedText>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', fontSize: '0.8rem' }}>
+                                                {u.research && Object.keys(u.research).length > 0 ? Object.entries(u.research).map(([key, val]) => (
+                                                    <span key={key} style={{ background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                                                        {key}: {typeof val === 'object' ? val.level : val}
+                                                    </span>
+                                                )) : <span>-</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </UnifiedCard>
+                        ))}
+                    </div>
+                )}
+                <div className="modal-actions" style={{ marginTop: '20px' }}>
+                    <UnifiedButton onClick={loadData}>{t('admin_refresh')}</UnifiedButton>
+                </div>
+
+
             </div>
         </UnifiedModal>
     );
