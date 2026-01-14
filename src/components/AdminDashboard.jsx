@@ -10,6 +10,54 @@ import UnifiedText from './common/UnifiedText';
 import UnifiedInput from './common/UnifiedInput';
 import UnifiedCard from './common/UnifiedCard';
 
+// Helper Component for Inline Gold Editing
+const GoldEditor = ({ userId, initialGold }) => {
+    const [gold, setGold] = useState(initialGold);
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+
+    useEffect(() => {
+        setGold(initialGold);
+    }, [initialGold]);
+
+    const handleBlur = async () => {
+        if (parseInt(gold) === parseInt(initialGold)) return;
+        setSaving(true);
+        setSaved(false);
+        const result = await AdminService.updateUserGold(userId, gold);
+        setSaving(false);
+        if (result.success) {
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+        }
+    };
+
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <strong>Gold:</strong>
+            <UnifiedInput
+                type="number"
+                value={gold}
+                onChange={(e) => setGold(e.target.value)}
+                onBlur={handleBlur}
+                disabled={saving}
+                style={{
+                    padding: '4px 8px',
+                    width: '120px',
+                    fontSize: '0.9rem',
+                    border: saved ? '2px solid #27ae60' : (saving ? '2px solid #f39c12' : '1px solid #d4c5a3'),
+                    backgroundColor: saved ? '#e8f8f5' : '#fff'
+                }}
+                containerStyle={{ marginBottom: 0 }}
+                min="0"
+                max="1000000"
+            />
+            {saving && <span title="Saving...">💾</span>}
+            {saved && <span title="Saved">✅</span>}
+        </div>
+    );
+};
+
 const AdminDashboard = ({ onClose, actions }) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -165,7 +213,7 @@ const AdminDashboard = ({ onClose, actions }) => {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                                                 <strong>{t('lbl_language')}:</strong> {renderLanguage(u.language)}
                                             </div>
-                                            <div><strong>{t('gold')}:</strong> {u.gold}</div>
+                                            <GoldEditor userId={u.id} initialGold={u.gold} />
                                             <div><strong>Heroes:</strong> {u.heroes.length}</div>
                                         </div>
 

@@ -75,6 +75,41 @@ export const AdminService = {
             console.error('Admin fetch error:', error);
             return [];
         }
+    },
+
+    async updateUserGold(userId, newGold) {
+        try {
+            // 1. Fetch current game data
+            const { data: currentData, error: fetchError } = await supabase
+                .from('game_data')
+                .select('data')
+                .eq('id', userId)
+                .single();
+
+            if (fetchError) throw fetchError;
+
+            let gameData = currentData.data || {};
+            if (!gameData.romestats) gameData.romestats = {};
+
+            // 2. Update Gold
+            gameData.romestats.gold = parseInt(newGold, 10);
+
+            // 3. Save back
+            const { error: updateError } = await supabase
+                .from('game_data')
+                .update({
+                    data: gameData,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+            return { success: true };
+
+        } catch (error) {
+            console.error('Admin update gold error:', error);
+            return { success: false, error };
+        }
     }
 };
 
